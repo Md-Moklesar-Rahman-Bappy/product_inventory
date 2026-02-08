@@ -22,6 +22,7 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+
         $perPage = $request->input('per_page', 10);
         $search  = $request->input('search');
         $status  = $request->input('warranty_status');
@@ -41,6 +42,9 @@ class ProductController extends Controller
         $query->orderBy('created_at', 'desc');
 
         $products = $query->paginate($perPage)->withQueryString();
+        return view('products.index', compact('products'));
+
+        $products = Cache::remember('products', 60, fn() => Product::all());
         return view('products.index', compact('products'));
     }
     public function create()
@@ -84,6 +88,8 @@ class ProductController extends Controller
         );
 
         return redirect()->route('products.index')->with('success', 'Product created successfully');
+
+        Cache::forget('products');
     }
     public function show(int $id)
     {
@@ -146,6 +152,8 @@ class ProductController extends Controller
             '<span class="text-primary fw-bold">Updated</span> product: <strong>' . $product->product_name . '</strong><br>Serial No: <code>' . $product->serial_no . '</code><br>Changes: ' . $changedFields
         );
         return redirect()->route('products.index')->with('success', 'Product updated successfully');
+
+        Cache::forget('products');
     }
     public function destroy(int $id)
     {
@@ -177,6 +185,8 @@ class ProductController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('products.index')->with('error', 'Failed to delete product: ' . $e->getMessage());
         }
+
+        Cache::forget('products');
     }
     public function export(Request $request)
     {
