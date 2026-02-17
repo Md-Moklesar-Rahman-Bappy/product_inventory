@@ -143,12 +143,12 @@ class Product extends Model
     // ──────── Warranty Date Accessors ─────────
     public function getWarrantyStartDateAttribute()
     {
-        return optional($this->warranty_start)->format('Y-m-d');
+        return optional($this->warranty_start)->format('m/d/Y');
     }
 
     public function getWarrantyEndDateAttribute()
     {
-        return optional($this->warranty_end)->format('Y-m-d');
+        return optional($this->warranty_end)->format('m/d/Y');
     }
 
     public function getWarrantyEndTooltipAttribute()

@@ -33,7 +33,7 @@ use App\Models\{
 // 🌐 Public Routes
 Route::view('/', 'auth.login')->name('login');
 
-// ✅ Public Email Verification Route (No login required)
+// ✅ Public Email Verification Route
 Route::get('/verify-email/{id}/{hash}', function ($id, $hash) {
     $user = User::findOrFail($id);
 
@@ -48,7 +48,6 @@ Route::get('/verify-email/{id}/{hash}', function ($id, $hash) {
         if ($user->shouldSendCredentials()) {
             try {
                 $password = Crypt::decryptString($user->initial_password);
-
                 $user->notify(new SendCredentialsNotification($password));
 
                 $user->update([
@@ -81,10 +80,8 @@ Route::controller(AuthController::class)->group(function () {
 // 🔐 Authenticated Routes
 Route::middleware(['auth'])->group(function () {
 
-    // 📧 Show verification notice
+    // 📧 Email verification notice + resend
     Route::get('/email/verify', fn() => view('auth.verify'))->name('verification.notice');
-
-    // 🔁 Resend verification email
     Route::post('/email/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
         return back()->with('message', '📧 Verification link sent!');
@@ -92,32 +89,30 @@ Route::middleware(['auth'])->group(function () {
 
     // 📊 Dashboard
     Route::get('dashboard', function () {
-    $logs = ActivityLog::with('user')->latest()->paginate(10);
+        $logs = ActivityLog::with('user')->latest()->paginate(10);
 
-    $entityCounts = [
-        'Categories' => Category::count(),
-        'Brands'     => Brand::count(),
-        'Models'     => AssetModel::count(),
-        'Products'   => Product::count(),
-        'Maintenance' => Maintenance::count(),
-        'Warranty'    => Product::whereNotNull('warranty_end')->count(),
-    ];
+        $entityCounts = [
+            'Categories'  => Category::count(),
+            'Brands'      => Brand::count(),
+            'Models'      => AssetModel::count(),
+            'Products'    => Product::count(),
+            'Maintenance' => Maintenance::count(),
+            'Warranty'    => Product::whereNotNull('warranty_end')->count(),
+        ];
 
-    $now = Carbon::now();
-    $soon = $now->copy()->addDays(30);
+        $now = Carbon::now();
+        $soon = $now->copy()->addDays(30);
 
-    $warrantyBreakdown = [
-        'Active'        => Product::where('warranty_end', '>', $soon)->count(),
-        'Expiring Soon' => Product::whereBetween('warranty_end', [$now, $soon])->count(),
-        'Expired'       => Product::where('warranty_end', '<', $now)->count(),
-    ];
+        $warrantyBreakdown = [
+            'Active'        => Product::where('warranty_end', '>', $soon)->count(),
+            'Expiring Soon' => Product::whereBetween('warranty_end', [$now, $soon])->count(),
+            'Expired'       => Product::where('warranty_end', '<', $now)->count(),
+        ];
 
-    return view('dashboard', compact('logs', 'entityCounts', 'warrantyBreakdown'));
-})->name('dashboard');
+        return view('dashboard', compact('logs', 'entityCounts', 'warrantyBreakdown'));
+    })->name('dashboard');
 
-
-
-    // 👤 Users (Superadmin only)
+    // 👤 Users
     Route::resource('users', UserController::class);
     Route::post('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
     Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
@@ -141,18 +136,32 @@ Route::middleware(['auth'])->group(function () {
     Route::post('models/{id}/restore', [AssetModelController::class, 'restore'])->name('models.restore');
     Route::delete('models/{id}/force-delete', [AssetModelController::class, 'forceDelete'])->name('models.forceDelete');
 
-    // 📦 Products
-    Route::resource('products', ProductController::class);
-    Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
-    Route::post('products/import', [ProductController::class, 'import'])->name('products.import');
+    // 📦 Products Import/Export grouped
+    Route::prefix('products')->group(function () {
+        // Sample CSV download
+        Route::get('sample', [ProductController::class, 'downloadSample'])->name('products.sample');
 
-    Route::prefix('products/export')->group(function () {
-        Route::get('excel', [ProductController::class, 'exportExcel'])->name('products.export.excel');
-        Route::get('category-wise', [ProductController::class, 'exportCategoryWise'])->name('products.export.category');
-        Route::get('brand-wise/{id}', [ProductController::class, 'exportBrandWise'])->name('products.export.brand');
-        Route::get('model-wise/{id}', [ProductController::class, 'exportModelWise'])->name('products.export.model');
+        // Import products
+        Route::post('import', [ProductController::class, 'import'])->name('products.import');
+
+        // 🚨 New route for exporting skipped rows
+        Route::get('skipped/export', [ProductController::class, 'exportSkippedRows'])->name('products.skipped.export');
+
+        // 🚨 New route for clearing skipped rows
+        Route::post('skipped/clear', [ProductController::class, 'clearSkippedRows'])->name('products.skipped.clear');
+
+        // Export products
+        Route::prefix('export')->group(function () {
+            Route::get('excel', [ProductController::class, 'exportExcel'])->name('products.export.excel');
+            Route::get('category-wise', [ProductController::class, 'exportCategoryWise'])->name('products.export.category');
+            Route::get('brand-wise/{id}', [ProductController::class, 'exportBrandWise'])->name('products.export.brand');
+            Route::get('model-wise/{id}', [ProductController::class, 'exportModelWise'])->name('products.export.model');
+        });
     });
 
+    // 📦 Products resource routes
+    Route::resource('products', ProductController::class);
+    Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
     Route::delete('products/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete');
 
     // 🛠️ Maintenance

@@ -12,37 +12,40 @@ class ProductExport implements FromCollection, WithHeadings
     {
         return Product::with(['category', 'brand', 'model'])->get()->map(function ($product) {
             return [
-                    $product->product_name,
-                    '৳ ' . number_format($product->price, 2),
-                    $product->category?->category_name,
-                    $product->brand?->brand_name,
-                    $product->model?->model_name,
-                    $product->serial_no,
-                    $product->project_serial_no,
-                    $product->position,
-                    $product->user_description,
-                    $product->remarks,
-                    $product->warranty_start,
-                    $product->warranty_end,
-                ];
+                'product_name'      => $product->product_name,
+                // Export plain numeric price for easier re-import
+                'price'             => $product->price,
+                'category'          => $product->category?->category_name,
+                'brand'             => $product->brand?->brand_name,
+                'model'             => $product->model?->model_name,
+                'serial_no'         => $product->serial_no,
+                'project_serial_no' => $product->project_serial_no,
+                'position'          => $product->position,
+                // Clean up newlines so CSV/XLSX stays tidy
+                'user_description'  => str_replace(["\r", "\n"], ' ', $product->user_description),
+                'remarks'           => str_replace(["\r", "\n"], ' ', $product->remarks),
+                // Format warranty dates for readability
+                'warranty_start'    => optional($product->warranty_start)->format('m/d/Y'),
+                'warranty_end'      => optional($product->warranty_end)->format('m/d/Y'),
+            ];
         });
     }
 
     public function headings(): array
     {
         return [
-                'Product Name',
-                'Price',
-                'Category',
-                'Brand',
-                'Model',
-                'Serial No',
-                'Project Serial No',
-                'Position',
-                'User Description',
-                'Remarks',
-                'Warranty Start',
-                'Warranty End',
-            ];
+            'product_name',
+            'price',
+            'category',
+            'brand',
+            'model',
+            'serial_no',
+            'project_serial_no',
+            'position',
+            'user_description',
+            'remarks',
+            'warranty_start',
+            'warranty_end',
+        ];
     }
 }

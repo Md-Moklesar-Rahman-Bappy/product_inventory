@@ -21,82 +21,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 🧭 docs/ Folder Structure
-Create a folder named docs/ with the following structure:
-
+Here’s a suggested structure for your documentation folder:
 docs/
 ├── ui-guidelines.md
+├── screenshots/
+│   ├── dashboard.png
+│   ├── product-form.png
+│   └── empty-state.png
 ├── architecture.md
-├── changelog.md
-└── screenshots/
-├── dashboard.png
-├── product-form.png
-└── empty-state.png
+└── changelog.md
 
-# 🎨 UI Guidelines
+# UI Guidelines
 
-This dashboard follows a vibrant, consistent design language focused on clarity, accessibility, and user delight.
+This dashboard follows a vibrant, consistent design language focused on clarity and user delight.
 
----
+## 🎨 Design Principles
 
-## ✨ Design Principles
+- Gradient buttons with hover effects
+- Font Awesome icons for actions
+- Tooltips for clarity and accessibility
+- Empty states with illustrations and friendly messages
+- Consistent spacing, padding, and visual hierarchy
 
--   **Gradient buttons** with hover transitions for visual feedback
--   **Font Awesome icons** for intuitive actions and navigation
--   **Tooltips** for clarity and accessibility across all interactive elements
--   **Empty states** with illustrations and friendly messages to guide users
--   **Consistent spacing**, padding, and visual hierarchy for readability
+## 📦 Components
 
----
-
-## 📦 Reusable Components
-
-| Component      | Purpose                                     |
-| -------------- | ------------------------------------------- |
-| `x-button`     | Gradient-styled button with icon support    |
-| `x-alert`      | Feedback messages with contextual styling   |
-| `x-form-group` | Input wrapper with label, icon, and errors  |
-| `x-badge`      | Status indicators with color-coded feedback |
-| `x-modal`      | Reusable modal with header and slots        |
-
----
+- `x-button`: Reusable button with gradient styling
+- `x-alert`: Feedback messages with icons
+- `x-form-group`: Input wrapper with label and validation
 
 ## 📱 Responsiveness
 
--   Built with **Bootstrap 5** grid system
--   Mobile-first layout with collapsible sidebar
--   Tables collapse gracefully on smaller screens
--   Forms stack vertically for readability
--   Charts resize dynamically using Chart.js
+- Mobile-first layout using Bootstrap grid
+- Tables collapse gracefully on smaller screens
+- Forms stack vertically for readability
 
----
-
-## 🖼️ Screenshots
-
-| View         | Preview                        |
-| ------------ | ------------------------------ |
-| Dashboard    | `screenshots/dashboard.png`    |
-| Product Form | `screenshots/product-form.png` |
-| Empty State  | `screenshots/empty-state.png`  |
-
----
-
-## 🧠 UX Enhancements
-
--   **Animated cards** using Animate.css for joyful transitions
--   **Badges** with rounded-pill styling for entity counts
--   **Real-time feedback** using Toastr or Blade alerts
--   **Accessible color contrast** and semantic HTML
-
----
-
-## 🧼 Best Practices
-
--   Use Blade components for all reusable UI
--   Avoid inline styles — use utility classes
--   Keep forms and tables keyboard-accessible
--   Use `aria-labels` and `role` attributes where needed
-
----
-
-Crafted with ❤️ by Md Moklesar Rahman  
-Inspired by joyful UI and ethical Laravel architecture
+  
