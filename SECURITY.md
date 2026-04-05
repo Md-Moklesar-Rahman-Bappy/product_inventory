@@ -16,7 +16,7 @@ We provide security updates for the following versions:
 If you discover a security vulnerability in this repository:
 
 - **Do not** open a public issue.
-- Please report it privately via email: [security@example.com]  
+- Please report it privately via email: [risingbappy1@gmail.com]  
   (replace with your actual contact address).
 - Include:
   - A clear description of the vulnerability
