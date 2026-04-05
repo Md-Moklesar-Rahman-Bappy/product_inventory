@@ -126,6 +126,7 @@ Crafted with ❤️ by Md Moklesar Rahman
 Laravel architect & UI/UX designer
 Focused on beauty, clarity, and backend precision.
 📧 Email: md.moklasarrahmanbappy@gmail.com
+📧 Email: risingbappy1@gmail.com
 
 📜 License
 This project is open-source under the [MIT License](LICENSE.md).
