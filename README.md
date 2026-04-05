@@ -93,8 +93,11 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 - Clean UI with instant feedback
 
 📸 Screenshots
+
 ![Dashboard](docs/screenshots/dashboard.png)
+
 ![Product Form](docs/screenshots/product-form.png)
+
 ![Empty State](docs/screenshots/empty-state.png)
 
 📖 Documentation
