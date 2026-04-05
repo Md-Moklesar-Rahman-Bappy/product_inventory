@@ -45,4 +45,8 @@ If you discover a security vulnerability in this repository:
 - Do not commit `.env` files or secrets.
 - Validate all user input using Laravel Form Requests.
 - Keep dependencies updated (`composer update`, `npm audit fix`).
+<<<<<<< HEAD
 - Run CodeQL and Dependabot scans regularly.
+=======
+- Run CodeQL and Dependabot scans regularly.
+>>>>>>> af656de39e6e8cfafcf6327b35394bee04eabfe0
