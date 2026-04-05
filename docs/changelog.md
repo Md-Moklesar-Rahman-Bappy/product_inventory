@@ -6,7 +6,7 @@ It covers backend logic, frontend structure, database design, and deployment con
 ---
 
 ## ⚙️ Backend (Laravel)
-- **Framework**: Laravel 10+
+- **Framework**: Laravel 12 (PHP 8.2+)
 - **ORM**: Eloquent ORM for database interactions
 - **Routing**:
   - Resourceful routes for CRUD operations
@@ -64,7 +64,7 @@ It covers backend logic, frontend structure, database design, and deployment con
   - Stored in `.env` file
   - Example: `DB_CONNECTION`, `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
 - **Server Requirements**:
-  - PHP 8.1+
+  - PHP 8.2+
   - MySQL/MariaDB
   - Composer
 - **Optional**:
