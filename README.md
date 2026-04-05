@@ -6,7 +6,7 @@
 [![Changelog](https://img.shields.io/badge/Changelog-📜-blue)](CHANGELOG.md)
 [![Screenshots](https://img.shields.io/badge/Screenshots-📸-green)](docs/screenshots/README.md)
 
-🔗 [Live Demo](https://your-deployment-link.com)
+🔗 [Live Demo](https://md-moklesar-rahman-bappy.github.io/product_inventory/)
 
 # 🧿 Product Inventory Dashboard
 
