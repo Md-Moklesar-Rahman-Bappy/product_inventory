@@ -1,0 +1,91 @@
+version: 2
+updates:
+  # Composer (PHP / Laravel)
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(composer)"
+    labels:
+      - "dependencies"
+      - "security"
+    open-pull-requests-limit: 10
+    # Auto-merge patch updates once CI passes
+    allow:
+      - dependency-type: "direct"
+    ignore:
+      - dependency-type: "indirect"
+    versioning-strategy: increase
+    automerge: true
+    automerge-strategy: "merge"
+
+  # npm (Node / Vite / Tailwind)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(npm)"
+    labels:
+      - "dependencies"
+      - "security"
+    open-pull-requests-limit: 10
+    automerge: true
+    automerge-strategy: "merge"
+
+  # GitHub Actions (workflow updates)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(actions)"
+    labels:
+      - "ci"
+      - "dependencies"
+    automerge: true
+    automerge-strategy: "merge"
+
+  # .github/workflows/codeql-analysis.yml
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  schedule:
+    - cron: '0 3 * * 0' # Weekly Sunday at 3 AM UTC
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'javascript', 'php' ] # Adjust if you add more languages
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"
