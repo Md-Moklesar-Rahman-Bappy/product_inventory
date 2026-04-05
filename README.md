@@ -92,12 +92,15 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 - Matching serials are highlighted using <mark>
 - Clean UI with instant feedback
 
-📸 Screenshots
+## 📸 Screenshots
+
 ![Dashboard](docs/screenshots/dashboard.png)
+
 ![Product Form](docs/screenshots/product-form.png)
+
 ![Empty State](docs/screenshots/empty-state.png)
 
-📖 Documentation
+
 ## 📖 Documentation
 - [UI Guidelines](docs/ui-guidelines.md)
 - [Architecture](docs/architecture.md)
