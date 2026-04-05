@@ -15,6 +15,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [v3-bugfix-security] - 2026-04-05
+### Fixed
+- Patched SQL injection vulnerability in product search
+- Corrected pagination issue with filtered queries
+- Fixed session handling bug causing unexpected logouts
+
+### Security
+- Added CodeQL scanning workflow for automated vulnerability detection
+- Enabled Dependabot alerts for dependency updates
+- Published initial [SECURITY.md](SECURITY.md) policy for responsible disclosure
+
+### Changed
+- Hardened validation rules for product creation forms
+- Updated logging level defaults to `info` in production
+- Improved error handling for failed database connections
+
+---
+
 ## [1.0.0] - 2026-04-05
 ### Added
 - Initial release of **Product Inventory Dashboard**
