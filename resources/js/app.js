@@ -1,6 +1,7 @@
-// Import Bootstrap (includes Popper)
+// Import Bootstrap CSS
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
+// Import Bootstrap JS bundle (includes Popper)
+import "bootstrap/dist/js/bootstrap.bundle.js";
 
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
