@@ -1,7 +1,11 @@
-// Import Bootstrap CSS
-import 'bootstrap/dist/css/bootstrap.min.css';
-
+/* Tailwind base styles */
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Bootstrap CSS */
+@import "bootstrap/dist/css/bootstrap.min.css";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
