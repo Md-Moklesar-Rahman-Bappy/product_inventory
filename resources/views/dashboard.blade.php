@@ -1,35 +1,35 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - Department of Land Record and Survey - SOCDS Project')
+@section('title', 'Dashboard')
 
 @section('contents')
 <div class="row">
   <div class="col-md-12">
 
-    <!-- 👋 Welcome Card -->
-    <div class="card shadow-lg border-0 mb-4 animate__animated animate__fadeInUp">
-      <div class="card-header bg-white border-bottom py-4 d-flex align-items-center justify-content-between">
-        <h5 class="mb-0 text-primary fw-bold">👋 Welcome, {{ auth()->user()->name }}</h5>
-        <span class="badge bg-gradient-info text-white fw-semibold px-3 py-2 rounded-pill shadow-sm">
+    <!-- Welcome Card -->
+    <div class="custom-card mb-4">
+      <div class="card-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-person-waving me-2"></i>Welcome, {{ auth()->user()->name }}</h5>
+        <span class="badge bg-primary fw-semibold">
           Product Inventory System
         </span>
       </div>
       <div class="card-body">
-        <p class="mb-2 fs-6">
+        <p class="mb-2">
           This is your central hub for managing <strong>categories</strong>, <strong>brands</strong>, <strong>models</strong>, and <strong>products</strong> with clarity and control.
         </p>
         <p class="text-muted small mb-3">
           Use the sidebar to navigate between modules. All changes are reflected <span class="text-success fw-semibold">in real-time</span> for seamless updates.
         </p>
         <div class="d-flex gap-2 flex-wrap">
-          <span class="badge bg-success text-white fw-medium rounded-pill px-3">Modular</span>
-          <span class="badge bg-warning text-dark fw-medium rounded-pill px-3">Maintainable</span>
-          <span class="badge bg-secondary text-white fw-medium rounded-pill px-3">Joyful UI</span>
+          <span class="badge bg-success text-white fw-medium">Modular</span>
+          <span class="badge bg-warning text-dark fw-medium">Maintainable</span>
+          <span class="badge bg-secondary text-white fw-medium">Joyful UI</span>
         </div>
       </div>
     </div>
 
-    <!-- 📦 Summary Cards (Compact & Inline) -->
+    <!-- Summary Cards -->
     <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
       @foreach($entityCounts as $label => $count)
         @php
@@ -42,21 +42,21 @@
             'Warranty' => 'warranties.index',
           ];
           $iconMap = [
-            'Categories' => 'fa-tags',
-            'Brands' => 'fa-industry',
-            'Models' => 'fa-cubes',
-            'Products' => 'fa-box-open',
-            'Maintenance' => 'fa-tools',
-            'Warranty' => 'fa-shield-alt',
+            'Categories' => 'bi-tags',
+            'Brands' => 'bi-award',
+            'Models' => 'bi-layers',
+            'Products' => 'bi-box',
+            'Maintenance' => 'bi-tools',
+            'Warranty' => 'bi-shield-check',
           ];
           $route = $routeMap[$label] ?? '#';
-          $icon = $iconMap[$label] ?? 'fa-box';
+          $icon = $iconMap[$label] ?? 'bi-box';
         @endphp
 
         <a href="{{ route($route) }}" class="text-decoration-none" title="View all {{ strtolower($label) }}">
-          <div class="card summary-card-mini text-center px-3 py-2 animate__animated animate__fadeInUp">
+          <div class="custom-card text-center px-3 py-2" style="min-width: 120px;">
             <div class="card-body p-2">
-              <i class="fa {{ $icon }} text-primary mb-1" style="font-size: 1.4rem;"></i>
+              <i class="bi {{ $icon }} text-primary mb-1" style="font-size: 1.4rem;"></i>
               <h6 class="fw-bold text-dark mb-0">{{ $count }}</h6>
               <small class="text-muted">{{ $label }}</small>
             </div>
@@ -65,13 +65,13 @@
       @endforeach
     </div>
 
-    <!-- 📊 Charts Row -->
+    <!-- Charts Row -->
     <div class="row">
-      <!-- 📊 Entity Distribution Chart -->
+      <!-- Entity Distribution Chart -->
       <div class="col-md-6 mb-4">
-        <div class="card shadow-lg border-0 h-100 animate__animated animate__fadeInUp">
-          <div class="card-header bg-white border-bottom py-4 d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 text-primary fw-bold">📊 Entity Distribution</h5>
+        <div class="custom-card h-100">
+          <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-pie-chart me-2"></i>Entity Distribution</h5>
             <select id="chartTypeSelector" class="form-select form-select-sm w-auto" onchange="switchChartType(this.value)">
               <option value="pie">Pie</option>
               <option value="doughnut">Doughnut</option>
@@ -84,7 +84,7 @@
             </div>
             <div class="d-flex gap-2 flex-wrap justify-content-center mt-4">
               @foreach($entityCounts as $label => $count)
-                <span class="badge bg-light text-dark fw-medium px-3 py-2 rounded-pill shadow-sm">
+                <span class="badge bg-light text-dark fw-medium">
                   {{ $label }}: <strong>{{ $count }}</strong>
                 </span>
               @endforeach
@@ -93,11 +93,11 @@
         </div>
       </div>
 
-      <!-- 📈 Warranty Status Chart -->
+      <!-- Warranty Status Chart -->
       <div class="col-md-6 mb-4">
-        <div class="card shadow-lg border-0 h-100 animate__animated animate__fadeInUp">
-          <div class="card-header bg-white border-bottom py-4">
-            <h5 class="mb-0 text-primary fw-bold">📈 Warranty Status Overview</h5>
+        <div class="custom-card h-100">
+          <div class="card-header">
+            <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-shield-check me-2"></i>Warranty Status Overview</h5>
           </div>
           <div class="card-body text-center">
             <div class="mx-auto" style="max-width: 500px;">
@@ -113,7 +113,7 @@
                   ];
                   $badgeClass = $colorMap[$status] ?? 'bg-light text-dark';
                 @endphp
-                <span class="badge {{ $badgeClass }} fw-medium px-3 py-2 rounded-pill shadow-sm">
+                <span class="badge {{ $badgeClass }} fw-medium">
                   {{ $status }}: <strong>{{ $count }}</strong>
                 </span>
               @endforeach
@@ -132,28 +132,18 @@
 
 @push('styles')
 <style>
-  .summary-card-mini {
-    min-width: 120px;
-    max-width: 140px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #ffffff, #f8f9fa);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  .custom-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
-  .summary-card-mini:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(13, 110, 253, 0.2);
+  .custom-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
   canvas {
     transition: transform 0.3s ease;
   }
   canvas:hover {
     transform: scale(1.02);
-  }
-  .badge.bg-success,
-  .badge.bg-warning,
-  .badge.bg-danger {
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
   }
 </style>
 @endpush

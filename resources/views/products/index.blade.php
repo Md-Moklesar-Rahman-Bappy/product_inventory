@@ -1,21 +1,20 @@
 @extends('layouts.app')
 
-@section('title', 'Home Product')
+@section('title', 'Products')
 
 @section('contents')
 <div class="row">
     <div class="col-lg-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+        <div class="custom-card">
 
             {{-- Header --}}
-                <div class="card-header text-white py-2" 
-                    style="background: linear-gradient(90deg, #00bcd4, #2196f3); position: sticky; top: 0; z-index: 1020;">
+                <div class="card-header bg-primary text-white py-3">
                     <div class="row gy-2 align-items-center">
 
                         {{-- Title & Count --}}
                         <div class="col-12 col-md-3 d-flex align-items-center">
                             <h5 class="mb-0 fw-bold">
-                                <i class="fa fa-boxes me-2"></i> Product Inventory
+                                <i class="bi bi-box-seam me-2"></i> Products
                             </h5>
                             <span class="badge bg-light text-dark ms-3">
                                 {{ $products->total() }} items
@@ -28,13 +27,38 @@
                                 class="d-flex justify-content-md-start justify-content-center">
                                 <div class="input-group input-group-sm w-100" style="max-width: 320px;">
                                     <input type="text" name="search" value="{{ request('search') }}"
-                                        class="form-control bg-light border-0"
-                                        placeholder="Search Product, Serial No, or Project Serial No"
+                                        class="form-control"
+                                        placeholder="Search products..."
                                         aria-label="Search">
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fas fa-search"></i>
+                                    <button class="btn btn-light" type="submit">
+                                        <i class="bi bi-search"></i>
                                     </button>
                                 </div>
+                            </form>
+                        </div>
+
+                        {{-- Filters --}}
+                        <div class="col-12 col-md-3">
+                            <form method="GET" action="{{ route('products.index') }}" class="d-flex gap-2 flex-wrap">
+                                <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="">All Categories</option>
+                                    @foreach(\App\Models\Category::all() as $cat)
+                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                            {{ $cat->category_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <select name="brand_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                    <option value="">All Brands</option>
+                                    @foreach(\App\Models\Brand::all() as $brand)
+                                        <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                            {{ $brand->brand_name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @if(request('search'))
+                                    <input type="hidden" name="search" value="{{ request('search') }}">
+                                @endif
                             </form>
                         </div>
 
@@ -44,8 +68,8 @@
                                 <div class="d-flex flex-wrap justify-content-md-end justify-content-center gap-2">
 
                                     <a href="{{ route('products.sample') }}" 
-                                    class="btn btn-sm btn-secondary shadow-sm">
-                                        <i class="fa fa-file-csv me-1"></i> Sample CSV
+                                    class="btn btn-sm btn-secondary">
+                                        <i class="bi bi-download me-1"></i> Sample
                                     </a>
 
                                     <form action="{{ route('products.import') }}" method="POST" 
@@ -55,19 +79,19 @@
                                         <input type="file" name="file" 
                                             class="form-control form-control-sm" 
                                             style="max-width: 140px;" required>
-                                        <button type="submit" class="btn btn-sm btn-primary shadow-sm">
-                                            <i class="fa fa-file-import me-1"></i> Import
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-upload me-1"></i> Import
                                         </button>
                                     </form>
 
                                     <a href="{{ route('products.export.excel') }}" 
-                                    class="btn btn-sm btn-success shadow-sm">
-                                        <i class="fa fa-file-export me-1"></i> Export All
+                                    class="btn btn-sm btn-success">
+                                        <i class="bi bi-file-earmark-excel me-1"></i> Export
                                     </a>
 
                                     <a href="{{ route('products.create') }}" 
-                                    class="btn btn-sm btn-warning fw-bold shadow-sm">
-                                        <i class="fa fa-plus me-1"></i> Add Product
+                                    class="btn btn-sm btn-warning fw-bold">
+                                        <i class="bi bi-plus-lg me-1"></i> Add
                                     </a>
 
                                 </div>
@@ -212,7 +236,9 @@
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn btn-sm btn-outline-danger" 
+                                                        class="btn btn-sm btn-outline-danger delete-btn" 
+                                                        data-title="Delete Product"
+                                                        data-text="Are you sure you want to delete {{ $p->product_name }}? This action can be undone."
                                                         title="Delete">
                                                     <i class="fa fa-trash"></i>
                                                 </button>
@@ -278,7 +304,10 @@
                                         <form action="{{ route('products.forceDelete', $deleted->id) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" title="Permanently Delete">
+                                            <button class="btn btn-sm btn-danger delete-btn" 
+                                                data-title="Permanent Delete"
+                                                data-text="This will permanently delete {{ $deleted->product_name }}. This action cannot be undone!"
+                                                title="Permanently Delete">
                                                 <i class="fa fa-trash"></i> Delete Permanently
                                             </button>
                                         </form>

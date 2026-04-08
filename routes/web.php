@@ -1,34 +1,27 @@
 <?php
 
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\AssetModelController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\MaintenanceController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
+use App\Models\ActivityLog;
+use App\Models\AssetModel;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Maintenance;
+use App\Models\Product;
+use App\Models\User;
+use App\Notifications\SendCredentialsNotification;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Auth\Events\Verified;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
-use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Notifications\SendCredentialsNotification;
-use App\Http\Controllers\{
-    AuthController,
-    ProductController,
-    CategoryController,
-    BrandController,
-    AssetModelController,
-    MaintenanceController,
-    ActivityLogController,
-    UserController
-};
-use App\Models\{
-    ActivityLog,
-    Category,
-    Brand,
-    AssetModel,
-    Product,
-    Maintenance,
-    User
-};
+use Illuminate\Support\Facades\Route;
 
 // 🌐 Public Routes
 Route::view('/', 'auth.login')->name('login');
@@ -59,10 +52,10 @@ Route::get('/verify-email/{id}/{hash}', function ($id, $hash) {
                     'send-credentials',
                     'User',
                     $user->id,
-                    '<span class="text-info fw-bold">Verified email</span> and sent credentials to user: <strong>' . e($user->name) . '</strong>'
+                    '<span class="text-info fw-bold">Verified email</span> and sent credentials to user: <strong>'.e($user->name).'</strong>'
                 );
             } catch (\Exception $e) {
-                Log::error('Credential decryption failed for user ID ' . $user->id, ['error' => $e->getMessage()]);
+                Log::error('Credential decryption failed for user ID '.$user->id, ['error' => $e->getMessage()]);
             }
         }
     }
@@ -73,7 +66,7 @@ Route::get('/verify-email/{id}/{hash}', function ($id, $hash) {
 // 🔐 Custom Authentication
 Route::controller(AuthController::class)->group(function () {
     Route::get('login', 'login')->name('login');
-    Route::post('login', 'loginAction')->name('login.action');
+    Route::post('login', 'loginAction')->middleware('throttle:5,1')->name('login.action');
     Route::post('logout', 'logout')->middleware('auth')->name('logout');
 });
 
@@ -81,32 +74,33 @@ Route::controller(AuthController::class)->group(function () {
 Route::middleware(['auth'])->group(function () {
 
     // 📧 Email verification notice + resend
-    Route::get('/email/verify', fn() => view('auth.verify'))->name('verification.notice');
+    Route::get('/email/verify', fn () => view('auth.verify'))->name('verification.notice');
     Route::post('/email/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
+
         return back()->with('message', '📧 Verification link sent!');
-    })->name('verification.resend');
+    })->middleware('throttle:3,1')->name('verification.resend');
 
     // 📊 Dashboard
     Route::get('dashboard', function () {
         $logs = ActivityLog::with('user')->latest()->paginate(10);
 
         $entityCounts = [
-            'Categories'  => Category::count(),
-            'Brands'      => Brand::count(),
-            'Models'      => AssetModel::count(),
-            'Products'    => Product::count(),
+            'Categories' => Category::count(),
+            'Brands' => Brand::count(),
+            'Models' => AssetModel::count(),
+            'Products' => Product::count(),
             'Maintenance' => Maintenance::count(),
-            'Warranty'    => Product::whereNotNull('warranty_end')->count(),
+            'Warranty' => Product::whereNotNull('warranty_end')->count(),
         ];
 
         $now = Carbon::now();
         $soon = $now->copy()->addDays(30);
 
         $warrantyBreakdown = [
-            'Active'        => Product::where('warranty_end', '>', $soon)->count(),
+            'Active' => Product::where('warranty_end', '>', $soon)->count(),
             'Expiring Soon' => Product::whereBetween('warranty_end', [$now, $soon])->count(),
-            'Expired'       => Product::where('warranty_end', '<', $now)->count(),
+            'Expired' => Product::where('warranty_end', '<', $now)->count(),
         ];
 
         return view('dashboard', compact('logs', 'entityCounts', 'warrantyBreakdown'));
