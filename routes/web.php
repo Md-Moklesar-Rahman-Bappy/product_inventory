@@ -182,4 +182,6 @@ Route::middleware(['auth'])->group(function () {
 
     // 👤 Profile
     Route::get('profile', [AuthController::class, 'profile'])->name('profile');
+    Route::post('profile', [AuthController::class, 'profileUpdate'])->name('profile.update');
+    Route::post('password', [AuthController::class, 'passwordUpdate'])->name('password.update');
 });

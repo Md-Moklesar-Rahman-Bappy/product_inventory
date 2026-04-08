@@ -37,12 +37,15 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ===================================
-    // Auto-hide alerts after 5 seconds
+    // Auto-hide alerts after 5 seconds (except password requirements)
     // ===================================
     setTimeout(function() {
-        const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
-        alerts.forEach(function(alert) {
-            if (bootstrap && bootstrap.Alert) {
+        document.querySelectorAll('.alert').forEach(function(alert) {
+            // Skip password requirements alerts - they should stay visible
+            if (alert.classList.contains('password-requirements')) return;
+            if (alert.textContent && alert.textContent.includes('Password Requirements')) return;
+            
+            if (typeof bootstrap !== 'undefined' && bootstrap.Alert) {
                 const bsAlert = new bootstrap.Alert(alert);
                 bsAlert.close();
             } else {

@@ -120,7 +120,7 @@ class ProductController extends Controller
             '<span class="text-success fw-bold">Created</span> product: <strong>'.$product->product_name.'</strong><br>Serial No: <code>'.$product->serial_no.'</code>'
         );
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully');
+        return redirect()->route('products.index')->with('success', '✅ Product created successfully');
     }
 
     public function show(int $id)
@@ -174,7 +174,7 @@ class ProductController extends Controller
                 '<span class="text-muted fw-bold">No changes</span> made to product: <strong>'.$product->product_name.'</strong><br>Serial No: <code>'.$product->serial_no.'</code>'
             );
 
-            return redirect()->route('products.index')->with('success', 'No changes were made.');
+            return redirect()->route('products.index')->with('success', '✅ No changes were made.');
         }
 
         $product->save();

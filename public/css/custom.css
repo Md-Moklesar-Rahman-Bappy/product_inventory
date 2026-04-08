@@ -682,3 +682,42 @@ body {
     color: var(--gray-600);
     font-size: 0.875rem;
 }
+
+/* ===================================
+   Toggle Switch for User Status
+   =================================== */
+.btn-toggle {
+    position: relative;
+    width: 44px;
+    height: 22px;
+    background-color: var(--gray-300);
+    border: none;
+    border-radius: 11px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-toggle::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.btn-toggle.active {
+    background-color: var(--success);
+}
+
+.btn-toggle.active::before {
+    transform: translateX(22px);
+}
+
+.btn-toggle:hover {
+    opacity: 0.9;
+}

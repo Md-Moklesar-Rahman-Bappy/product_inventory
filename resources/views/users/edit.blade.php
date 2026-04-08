@@ -3,163 +3,204 @@
 @section('title', 'Edit User')
 
 @section('contents')
-
-<div class="app-content main-content mt-0">
-    <div class="side-app">
-        <div class="main-container container-fluid">
-
-            <!-- PAGE HEADER -->
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">
-                        <i class="fa fa-user-edit me-2 text-primary"></i> Edit User
-                    </h1>
-                </div>
-                <div class="ms-auto pageheader-btn">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
-                    </ol>
+<div class="row">
+    <div class="col-lg-10 offset-lg-1">
+        <div class="custom-card">
+            <div class="card-header bg-primary text-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-person-plus me-2"></i>Edit User</h5>
+                    <a href="{{ route('users.index') }}" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
                 </div>
             </div>
+            
+            <div class="card-body">
+                @if($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li><i class="bi bi-exclamation-circle me-1"></i> {{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-            <!-- FORM CARD -->
-            <div class="row">
-                <div class="col-lg-8 offset-lg-2">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-gradient-info text-white text-center py-3">
-                            <h3 class="card-title fw-bold"><i class="fa fa-user-circle me-2"></i> Update Profile</h3>
+                <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="row">
+                        {{-- Left Column - Profile Photo --}}
+                        <div class="col-md-4 text-center">
+                            <div class="mb-3">
+                                <img src="{{ $user->profile_photo_url }}" alt="Profile Photo" 
+                                    class="rounded-circle shadow-sm" width="150" height="150" 
+                                    style="object-fit: cover;" id="photoPreview">
+                                <input type="file" name="profile_photo_path" class="form-control mt-3" 
+                                    accept="image/*" onchange="previewImage(this, 'photoPreview')">
+                                <small class="text-muted">Click to change photo (Max 2MB)</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-info text-white">{{ $user->role_label }}</span>
+                                <span class="badge {{ $user->status === 'active' ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ ucfirst($user->status) }}
+                                </span>
+                            </div>
                         </div>
-                        <div class="card-body bg-light p-4">
 
-                            @if(session('message'))
-                                <div class="alert alert-success text-center fw-semibold">
-                                    <i class="fa fa-check-circle me-1"></i> {{ session('message') }}
+                        {{-- Right Column - User Info --}}
+                        <div class="col-md-8">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">User Name</label>
+                                    <input type="text" name="name" class="form-control" 
+                                        value="{{ old('name', $user->name) }}" required>
                                 </div>
-                            @endif
-
-                            @if ($errors->any())
-                                <div class="alert alert-danger shadow-sm">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li><i class="fa fa-exclamation-circle me-1 text-danger"></i> {{ $error }}</li>
-                                        @endforeach
-                                    </ul>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control" 
+                                        value="{{ old('email', $user->email) }}" required>
                                 </div>
-                            @endif
-
-                            <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-
-                                {{-- Name --}}
-                                <div class="mb-4">
-                                    <label for="name" class="form-label fw-bold">User Name</label>
-                                    <input type="text" id="name" name="name" class="form-control"
-                                           value="{{ old('name', $user->name) }}" required>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Mobile Number</label>
+                                    <input type="text" name="mobile" class="form-control" 
+                                        value="{{ old('mobile', $user->mobile) }}">
                                 </div>
-
-                                {{-- Email --}}
-                                <div class="mb-4">
-                                    <label for="email" class="form-label fw-bold">Email</label>
-                                    <input type="email" id="email" name="email" class="form-control"
-                                           value="{{ old('email', $user->email) }}" required>
-                                </div>
-
-                                {{-- Mobile --}}
-                                <div class="mb-4">
-                                    <label for="mobile" class="form-label fw-bold">Mobile Number</label>
-                                    <input type="text" id="mobile" name="mobile" class="form-control"
-                                           value="{{ old('mobile', $user->mobile) }}">
-                                </div>
-
-                                {{-- Permission --}}
-                                <div class="mb-4">
-                                    <label for="permission" class="form-label fw-bold">Permission</label>
-                                    <select name="permission" id="permission" class="form-control" required>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Permission</label>
+                                    <select name="permission" class="form-select" required>
                                         <option value="1" {{ old('permission', $user->permission) == 1 ? 'selected' : '' }}>Admin</option>
                                         <option value="2" {{ old('permission', $user->permission) == 2 ? 'selected' : '' }}>User</option>
                                     </select>
                                 </div>
-
-                                {{-- Designation --}}
-                                <div class="mb-4">
-                                    <label for="designation" class="form-label fw-bold">Designation</label>
-                                    <input type="text" id="designation" name="designation" class="form-control"
-                                           value="{{ old('designation', $user->designation) }}">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Designation</label>
+                                    <input type="text" name="designation" class="form-control" 
+                                        value="{{ old('designation', $user->designation) }}">
                                 </div>
-
-                                {{-- Profile Photo --}}
-                                <div class="mb-4">
-                                    <label for="profile_photo_path" class="form-label fw-bold">Profile Photo</label>
-                                    <input type="file" id="profile_photo_path" name="profile_photo_path"
-                                           class="dropify form-control" data-height="200"
-                                           data-default-file="{{ $user->profile_photo_url }}"
-                                           accept="image/*">
-                                    <div class="mt-3 text-center">
-                                        <img src="{{ $user->profile_photo_url }}" alt="Current Photo"
-                                             class="rounded shadow-sm" width="120" height="120" style="object-fit: cover;">
-                                        <p class="small text-muted mt-2">Current photo</p>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Password <small class="text-muted">(leave blank to keep current)</small></label>
+                                    <input type="password" name="password" id="newPassword" class="form-control" 
+                                        placeholder="Enter new password" autocomplete="off">
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 8px;">
+                                            <div id="passwordStrengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="text-muted mt-1 d-block">Password Strength: <span id="strengthText">None</span></small>
                                     </div>
                                 </div>
-
-                                {{-- About --}}
-                                <div class="mb-4">
-                                    <label for="about" class="form-label fw-bold">About</label>
-                                    <textarea id="about" name="about" class="form-control" rows="3">{{ old('about', $user->about) }}</textarea>
-                                </div>
-
-                                {{-- Address --}}
-                                <div class="mb-4">
-                                    <label for="address" class="form-label fw-bold">Address</label>
-                                    <textarea id="address" name="address" class="form-control" rows="3">{{ old('address', $user->address) }}</textarea>
-                                </div>
-
-                                {{-- Password --}}
-                                <div class="mb-4">
-                                    <label for="password" class="form-label fw-bold">Password</label>
-                                    <input type="password" id="password" name="password" class="form-control"
-                                           placeholder="Leave blank to keep current password" autocomplete="off">
-                                </div>
-
-                                {{-- Submit --}}
-                                <div class="text-end mt-4">
-                                    <button type="submit" class="btn btn-primary fw-bold">
-                                        <i class="fa fa-save me-1"></i> Update User
-                                    </button>
-                                    <a href="{{ route('users.index') }}" class="btn btn-secondary fw-bold ms-2">
-                                        <i class="fa fa-arrow-left me-1"></i> Cancel
-                                    </a>
-                                </div>
-                            </form>
-
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">About</label>
+                                <textarea name="about" class="form-control" rows="2">{{ old('about', $user->about) }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Address</label>
+                                <textarea name="address" class="form-control" rows="2">{{ old('address', $user->address) }}</textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- END ROW -->
 
+                    <div class="alert alert-info mt-3 password-requirements">
+                        <strong>Password Requirements:</strong>
+                        <ul class="mb-0 small">
+                            <li id="req-length"><i class="bi bi-circle me-1"></i> At least 8 characters</li>
+                            <li id="req-upper"><i class="bi bi-circle me-1"></i> At least 1 uppercase letter (A-Z)</li>
+                            <li id="req-lower"><i class="bi bi-circle me-1"></i> At least 1 lowercase letter (a-z)</li>
+                            <li id="req-number"><i class="bi bi-circle me-1"></i> At least 1 number (0-9)</li>
+                            <li id="req-special"><i class="bi bi-circle me-1"></i> At least 1 special character (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-lg me-1"></i>Update User
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('assets/plugins/dropify/css/dropify.min.css') }}">
-@endpush
-
 @push('scripts')
-<script src="{{ asset('assets/plugins/dropify/js/dropify.min.js') }}"></script>
 <script>
-    $(document).ready(function () {
-        $('.dropify').dropify({
-            messages: {
-                'default': 'Drag and drop a file here or click',
-                'replace': 'Drag and drop or click to replace',
-                'remove':  'Remove',
-                'error':   'Ooops, something wrong happened.'
-            }
-        });
-    });
+function previewImage(input, previewId) {
+    const preview = document.getElementById(previewId);
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+document.getElementById('newPassword').addEventListener('input', function() {
+    const password = this.value;
+    const bar = document.getElementById('passwordStrengthBar');
+    const text = document.getElementById('strengthText');
+    
+    let strength = 0;
+    let requirements = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*]/.test(password)
+    };
+    
+    const updateReq = (id, met) => {
+        const el = document.getElementById(id);
+        if (met) {
+            el.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ' + el.textContent.replace('<i class="bi bi-check-circle-fill me-1"></i> ', '').replace('<i class="bi bi-circle me-1"></i> ', '');
+            el.className = 'text-success fw-bold';
+        } else {
+            el.innerHTML = '<i class="bi bi-circle me-1"></i> ' + el.textContent.replace('<i class="bi bi-check-circle-fill me-1"></i> ', '').replace('<i class="bi bi-circle me-1"></i> ', '');
+            el.className = 'text-muted';
+        }
+    };
+    
+    updateReq('req-length', requirements.length);
+    updateReq('req-upper', requirements.upper);
+    updateReq('req-lower', requirements.lower);
+    updateReq('req-number', requirements.number);
+    updateReq('req-special', requirements.special);
+    
+    if (requirements.length) strength++;
+    if (requirements.upper) strength++;
+    if (requirements.lower) strength++;
+    if (requirements.number) strength++;
+    if (requirements.special) strength++;
+    
+    const percentage = (strength / 5) * 100;
+    bar.style.width = percentage + '%';
+    
+    if (strength === 0) {
+        bar.className = 'progress-bar bg-secondary';
+        text.textContent = 'None';
+    } else if (strength === 1) {
+        bar.className = 'progress-bar bg-danger';
+        text.textContent = 'Very Weak';
+    } else if (strength === 2) {
+        bar.className = 'progress-bar bg-warning';
+        text.textContent = 'Weak';
+    } else if (strength === 3) {
+        bar.className = 'progress-bar bg-info';
+        text.textContent = 'Good';
+    } else if (strength === 4) {
+        bar.className = 'progress-bar bg-primary';
+        text.textContent = 'Strong';
+    } else {
+        bar.className = 'progress-bar bg-success';
+        text.textContent = 'Very Strong';
+    }
+});
 </script>
 @endpush
