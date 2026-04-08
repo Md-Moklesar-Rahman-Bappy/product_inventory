@@ -44,7 +44,7 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 ## 🛠️ Tech Stack
 | Layer        | Tools & Frameworks               |
 |-------------|----------------------------------|
-| Backend      | Laravel 10+, Eloquent ORM        |
+| Backend      | Laravel 12.0+, Eloquent ORM      |
 | Frontend     | Blade, Bootstrap 5, Font Awesome |
 | UI/UX        | Custom CSS, gradient buttons     |
 | Database     | MySQL / MariaDB                  |

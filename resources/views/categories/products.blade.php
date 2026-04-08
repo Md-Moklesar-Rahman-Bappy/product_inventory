@@ -91,12 +91,12 @@
                   <td>{{ number_format($product->price, 2) }} ৳</td>
                   <td title="{{ $product->brandName }}">{{ $product->brandName }}</td>
                   <td title="{{ $product->modelName }}">{{ $product->modelName }}</td>
-                  <td title="{{ strip_tags($product->serial_no) }}">{{ $product->serial_no }}</td>
-                  <td title="{{ strip_tags($product->projectSerial) }}">{{ $product->projectSerial }}</td>
-                  <td title="{{ strip_tags($product->position_display) }}">{!! $product->position_display !!}</td>
-                  <td title="{{ strip_tags($product->userDescriptionDisplay) }}">{!! $product->userDescriptionDisplay !!}</td>
-                  <td title="{{ strip_tags($product->remarks_display) }}">{!! $product->remarks_display !!}</td>
-                  <td title="{{ strip_tags($product->warranty_countdown) }}">{!! $product->warranty_countdown !!}</td>
+                  <td title="{{ $product->serial_no }}">{{ $product->serial_no }}</td>
+                  <td title="{{ $product->project_serial_no }}">{{ $product->project_serial_no ?? '-' }}</td>
+                  <td title="{{ $product->position }}">{{ $product->position ?? '-' }}</td>
+                  <td title="{{ $product->user_description }}">{{ $product->user_description ?? '-' }}</td>
+                  <td title="{{ $product->remarks }}">{{ $product->remarks ?? '-' }}</td>
+                  <td><x-warranty-countdown :start="$product->warranty_start" :end="$product->warranty_end" /></td>
                   <td>
                     <div class="d-flex justify-content-center gap-2">
                       <a href="{{ route('products.show', $product->id) }}"

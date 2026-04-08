@@ -41,8 +41,8 @@
             <input type="text" class="form-control" value="{{ $product->project_serial_no }}" readonly>
           </div>
           <div class="col-md-6">
-            <label class="mt-5">Warranty</label>
-            <td>{!! $product->warranty_countdown !!}</td>
+            <label class="form-label d-block">Warranty</label>
+            <x-warranty-countdown :start="$product->warranty_start" :end="$product->warranty_end" />
           </div>
         </div>
 

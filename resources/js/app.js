@@ -1,26 +1,25 @@
-// Import Bootstrap (includes Popper)
+// ✅ CSS imports
 import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
-
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "animate.css";
+
+// ✅ JS imports
+import "bootstrap/dist/js/bootstrap.bundle.js";
+import Alpine from "alpinejs";
+
+// ✅ Initialize Alpine once
+window.Alpine = Alpine;
+Alpine.start();
+
+// ✅ Your own JS code
+console.log("App initialized");
 
 // Import custom CSS or SCSS
 import "../css/app.css"; // Or use '../sass/app.scss' if you're using SCSS
 
-// Font Awesome (icons)
-import "@fortawesome/fontawesome-free/css/all.min.css";
-
-// Animate.css (for UI transitions)
-import "animate.css";
-
-// Alpine.js (lightweight interactivity)
-import Alpine from "alpinejs";
-window.Alpine = Alpine;
-Alpine.start();
-
-// jQuery (optional, only if needed for legacy Bootstrap plugins)
 import $ from "jquery";
 window.$ = $;
+window.jQuery = $; // optional, for plugins that expect jQuery global
 
 /**
  * ========================================

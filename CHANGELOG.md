@@ -56,6 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [0.1.0] - 2026-03-28
 ### Added
-- Project scaffolding with Laravel 10
+- Project scaffolding with Laravel 12.0+
 - Basic CRUD for products
 - Initial UI layout with Bootstrap 5

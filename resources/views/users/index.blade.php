@@ -56,10 +56,9 @@
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td class="fw-semibold">{{ $user->name }}</td>
-                                            <td>{!! $user->designation_display !!}</td>
+                                            <td>{{ $user->display_designation }}</td>
                                             <td>{{ $user->email }}</td>
-                                            {{-- <td>{!! $user->mobile_display !!}</td> --}}
-                                            <td>{!! $user->formatted_mobile !!}</td>
+                                            <td>{{ $user->display_mobile }}</td>
                                             <td><span class="badge bg-info text-white">{{ $user->role_label }}</span></td>
 
                                             <!-- ✅ Status Column with Toggle -->
@@ -145,7 +144,7 @@
                                                 <tr class="table-danger">
                                                     <td>{{ $deletedUser->name }}</td>
                                                     <td>{{ $deletedUser->email }}</td>
-                                                    <td>{!! $deletedUser->mobile_display !!}</td>
+                                                    <td>{{ $deletedUser->display_mobile }}</td>
                                                     <td>{{ $deletedUser->deleted_at->format('d M Y, h:i A') }}</td>
                                                     <td>
                                                         <form action="{{ route('users.restore', $deletedUser->id) }}" method="POST">
