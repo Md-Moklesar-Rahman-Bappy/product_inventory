@@ -89,55 +89,9 @@ class Product extends Model
         return $this->warranty_end->isPast() ? 'expired' : 'active';
     }
 
-    public function getWarrantyCountdownAttribute()
+    public function getIsExpiredAttribute()
     {
-        if (!$this->warranty_end || !$this->warranty_start) {
-            return '<span class="text-muted">—</span>';
-        }
-
-        $now = Carbon::now(config('app.timezone'));
-        $end = $this->warranty_end;
-        $expired = $end->isPast();
-
-        if ($expired) {
-            return "<span class='badge bg-danger text-white' title='Expired on {$end->format('d M Y')}'>Expired</span>";
-        }
-
-        $totalMinutes = $now->diffInMinutes($end);
-        $totalDays = floor($totalMinutes / (60 * 24));
-        $remainingHours = floor(($totalMinutes % (60 * 24)) / 60);
-
-        $badgeClass = match(true) {
-            $totalDays <= 7  => 'bg-danger text-white',
-            $totalDays <= 30 => 'bg-warning text-white',
-            default          => 'bg-success text-white',
-        };
-
-        $tooltip = 'Ends on ' . $end->format('d M Y');
-        $text = "{$totalDays} days {$remainingHours} hours";
-
-        return "<span class='badge {$badgeClass}' title='{$tooltip}'>{$text}</span>";
-    }
-
-    public function getRemarksDisplayAttribute()
-    {
-        return $this->remarks
-            ? e($this->remarks)
-            : '<span class="text-muted">—</span>';
-    }
-
-    public function getPositionDisplayAttribute()
-    {
-        return $this->position
-            ? e($this->position)
-            : '<span class="text-muted">—</span>';
-    }
-
-    public function getUserDescriptionDisplayAttribute()
-    {
-        return $this->user_description
-            ? e($this->user_description)
-            : '<span class="text-muted">—</span>';
+        return $this->warranty_end && $this->warranty_end->isPast();
     }
 
     // ──────── Warranty Date Accessors ─────────
@@ -149,11 +103,6 @@ class Product extends Model
     public function getWarrantyEndDateAttribute()
     {
         return optional($this->warranty_end)->format('m/d/Y');
-    }
-
-    public function getWarrantyEndTooltipAttribute()
-    {
-        return $this->warranty_end ? $this->warranty_end->format('d M Y') : '—';
     }
 
     // ──────── Urgency Helpers ─────────

@@ -111,8 +111,8 @@
                   <td title="{{ $product->remarks ?? '-' }}">
                     {{ $product->remarks ?? '-' }}
                   </td>
-                  <td title="{{ strip_tags($product->warranty_countdown) }}">
-                    {!! $product->warranty_countdown !!}
+                  <td>
+                    <x-warranty-countdown :start="$product->warranty_start" :end="$product->warranty_end" />
                   </td>
                   <td>
                     <div class="d-flex justify-content-center gap-2">

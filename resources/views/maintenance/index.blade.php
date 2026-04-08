@@ -55,7 +55,7 @@
                     <span class="badge bg-success">Completed</span>
                   @endif
                 </td>
-                <td>{!! $m->product->warranty_countdown !!}</td>
+                <td><x-warranty-countdown :start="$m->product->warranty_start" :end="$m->product->warranty_end" /></td>
                 <td>{{ $m->user->name ?? 'System' }}</td>
                 <td>
                   <div class="action-buttons">

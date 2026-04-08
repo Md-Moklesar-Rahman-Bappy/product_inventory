@@ -56,19 +56,19 @@
                                     </tr>
                                     <tr>
                                         <th class="bg-light text-primary">Mobile</th>
-                                        <td>{!! $user->mobile_display ?? '<span class="text-muted">—</span>' !!}</td>
+                                        <td>{{ $user->display_mobile }}</td>
                                     </tr>
                                     <tr>
                                         <th class="bg-light text-primary">Designation</th>
-                                        <td>{!! $user->designation_display ?? '<span class="text-muted">—</span>' !!}</td>
+                                        <td>{{ $user->display_designation }}</td>
                                     </tr>
                                     <tr>
                                         <th class="bg-light text-primary">About</th>
-                                        <td>{!! $user->about ? e($user->about) : '<span class="text-muted">—</span>' !!}</td>
+                                        <td>{{ $user->about ?? '—' }}</td>
                                     </tr>
                                     <tr>
                                         <th class="bg-light text-primary">Address</th>
-                                        <td>{!! $user->address ? e($user->address) : '<span class="text-muted">—</span>' !!}</td>
+                                        <td>{{ $user->address ?? '—' }}</td>
                                     </tr>
                                     <tr>
                                         <th class="bg-light text-primary">Created At</th>

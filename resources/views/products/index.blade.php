@@ -192,7 +192,7 @@
                                     {{ $p->remarks ?? '-' }}
                                 </td>
 
-                                <td data-label="Warranty">{!! $p->warranty_countdown !!}</td>
+                                <td data-label="Warranty"><x-warranty-countdown :start="$p->warranty_start" :end="$p->warranty_end" /></td>
 
                                 <td data-label="Actions">
                                     <div class="d-flex flex-wrap gap-1 justify-content-center justify-content-md-start">

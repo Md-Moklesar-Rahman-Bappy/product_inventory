@@ -176,7 +176,7 @@
         {{-- Optional Live Badge Preview --}}
         @if($product->warranty_end)
           <div class="mb-3">
-            <strong>Status:</strong> {!! $product->warranty_countdown !!}
+            <strong>Status:</strong> <x-warranty-countdown :start="$product->warranty_start" :end="$product->warranty_end" />
           </div>
         @endif
 

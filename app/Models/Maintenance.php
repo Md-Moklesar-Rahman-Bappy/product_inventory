@@ -61,20 +61,4 @@ class Maintenance extends Model
         }
         return '—';
     }
-
-    public function getStatusBadgeAttribute(): string
-    {
-        if (!$this->start_time || !$this->end_time) {
-            return "<span class='badge bg-warning text-dark'>Pending</span>";
-        }
-
-        return "<span class='badge bg-success'>Completed</span>";
-    }
-
-    public function getDeletedBadgeAttribute(): string
-    {
-        return $this->trashed()
-            ? "<span class='badge bg-danger'>Archived</span>"
-            : '';
-    }
 }

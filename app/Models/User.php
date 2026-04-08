@@ -47,30 +47,11 @@ class User extends Authenticatable implements MustVerifyEmail
 
     // ──────── Accessors ─────────
 
-    public function getFormattedMobileAttribute(): string
-    {
-        if (!$this->mobile) {
-            return '<span class="text-muted">—</span>';
-        }
-
-        $code = $this->country_code ?? '880'; // fallback to Bangladesh
-        return "+{$code} {$this->mobile}";
-    }
     public function getProfilePhotoUrlAttribute(): string
     {
         return $this->profile_photo_path && Storage::disk('public')->exists($this->profile_photo_path)
             ? Storage::url($this->profile_photo_path)
             : asset('images/default-profile.png');
-    }
-
-    public function getMobileDisplayAttribute(): string
-    {
-        return $this->mobile ?: '<span class="text-muted">—</span>';
-    }
-
-    public function getDesignationDisplayAttribute(): string
-    {
-        return $this->designation ?: '<span class="text-muted">—</span>';
     }
 
     public function getRoleLabelAttribute(): string
@@ -83,16 +64,19 @@ class User extends Authenticatable implements MustVerifyEmail
         };
     }
 
-    public function getStatusBadgeAttribute(): string
-    {
-        return $this->status === 'active'
-            ? '<span class="badge bg-success">Active</span>'
-            : '<span class="badge bg-danger">Deactivated</span>';
-    }
-
     public function getFullNameAttribute(): string
     {
         return $this->name;
+    }
+
+    public function getDisplayMobileAttribute(): string
+    {
+        return $this->mobile ?: '—';
+    }
+
+    public function getDisplayDesignationAttribute(): string
+    {
+        return $this->designation ?: '—';
     }
 
     // ──────── Role Helpers ─────────
@@ -178,97 +162,6 @@ class User extends Authenticatable implements MustVerifyEmail
             $this->id,
             '<span class="text-warning fw-bold">Verification email sent</span> to user: <strong>' . e($this->name) . '</strong>'
         );
-    }
-
-    // ──────── Create New User ─────────
-    public static function newUser($request): self
-    {
-        $user = new self();
-
-        $user->fill([
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'mobile'      => $request->mobile,
-            'designation' => $request->designation,
-            'about'       => $request->about,
-            'address'     => $request->address,
-            'permission'  => $request->permission,
-            'utype'       => $request->permission === 1 ? 'ADM' : 'USR',
-            'password'    => bcrypt($request->password),
-            'status'      => 'active',
-        ]);
-
-        if ($request->hasFile('profile_photo_path')) {
-            $image = $request->file('profile_photo_path')->store('uploads/users', 'public');
-            $user->profile_photo_path = $image;
-        }
-
-        $user->save();
-        return $user;
-    }
-
-    // ──────── Update Existing User ─────────
-    public static function updateUser($request, $id): self
-    {
-        $user = self::findOrFail($id);
-
-        $user->fill([
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'mobile'      => $request->mobile,
-            'designation' => $request->designation,
-            'about'       => $request->about,
-            'address'     => $request->address,
-            'permission'  => $request->permission,
-            'utype'       => $request->permission === 1 ? 'ADM' : 'USR',
-        ]);
-
-        if ($request->filled('password')) {
-            $user->password = bcrypt($request->password);
-        }
-
-        if ($request->hasFile('profile_photo_path')) {
-            if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-                Storage::disk('public')->delete($user->profile_photo_path);
-            }
-
-            $image = $request->file('profile_photo_path')->store('uploads/users', 'public');
-            $user->profile_photo_path = $image;
-        }
-
-        $user->save();
-        return $user;
-    }
-
-    // ──────── Delete User (Soft Delete) ─────────
-    public static function deleteUser($id): void
-    {
-        $user = self::findOrFail($id);
-
-        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-            Storage::disk('public')->delete($user->profile_photo_path);
-        }
-
-        $user->delete();
-    }
-
-    // ──────── Restore Soft-Deleted User ─────────
-    public static function restoreUser($id): void
-    {
-        $user = self::withTrashed()->findOrFail($id);
-        $user->restore();
-    }
-
-    // ──────── Force Delete User ─────────
-    public static function forceDeleteUser($id): void
-    {
-        $user = self::withTrashed()->findOrFail($id);
-
-        if ($user->profile_photo_path && Storage::disk('public')->exists($user->profile_photo_path)) {
-            Storage::disk('public')->delete($user->profile_photo_path);
-        }
-
-        $user->forceDelete();
     }
 
     // ──────── Custom Verification Notification ─────────
