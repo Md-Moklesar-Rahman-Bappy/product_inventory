@@ -6,247 +6,207 @@
 <div class="row">
     <div class="col-lg-12">
         <div class="custom-card">
-
             {{-- Header --}}
-                <div class="card-header bg-primary text-white py-3">
-                    <div class="row gy-2 align-items-center">
+            <div class="card-header bg-primary text-white py-3">
+                <div class="row gy-3 align-items-center">
+                    {{-- Title --}}
+                    <div class="col-12 col-lg-2 d-flex align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2"></i>Products</h5>
+                        <span class="badge bg-light text-dark ms-2">{{ $products->total() }}</span>
+                    </div>
 
-                        {{-- Title & Count --}}
-                        <div class="col-12 col-md-3 d-flex align-items-center">
-                            <h5 class="mb-0 fw-bold">
-                                <i class="bi bi-box-seam me-2"></i> Products
-                            </h5>
-                            <span class="badge bg-light text-dark ms-3">
-                                {{ $products->total() }} items
-                            </span>
+                    {{-- AJAX Live Search --}}
+                    <div class="col-12 col-lg-3">
+                        <div class="position-relative">
+                            <div class="input-group">
+                                <input type="text" id="liveSearch" 
+                                    class="form-control form-control-sm" 
+                                    placeholder="Search serial no..."
+                                    autocomplete="off">
+                                <button class="btn btn-light btn-sm" type="button">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
+                            {{-- Search Results Dropdown --}}
+                            <div id="searchResults" class="position-absolute w-100 bg-white shadow-lg rounded border mt-1" style="z-index: 1000; display: none; max-height: 300px; overflow-y: auto;">
+                            </div>
                         </div>
+                        {{-- Hidden form for actual search --}}
+                        <form id="searchForm" method="GET" action="{{ route('products.index') }}" class="d-none">
+                            <input type="hidden" name="search" id="searchInput">
+                        </form>
+                    </div>
 
-                        {{-- Search Bar --}}
-                        <div class="col-12 col-md-3">
-                            <form method="GET" action="{{ route('products.index') }}" 
-                                class="d-flex justify-content-md-start justify-content-center">
-                                <div class="input-group input-group-sm w-100" style="max-width: 320px;">
-                                    <input type="text" name="search" value="{{ request('search') }}"
-                                        class="form-control"
-                                        placeholder="Search products..."
-                                        aria-label="Search">
-                                    <button class="btn btn-light" type="submit">
-                                        <i class="bi bi-search"></i>
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-
-                        {{-- Filters --}}
-                        <div class="col-12 col-md-3">
-                            <form method="GET" action="{{ route('products.index') }}" class="d-flex gap-2 flex-wrap">
-                                <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="">All Categories</option>
-                                    @foreach(\App\Models\Category::all() as $cat)
-                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
-                                            {{ $cat->category_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                <select name="brand_id" class="form-select form-select-sm" onchange="this.form.submit()">
-                                    <option value="">All Brands</option>
-                                    @foreach(\App\Models\Brand::all() as $brand)
-                                        <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
-                                            {{ $brand->brand_name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @if(request('search'))
-                                    <input type="hidden" name="search" value="{{ request('search') }}">
-                                @endif
-                            </form>
-                        </div>
-
-                        {{-- Action Buttons --}}
-                        <div class="col-12 col-md-6 text-md-end">
-                            @if(auth()->user()->permission <= 1)
-                                <div class="d-flex flex-wrap justify-content-md-end justify-content-center gap-2">
-
-                                    <a href="{{ route('products.sample') }}" 
-                                    class="btn btn-sm btn-secondary">
-                                        <i class="bi bi-download me-1"></i> Sample
-                                    </a>
-
-                                    <form action="{{ route('products.import') }}" method="POST" 
-                                        enctype="multipart/form-data" 
-                                        class="d-flex align-items-center gap-2">
-                                        @csrf
-                                        <input type="file" name="file" 
-                                            class="form-control form-control-sm" 
-                                            style="max-width: 140px;" required>
-                                        <button type="submit" class="btn btn-sm btn-primary">
-                                            <i class="bi bi-upload me-1"></i> Import
-                                        </button>
-                                    </form>
-
-                                    <a href="{{ route('products.export.excel') }}" 
-                                    class="btn btn-sm btn-success">
-                                        <i class="bi bi-file-earmark-excel me-1"></i> Export
-                                    </a>
-
-                                    <a href="{{ route('products.create') }}" 
-                                    class="btn btn-sm btn-warning fw-bold">
-                                        <i class="bi bi-plus-lg me-1"></i> Add
-                                    </a>
-
-                                </div>
+                    {{-- Filters --}}
+                    <div class="col-12 col-lg-4">
+                        <form method="GET" action="{{ route('products.index') }}" class="d-flex gap-2">
+                            <select name="category_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="">All Categories</option>
+                                @foreach(\App\Models\Category::all() as $cat)
+                                    <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->category_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <select name="brand_id" class="form-select form-select-sm" onchange="this.form.submit()">
+                                <option value="">All Brands</option>
+                                @foreach(\App\Models\Brand::all() as $brand)
+                                    <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->brand_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if(request('search'))
+                                <input type="hidden" name="search" value="{{ request('search') }}">
                             @endif
-                        </div>
+                        </form>
+                    </div>
+
+                    {{-- Actions --}}
+                    <div class="col-12 col-lg-3 text-lg-end">
+                        @if(auth()->user()->permission <= 1)
+                            <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                                <a href="{{ route('products.sample') }}" class="btn btn-sm btn-light text-primary">
+                                    <i class="bi bi-download me-1"></i>Sample
+                                </a>
+                                <a href="{{ route('products.export.excel') }}" class="btn btn-sm btn-light text-success">
+                                    <i class="bi bi-file-earmark-excel me-1"></i>Export
+                                </a>
+                                <a href="{{ route('products.create') }}" class="btn btn-sm btn-warning fw-bold">
+                                    <i class="bi bi-plus-lg me-1"></i>Add Product
+                                </a>
+                            </div>
+                        @endif
                     </div>
                 </div>
+            </div>
+
+            {{-- Import Form --}}
+            @if(auth()->user()->permission <= 1)
+            <div class="card-body py-2 border-bottom">
+                <form action="{{ route('products.import') }}" method="POST" 
+                    enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                    @csrf
+                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" required>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-upload me-1"></i>Import
+                    </button>
+                </form>
+            </div>
+            @endif
+
             {{-- Skipped Rows Alert --}}
             @if(Session::has('skippedRows') && count(Session::get('skippedRows')) > 0)
-                <div class="alert alert-warning alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-                    <i class="fa fa-exclamation-triangle me-1"></i>
-                    Some rows were skipped during import:
-
-                    <div class="table-responsive mt-2">
-                        <table class="table table-sm table-bordered table-striped mb-0 small">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Reason</th>
-                                    <th>Product Name</th>
-                                    <th>Serial No</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(Session::get('skippedRows') as $row)
-                                    <tr>
-                                        <td>{{ $row['skip_reason'] ?? 'Unknown' }}</td>
-                                        <td>{{ $row['product_name'] ?? 'N/A' }}</td>
-                                        <td>{{ $row['serial_no'] ?? 'N/A' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                <div class="m-3 alert alert-warning" role="alert">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong><i class="bi bi-exclamation-triangle me-1"></i>Skipped Rows ({{ count(Session::get('skippedRows')) }})</strong>
+                            <div class="table-responsive mt-2" style="max-height: 200px;">
+                                <table class="table table-sm table-bordered mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Reason</th>
+                                            <th>Product Name</th>
+                                            <th>Serial No</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach(Session::get('skippedRows') as $row)
+                                            <tr>
+                                                <td>{{ $row['skip_reason'] ?? 'Unknown' }}</td>
+                                                <td>{{ $row['product_name'] ?? 'N/A' }}</td>
+                                                <td>{{ $row['serial_no'] ?? 'N/A' }}</td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{{ route('products.skipped.export') }}" class="btn btn-sm btn-outline-dark">
+                                <i class="bi bi-download"></i>
+                            </a>
+                            <form action="{{ route('products.skipped.clear') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn-close" aria-label="Close"></button>
+                            </form>
+                        </div>
                     </div>
-
-                    {{-- Download skipped rows --}}
-                    <a href="{{ route('products.skipped.export') }}" class="btn btn-sm btn-outline-dark mt-2">
-                        <i class="fa fa-download"></i> Download Skipped Rows CSV
-                    </a>
-
-                    {{-- X button that clears skipped rows session --}}
-                    <form action="{{ route('products.skipped.clear') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn-close" aria-label="Close"></button>
-                    </form>
                 </div>
             @endif
 
-            {{-- Body --}}
-            <div class="card-body bg-light p-4">
-                @if(Session::has('success'))
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-                        <i class="fa fa-check-circle me-1"></i> {{ Session::get('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
-                @if(Session::has('error'))
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-                        <i class="fa fa-exclamation-circle me-1"></i> {{ Session::get('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
-
+            {{-- Table --}}
+            <div class="card-body p-0">
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle text-center shadow-sm product-table">
-                        <thead class="text-uppercase fw-bold text-primary" style="background-color: #e3f2fd;">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
                             <tr>
-                                <th style="width: 50px;">SL</th>
-                                <th style="min-width: 80px;">Product</th>
-                                {{-- <th style="min-width: 90px;">Price</th> --}}
-                                <th style="min-width: 90px;">Serial No</th>
-                                <th class="d-none-xs" style="min-width: 80px;">Project Serial</th>
-                                <th class="d-none-xs" style="min-width: 70px;">Location</th>
-                                <th class="d-none-md" style="min-width: 100px;">User Description</th>
-                                <th class="d-none-sm" style="min-width: 80px;">Remarks</th>
-                                <th style="min-width: 90px;">Warranty</th>
-                                <th style="min-width: 120px;">Actions</th>
+                                <th class="text-center" style="width: 50px;">#</th>
+                                <th>Product</th>
+                                <th>Serial No</th>
+                                <th class="d-none d-md-table-cell">Location</th>
+                                <th class="d-none d-lg-table-cell">User Desc</th>
+                                <th class="d-none d-lg-table-cell">Remarks</th>
+                                <th style="width: 100px;">Warranty</th>
+                                <th style="width: 150px;" class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($products as $p)
+                            @forelse($products as $index => $p)
                             <tr>
-                                <td data-label="SL" class="fw-bold text-primary">
+                                <td class="text-center text-muted">
                                     {{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}
                                 </td>
 
-                                <td data-label="Product" class="fw-semibold text-dark text-truncate tooltip-cell" title="{{ $p->product_name }}">
-                                    @if(request('search'))
-                                        {!! str_replace(request('search'), '<mark>' . e(request('search')) . '</mark>', e($p->product_name)) !!}
-                                    @else
-                                        {{ $p->product_name }}
-                                    @endif
+                                <td>
+                                    <div class="fw-semibold text-dark">{{ $p->product_name }}</div>
+                                    <small class="text-muted">{{ $p->category->category_name ?? '' }} | {{ $p->brand->brand_name ?? '' }}</small>
                                 </td>
 
-                                {{-- <td data-label="Price">{{ number_format($p->price, 2) }} ৳</td> --}}
-
-                                <td data-label="Serial No" class="tooltip-cell text-truncate" title="{{ $p->serial_no }}">
-                                    @if(request('search'))
-                                        {!! str_replace(request('search'), '<mark>' . e(request('search')) . '</mark>', e($p->serial_no)) !!}
-                                    @else
-                                        {{ $p->serial_no ?? '-' }}
-                                    @endif
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ $p->serial_no ?? '-' }}</span>
                                 </td>
 
-                                <td data-label="Project Serial" class="d-none-xs tooltip-cell text-truncate" title="{{ $p->project_serial_no }}">
-                                    @if(request('search'))
-                                        {!! str_replace(request('search'), '<mark>' . e(request('search')) . '</mark>', e($p->project_serial_no)) !!}
-                                    @else
-                                        {{ $p->project_serial_no ?? '-' }}
-                                    @endif
-                                </td>
+                                <td class="d-none d-md-table-cell">{{ $p->position ?? '-' }}</td>
 
-                                <td data-label="Location" class="d-none-xs tooltip-cell text-truncate" title="{{ $p->position }}">
-                                    {{ $p->position ?? '-' }}
-                                </td>
-
-                                <td data-label="User Description" class="d-none-md tooltip-cell text-truncate" title="{{ $p->user_description }}">
+                                <td class="d-none d-lg-table-cell text-truncate" style="max-width: 150px;">
                                     {{ $p->user_description ?? '-' }}
                                 </td>
 
-                                <td data-label="Remarks" class="d-none-sm tooltip-cell text-truncate" title="{{ $p->remarks }}">
+                                <td class="d-none d-lg-table-cell text-truncate" style="max-width: 100px;">
                                     {{ $p->remarks ?? '-' }}
                                 </td>
 
-                                <td data-label="Warranty">{!! $p->warranty_countdown !!}</td>
+                                <td>{!! $p->warranty_countdown !!}</td>
 
-                                <td data-label="Actions">
-                                    <div class="d-flex flex-wrap gap-1 justify-content-center justify-content-md-start">
+                                <td>
+                                    <div class="d-flex justify-content-center gap-1">
                                         <a href="{{ route('products.show', $p->id) }}" 
                                         class="btn btn-sm btn-outline-info" title="View">
-                                            <i class="fa fa-eye"></i>
+                                            <i class="bi bi-eye"></i>
                                         </a>
 
                                         @if(auth()->user()->permission <= 1)
                                             <a href="{{ route('products.edit', $p->id) }}" 
                                             class="btn btn-sm btn-outline-warning" title="Edit">
-                                                <i class="fa fa-edit"></i>
+                                                <i class="bi bi-pencil"></i>
                                             </a>
 
-                                            <form action="{{ route('products.destroy', $p->id) }}" 
-                                                method="POST" class="d-inline">
+                                            <form action="{{ route('products.destroy', $p->id) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" 
-                                                        class="btn btn-sm btn-outline-danger delete-btn" 
-                                                        data-title="Delete Product"
-                                                        data-text="Are you sure you want to delete {{ $p->product_name }}? This action can be undone."
-                                                        title="Delete">
-                                                    <i class="fa fa-trash"></i>
+                                                    class="btn btn-sm btn-outline-danger delete-btn" 
+                                                    data-title="Delete Product"
+                                                    data-text="Delete {{ $p->product_name }}?"
+                                                    title="Delete">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
                                             </form>
 
                                             <a href="{{ route('maintenance.create', ['product_id' => $p->id]) }}" 
-                                            class="btn btn-sm btn-outline-primary" title="Send to Maintenance">
-                                                <i class="fa fa-tools me-1"></i>
+                                            class="btn btn-sm btn-outline-primary" title="Maintenance">
+                                                <i class="bi bi-tools"></i>
                                             </a>
                                         @endif
                                     </div>
@@ -254,12 +214,12 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="12" class="text-center py-5 text-muted">
-                                    <div class="d-flex flex-column align-items-center justify-content-center">
-                                        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No products" width="100" class="mb-3 opacity-75">
-                                        <h5 class="fw-bold text-danger">No products found</h5>
-                                        <a href="{{ route('products.create') }}" class="btn btn-outline-primary btn-lg fw-bold">
-                                            <i class="fa fa-plus me-1"></i> Add Product
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                        <h6 class="fw-bold text-muted mt-3">No products found</h6>
+                                        <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm mt-2">
+                                            <i class="bi bi-plus-lg me-1"></i>Add Product
                                         </a>
                                     </div>
                                 </td>
@@ -269,46 +229,45 @@
                     </table>
                 </div>
 
-                <!-- Pagination -->
-                <x-pagination-block :paginator="$products" />
+                {{-- Pagination --}}
+                <div class="p-3 border-top">
+                    <x-pagination-block :paginator="$products" />
+                </div>
 
-                <!-- Recycle Bin Section -->
+                {{-- Recycle Bin --}}
                 @if(\App\Models\Product::onlyTrashed()->count() > 0)
-                <div class="mt-4">
-                    <h5 class="text-danger">🗑️ Recycle Bin</h5>
+                <div class="card-body border-top bg-light">
+                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-trash me-1"></i>Recycle Bin</h6>
                     <div class="table-responsive">
-                        <table class="table table-bordered product-table">
-                            <thead class="bg-light">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
                                 <tr>
-                                    <th>Product Name</th>
+                                    <th>Product</th>
                                     <th>Serial No</th>
-                                    <th class="d-none-sm">Deleted At</th>
-                                    <th>Action</th>
+                                    <th>Deleted</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach(\App\Models\Product::onlyTrashed()->get() as $deleted)
                                 <tr>
-                                    <td class="tooltip-cell" title="{{ $deleted->product_name }}">
-                                        {{ Str::limit($deleted->product_name, 15, '...') }}
-                                    </td>
+                                    <td>{{ $deleted->product_name }}</td>
                                     <td>{{ $deleted->serial_no }}</td>
-                                    <td class="d-none-sm">{{ $deleted->deleted_at->format('d M Y, h:i A') }}</td>
+                                    <td>{{ $deleted->deleted_at->format('d M Y') }}</td>
                                     <td>
-                                        <form action="{{ route('products.restore', $deleted->id) }}" method="POST" style="display:inline;">
+                                        <form action="{{ route('products.restore', $deleted->id) }}" method="POST" class="d-inline">
                                             @csrf
-                                            <button class="btn btn-sm btn-success" title="Restore Product">
-                                                <i class="fa fa-undo"></i> Restore
+                                            <button class="btn btn-sm btn-success">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
                                             </button>
                                         </form>
-                                        <form action="{{ route('products.forceDelete', $deleted->id) }}" method="POST" style="display:inline;">
+                                        <form action="{{ route('products.forceDelete', $deleted->id) }}" method="POST" class="d-inline">
                                             @csrf
                                             @method('DELETE')
                                             <button class="btn btn-sm btn-danger delete-btn" 
                                                 data-title="Permanent Delete"
-                                                data-text="This will permanently delete {{ $deleted->product_name }}. This action cannot be undone!"
-                                                title="Permanently Delete">
-                                                <i class="fa fa-trash"></i> Delete Permanently
+                                                data-text="Permanently delete {{ $deleted->product_name }}?">
+                                                <i class="bi bi-trash me-1"></i>Delete
                                             </button>
                                         </form>
                                     </td>
@@ -324,66 +283,69 @@
     </div>
 </div>
 
-<style>
-    /* Compact text for all tables */
-    .product-table {
-        font-size: 0.8rem;
-    }
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('liveSearch');
+    const searchResults = document.getElementById('searchResults');
+    const searchForm = document.getElementById('searchForm');
+    const searchHiddenInput = document.getElementById('searchInput');
+    let debounceTimer;
 
-    .product-table td,
-    .product-table th {
-        padding-left: 0.5rem; /* reduce left gap */
-        text-align: left;     /* align everything left */
-    }
+    // Hide results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+            searchResults.style.display = 'none';
+        }
+    });
 
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    /* Mobile card layout */
-    @media (max-width: 767px) {
-        .product-table,
-        .product-table thead,
-        .product-table tbody,
-        .product-table th,
-        .product-table td,
-        .product-table tr {
-            display: block;
-            width: 100%;
+    // Live search on keyup
+    searchInput.addEventListener('keyup', function() {
+        const query = this.value.trim();
+        
+        clearTimeout(debounceTimer);
+        
+        if (query.length < 2) {
+            searchResults.style.display = 'none';
+            return;
         }
 
-        .product-table thead {
-            display: none; /* hide header on mobile */
-        }
+        debounceTimer = setTimeout(function() {
+            fetch('{{ route("products.search") }}?q=' + encodeURIComponent(query))
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        searchResults.innerHTML = '<div class="p-3 text-muted text-center">No products found</div>';
+                    } else {
+                        searchResults.innerHTML = data.map(product => `
+                            <a href="/products/${product.id}" class="text-decoration-none">
+                                <div class="p-2 border-bottom hover-bg-light d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fw-semibold text-dark">${product.product_name}</div>
+                                        <small class="text-muted">${product.serial_no || 'No serial'}</small>
+                                    </div>
+                                    <i class="bi bi-chevron-right text-muted"></i>
+                                </div>
+                            </a>
+                        `).join('');
+                    }
+                    searchResults.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                });
+        }, 300);
+    });
 
-        .product-table tr {
-            margin-bottom: 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            background: #fff;
-            padding: 0.5rem;
-            text-align: left;
+    // Submit form on Enter in search box (for full page search)
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            searchHiddenInput.value = searchInput.value;
+            searchForm.submit();
         }
-
-        .product-table td {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 0.4rem 0.6rem;
-            border: none;
-            font-size: 0.85rem;
-        }
-
-        .product-table td::before {
-            content: attr(data-label);
-            flex: 0 0 40%;
-            font-weight: 600;
-            color: #007bff;
-            text-align: left;
-            margin-right: 0.5rem;
-        }
-    }
-</style>
-
+    });
+});
+</script>
+@endpush
 @endsection
-

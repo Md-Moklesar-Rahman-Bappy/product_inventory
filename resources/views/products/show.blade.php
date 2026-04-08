@@ -1,180 +1,174 @@
 @extends('layouts.app')
 
-@section('title', 'Show Product')
+@section('title', 'Product Details')
 
 @section('contents')
-  <div class="container py-4">
-    <div class="card shadow-sm">
-      <div class="card-header bg-info text-white">
-        <h4 class="mb-0"><i class="fa fa-box-open me-2"></i> Product Details</h4>
-      </div>
-
-      <div class="card-body">
-        {{-- 📦 Product Info --}}
-        <h5 class="text-secondary mb-3">📦 Product Info</h5>
-
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Product Name</label>
-            <input type="text" class="form-control" value="{{ $product->product_name }}" readonly title="{{ $product->product_name }}">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Price (৳)</label>
-            <input type="text" class="form-control" value="{{ number_format($product->price, 2) }}" readonly title="{{ $product->price }}">
-            @if($product->price > 1000000)
-              <span class="badge bg-danger text-light mt-2">💸 High Value</span>
-            @elseif($product->price < 500000)
-              <span class="badge bg-success mt-2">🔖 Budget Pick</span>
-            @endif
-          </div>
-        </div>
-
-        {{-- 🏷️ Brand & Model --}}
-        <div class="row mb-3">
-          <div class="col-md-4">
-            <label class="form-label">Category</label>
-            <input type="text" class="form-control" value="{{ $product->category?->category_name ?? 'N/A' }}" readonly title="{{ $product->category?->category_name }}">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Brand</label>
-            <input type="text" class="form-control" value="{{ $product->brand?->brand_name ?? 'N/A' }}" readonly title="{{ $product->brand?->brand_name }}">
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">Model</label>
-            <input type="text" class="form-control" value="{{ $product->model?->model_name ?? 'N/A' }}" readonly title="{{ $product->model?->model_name }}">
-          </div>
-        </div>
-
-        {{-- 🔢 Serial Numbers --}}
-        <h5 class="text-secondary mb-3">🔢 Serial Numbers</h5>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Serial No</label>
-            <input type="text" class="form-control" value="{{ $product->serial_no ?? '-' }}" readonly title="{{ $product->serial_no }}">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Project Serial No</label>
-            <input type="text" class="form-control" value="{{ $product->project_serial_no ?? '-' }}" readonly title="{{ $product->project_serial_no }}">
-          </div>
-        </div>
-
-        {{-- 📍 Location & Description --}}
-        <h5 class="text-secondary mb-3">📍 Location & Description</h5>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Location</label>
-            <input type="text" class="form-control" value="{{ $product->position ?? '-' }}" readonly title="{{ $product->position }}">
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">User Description</label>
-            <textarea class="form-control" rows="3" readonly title="{{ $product->user_description }}">{{ $product->user_description ?? '-' }}</textarea>
-          </div>
-        </div>
-
-        {{-- 📝 Remarks --}}
-        <h5 class="text-secondary mb-3">📝 Remarks</h5>
-        <div class="mb-3">
-          <label class="form-label">Remarks</label>
-          <textarea class="form-control" rows="3" readonly title="{{ $product->remarks }}">{{ $product->remarks ?? '-' }}</textarea>
-        </div>
-
-        {{-- 🛡️ Warranty Status with Time --}}
-        {{-- <h5 class="text-secondary mb-3">🛡️ Warranty Status</h5>
-        <div class="row mb-3">
-          <div class="col-md-6">
-            <label class="form-label">Warranty Start</label>
-            <input type="text" class="form-control" value="{{ $product->warranty_start?->format('Y-m-d H:i') ?? '-' }}" readonly>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Warranty End</label>
-            <input type="text" class="form-control" value="{{ $product->warranty_end?->format('Y-m-d H:i') ?? '-' }}" readonly>
-          </div>
-        </div>
-
-        @php
-          $now = now();
-          $start = $product->warranty_start;
-          $end = $product->warranty_end;
-        @endphp
-
-        @if($start && $end)
-          @if($now->between($start, $end))
-            <div class="alert alert-success shadow-sm">
-              <i class="fa fa-check-circle me-1"></i>
-              Warranty is active. <strong>{{ $end->diffForHumans($now, ['parts' => 2]) }} remaining</strong>.
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="custom-card">
+            {{-- Header --}}
+            <div class="card-header bg-info text-white py-3">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold"><i class="bi bi-box-seam me-2"></i>Product Details</h4>
+                    <a href="{{ route('products.index') }}" class="btn btn-sm btn-light text-dark">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
+                </div>
             </div>
-          @elseif($now->lt($start))
-            <div class="alert alert-warning shadow-sm">
-              <i class="fa fa-hourglass-start me-1"></i>
-              Warranty starts in <strong>{{ $start->diffForHumans($now, ['parts' => 2]) }}</strong>.
-            </div>
-          @else
-            <div class="alert alert-danger shadow-sm">
-              <i class="fa fa-times-circle me-1"></i>
-              Warranty expired <strong>{{ $end->diffForHumans($now, ['parts' => 2]) }}</strong> ago.
-            </div>
-          @endif
-        @endif --}}
-        {{-- 🛡️ Warranty Status --}}
-        <h5 class="text-secondary mb-3">🛡️ Warranty Status</h5>
-        <div class="row mb-3">
-        <div class="col-md-6">
-            <label class="form-label">Warranty Start</label>
-            <input type="text" class="form-control"
-                value="{{ $product->warranty_start?->format('Y-m-d') ?? '-' }}" readonly>
-        </div>
-        <div class="col-md-6">
-            <label class="form-label">Warranty End</label>
-            <input type="text" class="form-control"
-                value="{{ $product->warranty_end?->format('Y-m-d') ?? '-' }}" readonly>
-        </div>
-        </div>
 
-        @php
-        $now = now();
-        $start = $product->warranty_start;
-        $end = $product->warranty_end;
-        @endphp
+            {{-- Body --}}
+            <div class="card-body p-4">
+                {{-- Product Info --}}
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-box me-2"></i>Product Info</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Product Name</small>
+                            <strong>{{ $product->product_name }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Price</small>
+                            <strong>{{ number_format($product->price, 2) }} ৳</strong>
+                            @if($product->price > 100000)
+                                <span class="badge bg-danger text-light ms-2">High Value</span>
+                            @elseif($product->price < 5000)
+                                <span class="badge bg-success ms-2">Budget Pick</span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
 
-        @if($start && $end)
-        @if($now->between($start, $end))
-            <div class="alert alert-success shadow-sm">
-            <i class="fa fa-check-circle me-1"></i>
-            Warranty is active. <strong>{{ $end->diffForHumans($now, ['parts' => 2]) }} remaining</strong>.
-            </div>
-        @elseif($now->lt($start))
-            <div class="alert alert-warning shadow-sm">
-            <i class="fa fa-hourglass-start me-1"></i>
-            Warranty starts in <strong>{{ $start->diffForHumans($now, ['parts' => 2]) }}</strong>.
-            </div>
-        @else
-            <div class="alert alert-danger shadow-sm">
-            <i class="fa fa-times-circle me-1"></i>
-            Warranty expired <strong>{{ $end->diffForHumans($now, ['parts' => 2]) }}</strong> ago.
-            </div>
-        @endif
-        @endif
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Category</small>
+                            <strong>{{ $product->category?->category_name ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Brand</small>
+                            <strong>{{ $product->brand?->brand_name ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Model</small>
+                            <strong>{{ $product->model?->model_name ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                </div>
 
-        {{-- 📅 Timestamps --}}
-        <h5 class="text-secondary mb-3">📅 Timestamps</h5>
-        <div class="row">
-          <div class="col-md-6">
-            <label class="form-label">Created At</label>
-            <input type="text" class="form-control" value="{{ $product->created_at->format('Y-m-d H:i') }}" readonly>
-          </div>
-          <div class="col-md-6">
-            <label class="form-label">Updated At</label>
-            <input type="text" class="form-control" value="{{ $product->updated_at->format('Y-m-d H:i') }}" readonly>
-          </div>
+                {{-- Serial Numbers --}}
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-upc me-2"></i>Serial Numbers</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Serial No</small>
+                            <strong>{{ $product->serial_no ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Project Serial No</small>
+                            <strong>{{ $product->project_serial_no ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Location & Description --}}
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-geo-alt me-2"></i>Location & Description</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Location</small>
+                            <strong>{{ $product->position ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">User Description</small>
+                            <strong>{{ $product->user_description ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Remarks --}}
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-chat-left-text me-2"></i>Remarks</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-12">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Remarks</small>
+                            <strong>{{ $product->remarks ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Warranty --}}
+                <h5 class="text-primary fw-bold mb-3"><i class="bi bi-shield-check me-2"></i>Warranty</h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Warranty Start</small>
+                            <strong>{{ $product->warranty_start?->format('d M Y') ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Warranty End</small>
+                            <strong>{{ $product->warranty_end?->format('d M Y') ?? 'N/A' }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                @if($product->warranty_end)
+                    <div class="mb-4">
+                        {!! $product->warranty_countdown !!}
+                    </div>
+                @endif
+
+                {{-- Timestamps --}}
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Created At</small>
+                            <strong>{{ $product->created_at->format('d M Y, h:i A') }}</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="p-3 bg-light rounded">
+                            <small class="text-muted d-block">Updated At</small>
+                            <strong>{{ $product->updated_at->format('d M Y, h:i A') }}</strong>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div class="d-flex justify-content-between pt-3 border-top">
+                    <a href="{{ route('products.index') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left me-1"></i>Back to List
+                    </a>
+                    <div class="d-flex gap-2">
+                        @if(auth()->user()->permission <= 1)
+                            <a href="{{ route('products.edit', $product->id) }}" class="btn btn-warning">
+                                <i class="bi bi-pencil me-1"></i>Edit
+                            </a>
+                            <form action="{{ route('products.destroy', $product->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger delete-btn"
+                                    data-title="Delete Product"
+                                    data-text="Are you sure you want to delete this product?">
+                                    <i class="bi bi-trash me-1"></i>Delete
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                </div>
+            </div>
         </div>
-
-        {{-- 🔙 Back Button --}}
-        <div class="mt-4">
-          <a href="{{ url()->previous() }}" class="btn btn-secondary">
-            <i class="fa fa-arrow-left me-1"></i> Go Back
-          </a>
-        </div>
-      </div>
     </div>
-  </div>
+</div>
 @endsection

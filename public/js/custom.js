@@ -5,15 +5,19 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // ===================================
-    // Sidebar Toggle
+    // Sidebar Toggle - Only on mobile
     // ===================================
     window.toggleSidebar = function() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.querySelector('.sidebar-overlay');
-        
         if (window.innerWidth < 992) {
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            if (sidebar) {
+                sidebar.classList.toggle('open');
+            }
+            if (overlay) {
+                overlay.classList.toggle('active');
+            }
         }
     };
 
@@ -182,3 +186,36 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+// ===================================
+// Toastr Helper Functions
+// ===================================
+window.showToast = function(type, message, title = '') {
+    const toastTypes = {
+        'success': toastr.success,
+        'error': toastr.error,
+        'warning': toastr.warning,
+        'info': toastr.info
+    };
+    
+    if (toastTypes[type]) {
+        toastTypes[type](message, title);
+    }
+};
+
+// Convenience methods
+window.toastSuccess = function(message, title = 'Success') {
+    toastr.success(message, title);
+};
+
+window.toastError = function(message, title = 'Error') {
+    toastr.error(message, title);
+};
+
+window.toastWarning = function(message, title = 'Warning') {
+    toastr.warning(message, title);
+};
+
+window.toastInfo = function(message, title = 'Info') {
+    toastr.info(message, title);
+};

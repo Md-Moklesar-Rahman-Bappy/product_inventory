@@ -117,18 +117,27 @@ Route::middleware(['auth'])->group(function () {
     Route::get('category/{id}/products/export', [CategoryController::class, 'exportCategoryProducts'])->name('category.products.export');
     Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
     Route::delete('categories/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete');
+    Route::post('categories/import', [CategoryController::class, 'import'])->name('categories.import');
+    Route::get('categories/sample', [CategoryController::class, 'downloadSample'])->name('categories.sample');
+    Route::get('categories/export', [CategoryController::class, 'export'])->name('categories.export');
 
     // 🏷️ Brands
     Route::resource('brands', BrandController::class);
     Route::get('brands/{id}/products', [BrandController::class, 'products'])->name('brands.products');
     Route::post('brands/{id}/restore', [BrandController::class, 'restore'])->name('brands.restore');
     Route::delete('brands/{id}/force-delete', [BrandController::class, 'forceDelete'])->name('brands.forceDelete');
+    Route::post('brands/import', [BrandController::class, 'import'])->name('brands.import');
+    Route::get('brands/sample', [BrandController::class, 'downloadSample'])->name('brands.sample');
+    Route::get('brands/export', [BrandController::class, 'export'])->name('brands.export');
 
     // 🧩 Models
     Route::resource('models', AssetModelController::class);
     Route::get('models/{id}/products', [AssetModelController::class, 'products'])->name('models.products');
     Route::post('models/{id}/restore', [AssetModelController::class, 'restore'])->name('models.restore');
     Route::delete('models/{id}/force-delete', [AssetModelController::class, 'forceDelete'])->name('models.forceDelete');
+    Route::post('models/import', [AssetModelController::class, 'import'])->name('models.import');
+    Route::get('models/sample', [AssetModelController::class, 'downloadSample'])->name('models.sample');
+    Route::get('models/export', [AssetModelController::class, 'export'])->name('models.export');
 
     // 📦 Products Import/Export grouped
     Route::prefix('products')->group(function () {
@@ -143,6 +152,9 @@ Route::middleware(['auth'])->group(function () {
 
         // 🚨 New route for clearing skipped rows
         Route::post('skipped/clear', [ProductController::class, 'clearSkippedRows'])->name('products.skipped.clear');
+
+        // 🔍 AJAX Live Search
+        Route::get('search', [ProductController::class, 'search'])->name('products.search');
 
         // Export products
         Route::prefix('export')->group(function () {

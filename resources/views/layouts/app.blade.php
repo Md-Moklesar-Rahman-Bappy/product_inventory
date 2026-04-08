@@ -15,6 +15,12 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <!-- Toastr CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
     
@@ -39,6 +45,7 @@
         
         <nav class="sidebar-nav">
             <ul class="nav flex-column">
+                {{-- Dashboard --}}
                 <li class="nav-item">
                     <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="bi bi-grid-1x2"></i>
@@ -46,22 +53,16 @@
                     </a>
                 </li>
                 
-                @if(auth()->user()->permission === 0)
+                {{-- Activity Log --}}
                 <li class="nav-item">
-                    <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                        <i class="bi bi-people"></i>
-                        <span>Manage Users</span>
+                    <a href="{{ route('activity.logs') }}" class="nav-link {{ request()->routeIs('activity.logs') ? 'active' : '' }}">
+                        <i class="bi bi-clock-history"></i>
+                        <span>Activity Log</span>
                     </a>
                 </li>
-                @endif
                 
+                {{-- Categories, Brands, Models, Products (Admin only) --}}
                 @if(in_array(auth()->user()->permission, [0, 1]))
-                <li class="nav-item">
-                    <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                        <i class="bi bi-box"></i>
-                        <span>Products</span>
-                    </a>
-                </li>
                 <li class="nav-item">
                     <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
                         <i class="bi bi-tags"></i>
@@ -81,29 +82,44 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                        <i class="bi bi-box"></i>
+                        <span>Products</span>
+                    </a>
+                </li>
+                
+                {{-- Warranty --}}
+                <li class="nav-item">
+                    <a href="{{ route('warranties.index') }}" class="nav-link {{ request()->routeIs('warranties.*') ? 'active' : '' }}">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Warranty</span>
+                    </a>
+                </li>
+                
+                {{-- Maintenance --}}
+                <li class="nav-item">
                     <a href="{{ route('maintenance.index') }}" class="nav-link {{ request()->routeIs('maintenance.*') ? 'active' : '' }}">
                         <i class="bi bi-tools"></i>
                         <span>Maintenance</span>
                     </a>
                 </li>
+                @endif
+                
+                {{-- Manage Users (Superadmin only) --}}
+                @if(auth()->user()->permission === 0)
                 <li class="nav-item">
-                    <a href="{{ route('warranties.index') }}" class="nav-link {{ request()->routeIs('warranties.*') ? 'active' : '' }}">
-                        <i class="bi bi-shield-check"></i>
-                        <span>Warranties</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('activity.logs') }}" class="nav-link {{ request()->routeIs('activity.logs') ? 'active' : '' }}">
-                        <i class="bi bi-clock-history"></i>
-                        <span>Activity Logs</span>
+                    <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <i class="bi bi-person-plus"></i>
+                        <span>Manage Users</span>
                     </a>
                 </li>
                 @endif
                 
+                {{-- Profile --}}
                 <li class="nav-item">
                     <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
                         <i class="bi bi-person-circle"></i>
-                        <span>My Profile</span>
+                        <span>Profile</span>
                     </a>
                 </li>
             </ul>
@@ -121,13 +137,13 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
         <!-- Top Navbar -->
         <header class="top-navbar">
             <div class="container-fluid">
                 <div class="row align-items-center">
                     <div class="col-auto">
-                        <button class="toggle-btn" onclick="toggleSidebar()">
+                        <button class="toggle-btn" onclick="toggleSidebar()" title="Toggle Sidebar">
                             <i class="bi bi-list"></i>
                         </button>
                     </div>
@@ -161,35 +177,6 @@
         <!-- Page Content -->
         <div class="page-content">
             <div class="container-fluid">
-                <!-- Flash Messages -->
-                @if(session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="bi bi-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-                
-                @if(session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-circle me-2"></i>{{ session('error') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-                
-                @if(session('warning'))
-                <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                    <i class="bi bi-exclamation-triangle me-2"></i>{{ session('warning') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-                
-                @if(session('message'))
-                <div class="alert alert-info alert-dismissible fade show" role="alert">
-                    <i class="bi bi-info-circle me-2"></i>{{ session('message') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-                @endif
-
                 @yield('contents')
             </div>
         </div>
@@ -212,26 +199,99 @@
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- Toastr JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <!-- Custom Scripts -->
     <script src="{{ asset('js/custom.js') }}"></script>
     
     <script>
-        // Toggle Sidebar
+        // Toggle Sidebar - Collapse/Expand
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
+            const mainContent = document.getElementById('mainContent');
+            const isDesktop = window.innerWidth >= 992;
+            
+            if (isDesktop) {
+                // Desktop: toggle between collapsed (icons only) and expanded
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('collapsed');
+            } else {
+                // Mobile: slide in/out
+                sidebar.classList.toggle('open');
+                const overlay = document.querySelector('.sidebar-overlay');
+                overlay.classList.toggle('active');
+            }
+            
+            // Save state to localStorage
+            const isCollapsed = sidebar.classList.contains('collapsed');
+            localStorage.setItem('sidebarCollapsed', isCollapsed);
         }
         
-        // Auto-hide alerts
+        // Initialize sidebar state on page load
         document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
-                document.querySelectorAll('.alert').forEach(function(alert) {
-                    const bsAlert = new bootstrap.Alert(alert);
-                    bsAlert.close();
-                });
-            }, 5000);
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const isDesktop = window.innerWidth >= 992;
+            
+            // Check localStorage for saved state
+            const savedState = localStorage.getItem('sidebarCollapsed');
+            if (savedState === 'true' && isDesktop) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('collapsed');
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                const nowDesktop = window.innerWidth >= 992;
+                if (nowDesktop) {
+                    // On desktop, remove mobile open state
+                    sidebar.classList.remove('open');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (overlay) overlay.classList.remove('active');
+                }
+            });
+        });
+        
+        // Toastr Configuration
+        toastr.options = {
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": true,
+            "progressBar": true,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "4000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        
+        // Display Toastr notifications from session
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(session('success'))
+                toastr.success('{{ strip_tags(session('success')) }}', 'Success');
+            @endif
+            
+            @if(session('error'))
+                toastr.error('{{ strip_tags(session('error')) }}', 'Error');
+            @endif
+            
+            @if(session('warning'))
+                toastr.warning('{{ strip_tags(session('warning')) }}', 'Warning');
+            @endif
+            
+            @if(session('message'))
+                toastr.info('{{ strip_tags(session('message')) }}', 'Info');
+            @endif
         });
     </script>
     

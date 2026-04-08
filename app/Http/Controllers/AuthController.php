@@ -11,13 +11,13 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // 📝 Show Registration Form
+    // Show Registration Form
     public function register()
     {
-        return view('auth.register'); // resources/views/auth/register.blade.php
+        return view('auth.register');
     }
 
-    // ✅ Handle Registration
+    // Handle Registration
     public function registerSave(Request $request)
     {
         $request->validate([
@@ -34,18 +34,18 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
         ]);
 
-        event(new Registered($user)); // ✅ Send verification email
+        event(new Registered($user));
 
-        return redirect()->route('login')->with('success', '✅ Account created successfully. Please check your email to verify.');
+        return redirect()->route('login')->with('success', 'Account created successfully. Please check your email to verify.');
     }
 
-    // 🔐 Show Login Form
+    // Show Login Form
     public function login()
     {
-        return view('auth.login'); // resources/views/auth/login.blade.php
+        return view('auth.login');
     }
 
-    // 🔓 Handle Login
+    // Handle Login
     public function loginAction(Request $request)
     {
         Validator::make($request->all(), [
@@ -63,7 +63,15 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // 📧 Send verification email if not verified
+        // Log login activity
+        ActivityLogController::logAction(
+            'login',
+            'User',
+            $user->id,
+            '<span class="text-success fw-bold">Logged in</span> as: <strong>'.e($user->name).'</strong> <span class="text-muted">('.e($user->email).')</span>'
+        );
+
+        // Send verification email if not verified
         if (! $user->hasVerifiedEmail()) {
             event(new Registered($user));
         }
@@ -71,9 +79,21 @@ class AuthController extends Controller
         return redirect()->route('dashboard');
     }
 
-    // 🚪 Logout
+    // Logout
     public function logout(Request $request)
     {
+        $user = Auth::user();
+
+        // Log logout activity before logging out
+        if ($user) {
+            ActivityLogController::logAction(
+                'logout',
+                'User',
+                $user->id,
+                '<span class="text-warning fw-bold">Logged out</span>: <strong>'.e($user->name).'</strong>'
+            );
+        }
+
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
@@ -81,9 +101,9 @@ class AuthController extends Controller
         return redirect()->route('login');
     }
 
-    // 👤 Profile View
+    // Profile View
     public function profile()
     {
-        return view('profile'); // resources/views/profile.blade.php
+        return view('profile');
     }
 }

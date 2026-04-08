@@ -1,154 +1,171 @@
 @extends('layouts.app')
 
-@section('title', 'Home Brands')
+@section('title', 'Brands')
 
 @section('contents')
-<div class="container py-5">
-  {{-- Card Wrapper --}}
-  <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-
-    {{-- Gradient Header --}}
-    <div class="card-header text-white d-flex justify-content-between align-items-center"
-         style="background: linear-gradient(90deg, #00C9FF, #92FE9D); padding: 1.5rem;">
-      <h3 class="mb-0 fw-bold">
-        <i class="fa fa-tags me-2"></i> Brand List
-        <span class="badge bg-light text-dark ms-3">{{ $brands->total() }}</span>
-      </h3>
-      @if(auth()->user()->permission <= 1)
-        <a href="{{ route('brands.create') }}" class="btn btn-lg fw-bold shadow-sm"
-           style="background: linear-gradient(to right, #FF512F, #DD2476); color: white;">
-          <i class="fa fa-plus me-1"></i> Add Brand
-        </a>
-      @endif
-    </div>
-
-    {{-- Card Body --}}
-    <div class="card-body bg-light" style="padding: 2rem;">
-
-      {{-- Success Message --}}
-      @if(Session::has('success'))
-        <div class="alert alert-success alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-          <i class="fa fa-check-circle me-1"></i> {{ Session::get('success') }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-      @endif
-
-      {{-- Brand Table --}}
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover align-middle text-center shadow-sm" style="min-width: 800px;">
-          <thead style="background: linear-gradient(to right, #FFB75E, #ED8F03); color: white;">
-            <tr style="height: 60px;">
-              <th style="width: 80px;">SL</th>
-              <th style="min-width: 200px;">Brand</th>
-              <th style="min-width: 220px;">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            @forelse($brands as $brand)
-              <tr style="height: 55px;" @if($brand->trashed()) class="table-danger" @endif>
-                <td class="fw-bold text-primary">
-                  {{ $loop->iteration + ($brands->currentPage() - 1) * $brands->perPage() }}
-                </td>
-                <td class="fw-semibold">
-                  <a href="{{ route('brands.products', $brand->id) }}"
-                     class="text-decoration-none text-dark fw-semibold"
-                     style="transition: color 0.2s;"
-                     onmouseover="this.style.color='#0d6efd'"
-                     onmouseout="this.style.color=''"
-                     title="View products under {{ $brand->brand_name }}">
-                    {{ $brand->brand_name }}
-                  </a>
-                  @if($brand->trashed())
-                    <span class="badge bg-danger ms-2">Archived</span>
-                  @endif
-                </td>
-                <td>
-                  @if(auth()->user()->permission <= 1)
-                    <div class="action-buttons">
-                      @if($brand->trashed())
-                        <form action="{{ route('brands.restore', $brand->id) }}" method="POST">
-                          @csrf
-                          <button class="btn btn-sm btn-outline-success fw-bold" title="Restore">
-                            <i class="fa fa-undo"></i>
-                          </button>
-                        </form>
-                      @else
-                        <a href="{{ route('brands.edit', $brand->id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
-                          <i class="fa fa-edit"></i>
-                        </a>
-                        <form action="{{ route('brands.destroy', $brand->id) }}" method="POST"
-                              onsubmit="return confirm('Are you sure you want to archive this brand?')" style="display:inline;">
-                          @csrf
-                          @method('DELETE')
-                          <button type="submit" class="btn btn-sm btn-outline-danger" title="Archive">
-                            <i class="fa fa-trash"></i>
-                          </button>
-                        </form>
-                      @endif
-                    </div>
-                  @endif
-                </td>
-              </tr>
-            @empty
-              <tr>
-                <td colspan="3" class="text-center py-5 text-muted">
-                  <div class="d-flex flex-column align-items-center justify-content-center">
-                    <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No brands" width="100" class="mb-3 opacity-75">
-                    <h5 class="fw-bold text-danger">No brands found</h5>
-                    <p class="small">Start by adding a new brand to your inventory.</p>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="custom-card">
+            {{-- Header --}}
+            <div class="card-header bg-primary text-white py-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-award me-2"></i>Brands</h5>
                     @if(auth()->user()->permission <= 1)
-                      <a href="{{ route('brands.create') }}" class="btn btn-lg fw-bold"
-                         style="background: linear-gradient(to right, #FF512F, #DD2476); color: white;">
-                        <i class="fa fa-plus me-1"></i> Add Brand
-                      </a>
+                    <div class="d-flex gap-2">
+                        <a href="{{ route('brands.sample') }}" class="btn btn-sm btn-light text-primary">
+                            <i class="bi bi-download me-1"></i>Sample
+                        </a>
+                        <a href="{{ route('brands.export') }}" class="btn btn-sm btn-light text-success">
+                            <i class="bi bi-file-earmark-excel me-1"></i>Export
+                        </a>
+                        <a href="{{ route('brands.create') }}" class="btn btn-sm btn-warning fw-bold">
+                            <i class="bi bi-plus-lg me-1"></i>Add
+                        </a>
+                    </div>
                     @endif
-                  </div>
-                </td>
-              </tr>
-            @endforelse
-          </tbody>
-        </table>
+                </div>
+            </div>
 
-        {{-- Pagination --}}
-        <x-pagination-block :paginator="$brands" />
+            {{-- Import Form --}}
+            @if(auth()->user()->permission <= 1)
+            <div class="card-body py-2 border-bottom">
+                <form action="{{ route('brands.import') }}" method="POST" 
+                    enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                    @csrf
+                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" required>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-upload me-1"></i>Import
+                    </button>
+                </form>
+            </div>
+            @endif
 
-        {{-- Recycle Bin Section --}}
-        @if(auth()->user()->permission <= 1 && $trashedBrands->total() > 0)
-          <div class="mt-5">
-            <h5 class="text-danger fw-bold"><i class="fa fa-trash-alt me-2"></i> Recycle Bin</h5>
-            <table class="table table-bordered table-hover text-center">
-              <thead class="bg-light">
-                <tr>
-                  <th>Brand Name</th>
-                  <th>Deleted At</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @foreach($trashedBrands as $deleted)
-                <tr class="table-danger">
-                  <td class="fw-semibold">
-                    {{ $deleted->brand_name }}
-                    <span class="badge bg-danger text-white ms-2">Archived</span>
-                  </td>
-                  <td>{{ $deleted->deleted_at->format('d M Y, h:i A') }}</td>
-                  <td>
-                    <form action="{{ route('brands.restore', $deleted->id) }}" method="POST">
-                      @csrf
-                      <button class="btn btn-sm btn-success fw-bold" title="Restore Brand">
-                        <i class="fa fa-undo"></i> Restore
-                      </button>
-                    </form>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-            <x-pagination-block :paginator="$trashedBrands" />
-          </div>
-        @endif
-      </div>
+            {{-- Body --}}
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th style="width: 60px;">#</th>
+                                <th>Brand Name</th>
+                                <th style="width: 150px;">Products</th>
+                                <th style="width: 150px;" class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($brands as $b)
+                            <tr @if($b->trashed()) class="table-danger" @endif>
+                                <td class="text-muted">{{ $loop->iteration }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <a href="{{ route('brands.products', $b->id) }}" class="text-decoration-none text-dark fw-semibold">
+                                            {{ $b->brand_name }}
+                                        </a>
+                                        @if($b->trashed())
+                                            <span class="badge bg-danger ms-2">Archived</span>
+                                        @endif
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-light text-dark border">{{ $b->products_count ?? 0 }}</span>
+                                </td>
+                                <td>
+                                    @if(auth()->user()->permission <= 1)
+                                        <div class="d-flex justify-content-center gap-1">
+                                            @if($b->trashed())
+                                                <form action="{{ route('brands.restore', $b->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-sm btn-success" title="Restore">
+                                                        <i class="bi bi-arrow-counterclockwise"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <a href="{{ route('brands.edit', $b->id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <form action="{{ route('brands.destroy', $b->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger delete-btn"
+                                                        data-title="Archive Brand"
+                                                        data-text="Archive {{ $b->brand_name }}?"
+                                                        title="Archive">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-4">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                                        <h6 class="fw-bold text-muted mt-3">No brands found</h6>
+                                        @if(auth()->user()->permission <= 1)
+                                            <a href="{{ route('brands.create') }}" class="btn btn-primary btn-sm mt-2">
+                                                <i class="bi bi-plus-lg me-1"></i>Add Brand
+                                            </a>
+                                        @endif
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                {{-- Pagination --}}
+                <div class="p-3 border-top">
+                    <x-pagination-block :paginator="$brands" />
+                </div>
+
+                {{-- Recycle Bin --}}
+                @if(auth()->user()->permission <= 1 && $trashedBrands->count() > 0)
+                <div class="card-body border-top bg-light py-3">
+                    <h6 class="text-danger fw-bold mb-3"><i class="bi bi-trash me-1"></i>Recycle Bin</h6>
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Brand</th>
+                                    <th>Deleted</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($trashedBrands as $deleted)
+                                <tr>
+                                    <td>{{ $deleted->brand_name }}</td>
+                                    <td>{{ $deleted->deleted_at->format('d M Y') }}</td>
+                                    <td>
+                                        <form action="{{ route('brands.restore', $deleted->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            <button class="btn btn-sm btn-success">
+                                                <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('brands.forceDelete', $deleted->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button class="btn btn-sm btn-danger delete-btn"
+                                                data-title="Permanent Delete"
+                                                data-text="Permanently delete {{ $deleted->brand_name }}?">
+                                                <i class="bi bi-trash me-1"></i>Delete
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 @endsection

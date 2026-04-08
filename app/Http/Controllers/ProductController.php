@@ -34,7 +34,7 @@ class ProductController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->where('serial_no', 'like', '%'.$search.'%')
                     ->orWhere('product_name', 'like', '%'.$search.'%')
-                    ->orWhere('project_serial_no', 'like', '%'.$search.'%'); // ✅ added
+                    ->orWhere('project_serial_no', 'like', '%'.$search.'%');
             });
         }
 
@@ -57,6 +57,27 @@ class ProductController extends Controller
         $products = $query->paginate($perPage)->withQueryString();
 
         return view('products.index', compact('products'));
+    }
+
+    // AJAX Live Search
+    public function search(Request $request)
+    {
+        $search = $request->input('q');
+
+        if (! $search || strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where(function ($q) use ($search) {
+            $q->where('serial_no', 'like', '%'.$search.'%')
+                ->orWhere('product_name', 'like', '%'.$search.'%')
+                ->orWhere('project_serial_no', 'like', '%'.$search.'%');
+        })
+            ->select('id', 'product_name', 'serial_no', 'project_serial_no', 'position')
+            ->limit(10)
+            ->get();
+
+        return response()->json($products);
     }
 
     public function create()
@@ -341,12 +362,11 @@ class ProductController extends Controller
         $import = new ProductImport;
         Excel::import($import, $request->file('file'));
 
-        $message = "{$import->imported} products imported, {$import->skipped} rows skipped.";
+        $message = "Import completed: {$import->created} created, {$import->updated} updated, {$import->skipped} skipped.";
 
-        // Persist skipped rows until cleared
         session()->put('skippedRows', $import->skippedRows);
 
-        return redirect()->back()->with('success', $message);
+        return redirect()->route('products.index')->with('success', $message);
     }
 
     public function exportSkippedRows()
@@ -454,7 +474,7 @@ class ProductController extends Controller
     {
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="product.csv"',
+            'Content-Disposition' => 'attachment; filename="product_sample.csv"',
         ];
 
         $columns = [
@@ -476,18 +496,18 @@ class ProductController extends Controller
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             fputcsv($file, [
-                'Product Name',
-                'Price',
-                'Category',
-                'Brand',
-                'Model',
-                'Serial',
-                'Project Serial',
-                'Position',
-                'User Description',
+                'Sample Product',
+                '1000',
+                'Laptop',
+                'HP',
+                'ThinkPad X1',
+                'SN123456',
+                'PSN123456',
+                'Office',
+                'User description',
                 'Remarks',
-                'Warranty Start',
-                'Warranty End',
+                '01/01/2025',
+                '01/01/2026',
             ]);
             fclose($file);
         };
