@@ -4,12 +4,32 @@
     <div class="text-center small text-muted fw-semibold" style="animation: fadeIn 0.6s ease-in-out;">
       <span>
         <i class="fas fa-calendar-alt me-1 text-primary"></i>
-        <strong>© July 2020 – {{ date('d M Y, h:i:s A') }}</strong>
+        <strong id="datetime"></strong>
         <span class="text-dark">DLRS SOCDS Project</span>
       </span>
     </div>
   </div>
 </footer>
+
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    const options = { day: 'numeric', month: 'short', year: 'numeric' };
+    const dateStr = now.toLocaleDateString('en-GB', options).replace(/\//g, ' ');
+    
+    let hours = now.getHours();
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const seconds = now.getSeconds().toString().padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const timeStr = `${hours}:${minutes}:${seconds} ${ampm} GMT+6`;
+    
+    document.getElementById('datetime').textContent = `${dateStr}, ${timeStr}`;
+  }
+  
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+</script>
 
 <style>
   @keyframes fadeIn {

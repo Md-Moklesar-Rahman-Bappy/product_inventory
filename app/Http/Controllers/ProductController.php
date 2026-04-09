@@ -153,8 +153,8 @@ class ProductController extends Controller
             'category_id' => 'required|exists:categories,id',
             'brand_id' => 'required|exists:brands,id',
             'model_id' => 'required|exists:asset_models,id',
-            'serial_no' => 'nullable|string|max:255',
-            'project_serial_no' => 'nullable|string|max:255',
+            'serial_no' => 'nullable|string|max:255|unique:products,serial_no,'.$id,
+            'project_serial_no' => 'nullable|string|max:255|unique:products,project_serial_no,'.$id,
             'position' => 'nullable|string|max:255',
             'user_description' => 'nullable|string|max:255',
             'remarks' => 'nullable|string|max:255',
@@ -279,7 +279,6 @@ class ProductController extends Controller
     public function export(Request $request)
     {
         $format = $request->get('format', 'csv');
-        $products = Product::with(['category', 'brand', 'model'])->get();
 
         if ($format === 'csv') {
             $filename = 'products_export_'.now()->format('Ymd_His').'.csv';
@@ -288,7 +287,7 @@ class ProductController extends Controller
                 'Content-Disposition' => "attachment; filename=\"$filename\"",
             ];
 
-            $callback = function () use ($products) {
+            $callback = function () {
                 $handle = fopen('php://output', 'w');
 
                 fputcsv($handle, [
@@ -297,22 +296,25 @@ class ProductController extends Controller
                     'User Description', 'Remarks', 'Warranty Start', 'Warranty End',
                 ]);
 
-                foreach ($products as $p) {
-                    fputcsv($handle, [
-                        $p->product_name,
-                        $p->category?->category_name,
-                        $p->brand?->brand_name,
-                        $p->model?->model_name,
-                        $p->price,
-                        $p->serial_no,
-                        $p->project_serial_no,
-                        $p->position,
-                        str_replace(["\r", "\n"], ' ', $p->user_description),
-                        str_replace(["\r", "\n"], ' ', $p->remarks),
-                        optional($p->warranty_start)->format('d/m/Y'),
-                        optional($p->warranty_end)->format('d/m/Y'),
-                    ]);
-                }
+                Product::with(['category', 'brand', 'model'])
+                    ->chunk(500, function ($products) use ($handle) {
+                        foreach ($products as $p) {
+                            fputcsv($handle, [
+                                $p->product_name,
+                                $p->category?->category_name,
+                                $p->brand?->brand_name,
+                                $p->model?->model_name,
+                                $p->price,
+                                $p->serial_no,
+                                $p->project_serial_no,
+                                $p->position,
+                                str_replace(["\r", "\n"], ' ', $p->user_description),
+                                str_replace(["\r", "\n"], ' ', $p->remarks),
+                                optional($p->warranty_start)->format('d/m/Y'),
+                                optional($p->warranty_end)->format('d/m/Y'),
+                            ]);
+                        }
+                    });
 
                 fclose($handle);
             };

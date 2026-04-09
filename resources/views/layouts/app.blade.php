@@ -184,16 +184,37 @@
         <!-- Footer -->
         <footer class="main-footer">
             <div class="container-fluid">
-                <div class="row">
+                <div class="row align-items-center">
                     <div class="col-md-6">
-                        <p class="mb-0">&copy; {{ date('Y') }} Product Inventory. All rights reserved.</p>
+                        <p class="mb-0 small text-muted">
+                            <i class="fas fa-calendar-alt me-1 text-primary"></i>
+                            <span id="datetime"></span>
+                        </p>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <p class="mb-0">Designed with <i class="bi bi-heart-fill text-danger"></i></p>
+                        <p class="mb-0 small text-muted">DLRS SOCDS Project</p>
                     </div>
                 </div>
             </div>
         </footer>
+        <script>
+          function updateDateTime() {
+            const now = new Date();
+            const options = { day: 'numeric', month: 'short', year: 'numeric' };
+            const dateStr = now.toLocaleDateString('en-GB', options).replace(/\//g, ' ');
+            
+            let hours = now.getHours();
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12 || 12;
+            const timeStr = `${hours}:${minutes}:${seconds} ${ampm} GMT+6`;
+            
+            document.getElementById('datetime').textContent = `${dateStr}, ${timeStr}`;
+          }
+          updateDateTime();
+          setInterval(updateDateTime, 1000);
+        </script>
     </main>
 
     <!-- Bootstrap 5 JS Bundle -->

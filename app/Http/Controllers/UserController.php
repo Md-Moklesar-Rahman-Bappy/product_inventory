@@ -52,7 +52,7 @@ class UserController extends Controller
             'designation' => 'nullable|string|max:255',
             'about' => 'nullable|string',
             'address' => 'nullable|string',
-            'permission' => 'required|integer|min:1|max:2',
+            'permission' => 'required|integer|min:0|max:2',
             'profile_photo_path' => 'nullable|image|max:2048',
         ], [
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
@@ -68,7 +68,7 @@ class UserController extends Controller
             'about' => $request->about,
             'address' => $request->address,
             'permission' => $request->permission,
-            'utype' => $request->permission === 1 ? 'ADM' : 'USR',
+            'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
             'status' => 'active',
             'initial_password' => Crypt::encryptString($request->password),
         ]);
@@ -148,7 +148,7 @@ class UserController extends Controller
             'about' => $request->about,
             'address' => $request->address,
             'permission' => $request->permission,
-            'utype' => $request->permission === 1 ? 'ADM' : 'USR',
+            'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
         ]);
 
         if ($request->filled('password')) {
