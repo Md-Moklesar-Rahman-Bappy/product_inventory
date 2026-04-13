@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -248,43 +247,5 @@ class UserController extends Controller
         );
 
         return back()->with('success', 'User status updated successfully.');
-    }
-
-    // 🔐 Optional: Custom login method with status check
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (! $user) {
-            return back()->withErrors(['email' => 'No account found with this email.']);
-        }
-
-        if ($user->status !== 'active') {
-            return back()->withErrors(['email' => '🚫 Your account is currently deactivated. Please contact support.']);
-        }
-
-        if (! Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => '❌ Incorrect password.']);
-        }
-
-        if (! $user->hasVerifiedEmail()) {
-            return redirect()->route('verification.notice')->with('message', '📧 Please verify your email before logging in.');
-        }
-
-        Auth::login($user);
-
-        ActivityLogController::logAction(
-            'login',
-            'User',
-            $user->id,
-            '<span class="text-success fw-bold">Logged in</span> as user: <strong>'.e($user->name).'</strong>'
-        );
-
-        return redirect()->intended('/dashboard')->with('message', '🎉 Welcome back, '.$user->name.'!');
     }
 }

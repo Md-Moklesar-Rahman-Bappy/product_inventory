@@ -55,7 +55,14 @@ class AuthController extends Controller
             'password' => 'required',
         ])->validate();
 
-        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+        $credentials = $request->only('email', 'password');
+        $user = User::where('email', $credentials['email'])->first();
+
+        if ($user && $user->status !== 'active') {
+            return back()->with('error', 'Your account has been deactivated. Please contact support.');
+        }
+
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
@@ -65,7 +72,12 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
-        // Log login activity
+        if ($user->status !== 'active') {
+            Auth::logout();
+
+            return back()->with('error', 'Your account has been deactivated. Please contact support.');
+        }
+
         ActivityLogController::logAction(
             'login',
             'User',
@@ -73,7 +85,6 @@ class AuthController extends Controller
             '<span class="text-success fw-bold">Logged in</span> as: <strong>'.e($user->name).'</strong> <span class="text-muted">('.e($user->email).')</span>'
         );
 
-        // Send verification email if not verified
         if (! $user->hasVerifiedEmail()) {
             event(new Registered($user));
         }

@@ -60,7 +60,7 @@ Route::get('/verify-email/{id}/{hash}', function ($id, $hash) {
         }
     }
 
-    return redirect()->route('login')->with('message', '✅ Your email has been verified. Please check your inbox for login credentials.');
+    return redirect()->route('login')->with('success', 'Your email has been verified. Please check your inbox for login credentials.');
 })->middleware('signed')->name('verification.verify.public');
 
 // 🔐 Custom Authentication
@@ -78,7 +78,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/email/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('message', '📧 Verification link sent!');
+        return back()->with('success', '📧 Verification link sent!');
     })->middleware('throttle:3,1')->name('verification.resend');
 
     // 📊 Dashboard

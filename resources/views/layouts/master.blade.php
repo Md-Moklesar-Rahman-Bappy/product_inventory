@@ -49,7 +49,7 @@
                     <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link">Dashboard</a></li>
 
                     @if(auth()->user()->permission === 0)
-                        <li class="nav-item"><a href="{{ route('user.index') }}" class="nav-link">Manage Users</a></li>
+                        <li class="nav-item"><a href="{{ route('users.index') }}" class="nav-link">Manage Users</a></li>
                     @endif
 
                     @if(in_array(auth()->user()->permission, [0, 1]))
