@@ -721,3 +721,202 @@ body {
 .btn-toggle:hover {
     opacity: 0.9;
 }
+
+/* ===================================
+   Table Styles - Unified Design
+   =================================== */
+.icon-box {
+    width: 45px;
+    height: 45px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+}
+
+.search-box {
+    position: relative;
+    width: 100%;
+}
+
+.search-box i {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.product-avatar {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+.table-row {
+    transition: background 0.2s;
+}
+
+.table-row:hover {
+    background: #f8fafc !important;
+}
+
+.table thead th {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    border-bottom: 2px solid #e2e8f0;
+    padding: 12px 16px;
+}
+
+.table td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.btn-table-action {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+.btn-table-action:hover {
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+}
+
+.empty-state {
+    padding: 20px;
+}
+
+.empty-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+/* Subtle background colors */
+.bg-light-subtle { background-color: #f8fafc !important; }
+.bg-danger-subtle { background-color: #fef2f2 !important; }
+.bg-primary-subtle { background-color: #e0e7ff !important; }
+.bg-secondary-subtle { background-color: #f1f5f9 !important; }
+.bg-info-subtle { background-color: #e0f2fe !important; }
+.bg-success-subtle { background-color: #d1fae5 !important; }
+.bg-warning-subtle { background-color: #fef3c7 !important; }
+
+/* Text colors */
+.text-primary { color: #4f46e5 !important; }
+.text-secondary { color: #64748b !important; }
+.text-info { color: #0ea5e9 !important; }
+.text-success { color: #10b981 !important; }
+.text-warning { color: #f59e0b !important; }
+.text-danger { color: #ef4444 !important; }
+
+/* Detail sections for show pages */
+.detail-section {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.detail-card {
+    background: white;
+    border-radius: 8px;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+}
+
+.detail-label {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    display: block;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+}
+
+/* Search Results */
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+.search-results.show {
+    display: block;
+}
+
+.search-results a {
+    display: block;
+    padding: 10px 12px;
+    border-bottom: 1px solid #f1f5f9;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.search-results a:hover {
+    background: #f8fafc;
+}
+
+.search-results a:last-child {
+    border-bottom: none;
+}
