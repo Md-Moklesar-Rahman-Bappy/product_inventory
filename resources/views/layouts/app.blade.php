@@ -150,8 +150,26 @@
                     <div class="col">
                         <h1 class="page-title">@yield('title', 'Dashboard')</h1>
                     </div>
-                    <div class="col-auto">
-                        <div class="user-menu">
+                    <div class="col-auto d-flex align-items-center gap-2">
+                        <!-- Global Search -->
+                        <div class="global-search d-none d-lg-block">
+                            <form action="{{ route('products.index') }}" method="GET" class="d-flex">
+                                <input type="text" name="search" class="form-control form-control-sm" 
+                                    placeholder="Search products..." 
+                                    style="width: 200px; border-radius: 20px 0 0 20px;">
+                                <button type="submit" class="btn btn-sm btn-primary" 
+                                    style="border-radius: 0 20px 20px 0;">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Dark Mode Toggle -->
+                        <button class="btn theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                            <i class="bi bi-moon-stars" id="themeIcon"></i>
+                        </button>
+                        
+                        <!-- User Menu -->
                             <div class="dropdown">
                                 <button class="btn user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
                                     <img src="{{ auth()->user()->profile_photo_url }}" alt="Profile" class="user-avatar">
@@ -214,7 +232,217 @@
           }
           updateDateTime();
           setInterval(updateDateTime, 1000);
-        </script>
+    </script>
+    
+    <!-- Theme Toggle CSS -->
+    <style>
+        .theme-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            background: #f1f5f9;
+            transform: translateY(-2px);
+        }
+        
+        .theme-toggle i {
+            font-size: 1.1rem;
+            color: #64748b;
+        }
+        
+        .global-search form {
+            display: flex;
+            align-items: center;
+        }
+        
+        .global-search input {
+            border-right: none;
+        }
+        
+        .global-search input:focus {
+            border-color: #4f46e5;
+            box-shadow: none;
+        }
+        
+        .global-search button {
+            background: #4f46e5;
+            border-color: #4f46e5;
+        }
+        
+        /* Dark Mode Styles */
+        body.dark-mode {
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .sidebar {
+            background: #1e293b;
+            border-right: 1px solid #334155;
+        }
+        
+        body.dark-mode .sidebar-header {
+            border-bottom-color: #334155;
+        }
+        
+        body.dark-mode .sidebar-nav .nav-link {
+            color: #94a3b8;
+        }
+        
+        body.dark-mode .sidebar-nav .nav-link:hover,
+        body.dark-mode .sidebar-nav .nav-link.active {
+            background: #334155;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .main-content {
+            background: #0f172a;
+        }
+        
+        body.dark-mode .top-navbar {
+            background: #1e293b;
+            border-bottom-color: #334155;
+        }
+        
+        body.dark-mode .page-title {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .theme-toggle {
+            background: #334155;
+            border-color: #475569;
+        }
+        
+        body.dark-mode .theme-toggle i {
+            color: #fbbf24;
+        }
+        
+        body.dark-mode .custom-card,
+        body.dark-mode .dashboard-widget,
+        body.dark-mode .chart-card,
+        body.dark-mode .stat-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+        
+        body.dark-mode .card-header {
+            background: #1e293b;
+            border-bottom-color: #334155;
+        }
+        
+        body.dark-mode .table {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .table thead th {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+        
+        body.dark-mode .table td {
+            border-color: #334155;
+        }
+        
+        body.dark-mode .form-control {
+            background: #334155;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .form-control:focus {
+            background: #334155;
+            border-color: #4f46e5;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .btn-light {
+            background: #334155;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .welcome-section {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+        
+        body.dark-mode .main-footer {
+            background: #1e293b;
+            border-top-color: #334155;
+        }
+        
+        body.dark-mode .stat-value,
+        body.dark-mode .stat-label {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .list-text {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .widget-title {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .chart-title {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .detail-card {
+            background: #334155;
+            border-color: #475569;
+        }
+        
+        body.dark-mode .detail-label {
+            color: #94a3b8;
+        }
+        
+        body.dark-mode .detail-value {
+            color: #e2e8f0;
+        }
+        
+        body.dark-mode .detail-section {
+            background: #334155;
+        }
+    </style>
+    
+    <!-- Theme Toggle Script -->
+    <script>
+        // Check saved theme on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeIcon').classList.remove('bi-moon-stars');
+                document.getElementById('themeIcon').classList.add('bi-sun');
+            }
+        });
+        
+        function toggleTheme() {
+            const body = document.body;
+            const icon = document.getElementById('themeIcon');
+            
+            body.classList.toggle('dark-mode');
+            
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('theme', 'dark');
+                icon.classList.remove('bi-moon-stars');
+                icon.classList.add('bi-sun');
+            } else {
+                localStorage.setItem('theme', 'light');
+                icon.classList.remove('bi-sun');
+                icon.classList.add('bi-moon-stars');
+            }
+        }
+    </script>
     </main>
 
     <!-- Bootstrap 5 JS Bundle -->

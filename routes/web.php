@@ -103,7 +103,22 @@ Route::middleware(['auth'])->group(function () {
             'Expired' => Product::where('warranty_end', '<', $now)->count(),
         ];
 
-        return view('dashboard', compact('logs', 'entityCounts', 'warrantyBreakdown'));
+        // Additional data for enhanced dashboard
+        $recentProducts = Product::latest()->take(5)->get();
+        $expiringWarranties = Product::whereBetween('warranty_end', [$now, $soon])->take(5)->get();
+        $pendingMaintenance = Maintenance::where('end_time', '>', $now)->where('start_time', '<=', $now)->take(5)->get();
+
+        // Product trend data (last 6 months)
+        $productTrend = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = Carbon::now()->subMonths($i);
+            $productTrend[] = [
+                'month' => $month->format('M'),
+                'count' => Product::whereYear('created_at', $month->year)->whereMonth('created_at', $month->month)->count(),
+            ];
+        }
+
+        return view('dashboard', compact('logs', 'entityCounts', 'warrantyBreakdown', 'recentProducts', 'expiringWarranties', 'pendingMaintenance', 'productTrend'));
     })->name('dashboard');
 
     // 👤 Users
