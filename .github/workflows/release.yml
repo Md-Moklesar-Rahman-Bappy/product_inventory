@@ -19,9 +19,18 @@ jobs:
         id: changelog
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
-          awk "/## \\[$VERSION\\]/,/^## \\[/" CHANGELOG.md | sed '$d' > release_notes.md || true
+          NOTES=$(awk "/## \
+
+\[$VERSION\\]
+
+/,/^## \
+
+\[/" CHANGELOG.md | sed '$d' || true)
+          if [ -z "$NOTES" ]; then
+            NOTES="No changelog entry found for $VERSION."
+          fi
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
-          cat release_notes.md >> $GITHUB_ENV
+          echo "$NOTES" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Create GitHub Release
@@ -32,3 +41,9 @@ jobs:
           body: ${{ env.RELEASE_NOTES }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Optional: attach build artifacts
+      # - name: Upload release asset
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     files: path/to/artifact.zip
