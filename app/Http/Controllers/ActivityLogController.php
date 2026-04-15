@@ -46,7 +46,7 @@ class ActivityLogController extends Controller
             })
             ->latest();
 
-        $logs = $logsQuery->paginate(15);
+        $logs = $logsQuery->paginate(10);
 
         return view('activity_logs.index', [
             'logs' => $logs,
