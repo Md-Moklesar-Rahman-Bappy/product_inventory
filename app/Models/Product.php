@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Carbon\Carbon;
 
 class Product extends Model
 {
@@ -29,10 +29,10 @@ class Product extends Model
 
     // ──────── Casts ─────────
     protected $casts = [
-        'created_at'     => 'datetime',
-        'updated_at'     => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'warranty_start' => 'datetime',
-        'warranty_end'   => 'datetime',
+        'warranty_end' => 'datetime',
     ];
 
     // ──────── Relationships ─────────
@@ -49,6 +49,11 @@ class Product extends Model
     public function model()
     {
         return $this->belongsTo(AssetModel::class, 'model_id');
+    }
+
+    public function maintenances()
+    {
+        return $this->hasMany(Maintenance::class);
     }
 
     // ──────── Mutators ─────────
@@ -85,13 +90,62 @@ class Product extends Model
 
     public function getWarrantyStatusAttribute()
     {
-        if (!$this->warranty_end) return 'unknown';
+        if (! $this->warranty_end) {
+            return 'unknown';
+        }
+
         return $this->warranty_end->isPast() ? 'expired' : 'active';
     }
 
     public function getIsExpiredAttribute()
     {
-        return $this->warranty_end && $this->warranty_end->isPast();
+        if (! $this->warranty_end || ! $this->warranty_start) {
+            return '<span class="text-muted">—</span>';
+        }
+
+        $now = Carbon::now(config('app.timezone'));
+        $end = $this->warranty_end;
+        $expired = $end->isPast();
+
+        if ($expired) {
+            return "<span class='badge bg-danger text-white' title='Expired on {$end->format('d M Y')}'>Expired</span>";
+        }
+
+        $totalMinutes = $now->diffInMinutes($end);
+        $totalDays = floor($totalMinutes / (60 * 24));
+        $remainingHours = floor(($totalMinutes % (60 * 24)) / 60);
+
+        $badgeClass = match (true) {
+            $totalDays <= 7 => 'bg-danger text-white',
+            $totalDays <= 30 => 'bg-warning text-white',
+            default => 'bg-success text-white',
+        };
+
+        $tooltip = 'Ends on '.$end->format('d M Y');
+        $text = "{$totalDays} days {$remainingHours} hours";
+
+        return "<span class='badge {$badgeClass}' title='{$tooltip}'>{$text}</span>";
+    }
+
+    public function getRemarksDisplayAttribute()
+    {
+        return $this->remarks
+            ? e($this->remarks)
+            : '<span class="text-muted">—</span>';
+    }
+
+    public function getPositionDisplayAttribute()
+    {
+        return $this->position
+            ? e($this->position)
+            : '<span class="text-muted">—</span>';
+    }
+
+    public function getUserDescriptionDisplayAttribute()
+    {
+        return $this->user_description
+            ? e($this->user_description)
+            : '<span class="text-muted">—</span>';
     }
 
     // ──────── Warranty Date Accessors ─────────
@@ -108,16 +162,24 @@ class Product extends Model
     // ──────── Urgency Helpers ─────────
     public function getUrgencyLevelAttribute()
     {
-        if (!$this->warranty_end) return 4;
-        if ($this->warranty_end->isPast()) return 0;
+        if (! $this->warranty_end) {
+            return 4;
+        }
+        if ($this->warranty_end->isPast()) {
+            return 0;
+        }
 
         $daysLeft = now()->diffInDays($this->warranty_end);
+
         return $daysLeft <= 7 ? 1 : ($daysLeft <= 30 ? 2 : 3);
     }
 
     public function getIsExpiringSoonAttribute()
     {
-        if (!$this->warranty_end || $this->warranty_end->isPast()) return false;
+        if (! $this->warranty_end || $this->warranty_end->isPast()) {
+            return false;
+        }
+
         return $this->warranty_end->diffInDays(now()) <= 7;
     }
 
@@ -125,7 +187,7 @@ class Product extends Model
     public function scopeWithUrgencyOrder($query)
     {
         return $query->select('*')
-            ->selectRaw("
+            ->selectRaw('
                 CASE
                     WHEN warranty_end IS NULL THEN 4
                     WHEN warranty_end < NOW() THEN 0
@@ -133,15 +195,14 @@ class Product extends Model
                     WHEN DATEDIFF(warranty_end, NOW()) <= 30 THEN 2
                     ELSE 3
                 END AS urgency_level
-            ")
+            ')
             ->orderBy('urgency_level')
             ->orderBy('warranty_end');
     }
 
-
     public function scopeExpiringSoon($query)
     {
         return $query->whereDate('warranty_end', '>=', now())
-                     ->whereRaw('DATEDIFF(warranty_end, NOW()) <= 7');
+            ->whereRaw('DATEDIFF(warranty_end, NOW()) <= 7');
     }
 }

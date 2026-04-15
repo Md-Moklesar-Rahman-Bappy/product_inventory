@@ -2,20 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AssetModelProductExport;
+use App\Exports\BrandProductExport;
+use App\Exports\CategoryProductExport;
 use App\Exports\ProductExport;
 use App\Imports\ProductImport;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Exports\CategoryProductExport;
-use App\Exports\BrandProductExport;
-use App\Exports\AssetModelProductExport;
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Response;
-use App\Models\Product;
-use App\Models\Category;
-use App\Models\Brand;
 use App\Models\AssetModel;
-use App\Http\Controllers\ActivityLogController;
+use App\Models\Brand;
+use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ProductController extends Controller
@@ -24,17 +23,27 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $search  = $request->input('search');
-        $status  = $request->input('warranty_status');
+        $search = $request->input('search');
+        $status = $request->input('warranty_status');
+        $categoryId = $request->input('category_id');
+        $brandId = $request->input('brand_id');
 
         $query = Product::query();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('serial_no', 'like', '%' . $search . '%')
-                  ->orWhere('product_name', 'like', '%' . $search . '%')
-                  ->orWhere('project_serial_no', 'like', '%' . $search . '%'); // ✅ added
+                $q->where('serial_no', 'like', '%'.$search.'%')
+                    ->orWhere('product_name', 'like', '%'.$search.'%')
+                    ->orWhere('project_serial_no', 'like', '%'.$search.'%');
             });
+        }
+
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        if ($brandId) {
+            $query->where('brand_id', $brandId);
         }
 
         if ($status === 'active') {
@@ -46,38 +55,60 @@ class ProductController extends Controller
         $query->orderBy('created_at', 'desc');
 
         $products = $query->paginate($perPage)->withQueryString();
+
         return view('products.index', compact('products'));
+    }
+
+    // AJAX Live Search
+    public function search(Request $request)
+    {
+        $search = $request->input('q');
+
+        if (! $search || strlen($search) < 2) {
+            return response()->json([]);
+        }
+
+        $products = Product::where(function ($q) use ($search) {
+            $q->where('serial_no', 'like', '%'.$search.'%')
+                ->orWhere('product_name', 'like', '%'.$search.'%')
+                ->orWhere('project_serial_no', 'like', '%'.$search.'%');
+        })
+            ->select('id', 'product_name', 'serial_no', 'project_serial_no', 'position')
+            ->limit(10)
+            ->get();
+
+        return response()->json($products);
     }
 
     public function create()
     {
         return view('products.create', [
             'categories' => Category::all(),
-            'brands'     => Brand::all(),
-            'models'     => AssetModel::all(),
+            'brands' => Brand::all(),
+            'models' => AssetModel::all(),
         ]);
     }
 
     public function store(Request $request)
     {
         $request->merge([
-            'serial_no'         => strtoupper($request->serial_no),
+            'serial_no' => strtoupper($request->serial_no),
             'project_serial_no' => strtoupper($request->project_serial_no),
         ]);
 
         $validated = $request->validate([
-            'product_name'       => 'required|string|max:255',
-            'price'              => 'required|numeric|min:0|max:9999999.99',
-            'category_id'        => 'required|exists:categories,id',
-            'brand_id'           => 'required|exists:brands,id',
-            'model_id'           => 'required|exists:asset_models,id',
-            'serial_no'          => 'required|string|max:255|unique:products,serial_no',
-            'project_serial_no'  => 'required|string|max:255|unique:products,project_serial_no',
-            'position'           => 'nullable|string|max:255',
-            'user_description'   => 'nullable|string|max:255',
-            'remarks'            => 'nullable|string|max:255',
-            'warranty_start'     => 'nullable|date',
-            'warranty_end'       => 'nullable|date|after_or_equal:warranty_start',
+            'product_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0|max:9999999.99',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+            'model_id' => 'required|exists:asset_models,id',
+            'serial_no' => 'required|string|max:255|unique:products,serial_no',
+            'project_serial_no' => 'required|string|max:255|unique:products,project_serial_no',
+            'position' => 'nullable|string|max:255',
+            'user_description' => 'nullable|string|max:255',
+            'remarks' => 'nullable|string|max:255',
+            'warranty_start' => 'nullable|date',
+            'warranty_end' => 'nullable|date|after_or_equal:warranty_start',
         ]);
 
         $product = Product::create($validated);
@@ -86,50 +117,52 @@ class ProductController extends Controller
             'create',
             'Product',
             $product->id,
-            '<span class="text-success fw-bold">Created</span> product: <strong>' . $product->product_name . '</strong><br>Serial No: <code>' . $product->serial_no . '</code>'
+            '<span class="text-success fw-bold">Created</span> product: <strong>'.$product->product_name.'</strong><br>Serial No: <code>'.$product->serial_no.'</code>'
         );
 
-        return redirect()->route('products.index')->with('success', 'Product created successfully');
+        return redirect()->route('products.index')->with('success', '✅ Product created successfully');
     }
 
     public function show(int $id)
     {
         $product = Product::with(['category', 'brand', 'model'])->findOrFail($id);
+
         return view('products.show', compact('product'));
     }
 
     public function edit(int $id)
     {
-        $product    = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
         $categories = Category::all();
-        $brands     = Brand::all();
-        $models     = AssetModel::all();
+        $brands = Brand::all();
+        $models = AssetModel::all();
+
         return view('products.edit', compact('product', 'categories', 'brands', 'models'));
     }
 
     public function update(Request $request, int $id)
     {
         $request->merge([
-            'serial_no'         => strtoupper($request->serial_no),
+            'serial_no' => strtoupper($request->serial_no),
             'project_serial_no' => strtoupper($request->project_serial_no),
         ]);
 
         $validated = $request->validate([
-            'product_name'       => 'required|string|max:255',
-            'price'              => 'required|numeric|min:0|max:9999999.99',
-            'category_id'        => 'required|exists:categories,id',
-            'brand_id'           => 'required|exists:brands,id',
-            'model_id'           => 'required|exists:asset_models,id',
-            'serial_no'          => 'nullable|string|max:255',
-            'project_serial_no'  => 'nullable|string|max:255',
-            'position'           => 'nullable|string|max:255',
-            'user_description'   => 'nullable|string|max:255',
-            'remarks'            => 'nullable|string|max:255',
-            'warranty_start'     => 'nullable|date',
-            'warranty_end'       => 'nullable|date|after_or_equal:warranty_start',
+            'product_name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0|max:9999999.99',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+            'model_id' => 'required|exists:asset_models,id',
+            'serial_no' => 'nullable|string|max:255|unique:products,serial_no,'.$id,
+            'project_serial_no' => 'nullable|string|max:255|unique:products,project_serial_no,'.$id,
+            'position' => 'nullable|string|max:255',
+            'user_description' => 'nullable|string|max:255',
+            'remarks' => 'nullable|string|max:255',
+            'warranty_start' => 'nullable|date',
+            'warranty_end' => 'nullable|date|after_or_equal:warranty_start',
         ]);
 
-        $product  = Product::findOrFail($id);
+        $product = Product::findOrFail($id);
         $original = $product->getOriginal();
         $product->fill($validated);
 
@@ -138,16 +171,17 @@ class ProductController extends Controller
                 'update',
                 'Product',
                 $product->id,
-                '<span class="text-muted fw-bold">No changes</span> made to product: <strong>' . $product->product_name . '</strong><br>Serial No: <code>' . $product->serial_no . '</code>'
+                '<span class="text-muted fw-bold">No changes</span> made to product: <strong>'.$product->product_name.'</strong><br>Serial No: <code>'.$product->serial_no.'</code>'
             );
-            return redirect()->route('products.index')->with('success', 'No changes were made.');
+
+            return redirect()->route('products.index')->with('success', '✅ No changes were made.');
         }
 
         $product->save();
         $changes = $product->getChanges();
         $changedFields = collect($changes)->map(function ($value, $field) use ($original) {
-            return '<span class="badge bg-warning text-dark me-1">' .
-                Str::headline($field) . ': "' . ($original[$field] ?? '-') . '" → "' . $value . '"' .
+            return '<span class="badge bg-warning text-dark me-1">'.
+                Str::headline($field).': "'.e($original[$field] ?? '-').'" → "'.e($value).'"'.
                 '</span>';
         })->implode(' ');
 
@@ -155,7 +189,7 @@ class ProductController extends Controller
             'update',
             'Product',
             $product->id,
-            '<span class="text-primary fw-bold">Updated</span> product: <strong>' . $product->product_name . '</strong><br>Serial No: <code>' . $product->serial_no . '</code><br>Changes: ' . $changedFields
+            '<span class="text-primary fw-bold">Updated</span> product: <strong>'.$product->product_name.'</strong><br>Serial No: <code>'.$product->serial_no.'</code><br>Changes: '.$changedFields
         );
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully');
@@ -173,8 +207,8 @@ class ProductController extends Controller
             }
 
             $productName = e(strtoupper($product->product_name));
-            $serial      = e(strtoupper($product->serial_no));
-            $user        = auth()->user();
+            $serial = e(strtoupper($product->serial_no));
+            $user = auth()->user();
 
             $product->delete();
 
@@ -189,7 +223,7 @@ class ProductController extends Controller
                 ->with('success', 'Product deleted successfully');
         } catch (\Exception $e) {
             return redirect()->route('products.index')
-                ->with('error', 'Failed to delete product: ' . $e->getMessage());
+                ->with('error', 'Failed to delete product: '.$e->getMessage());
         }
     }
 
@@ -197,15 +231,15 @@ class ProductController extends Controller
     {
         $product = Product::withTrashed()->findOrFail($id);
 
-        if (!$product->trashed()) {
+        if (! $product->trashed()) {
             return redirect()->route('products.index')->with('warning', 'Product is already active.');
         }
 
         $product->restore();
 
         $productName = e(strtoupper($product->product_name));
-        $serial      = e(strtoupper($product->serial_no));
-        $user        = auth()->user();
+        $serial = e(strtoupper($product->serial_no));
+        $user = auth()->user();
 
         ActivityLogController::logAction(
             'restore',
@@ -217,17 +251,17 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product restored successfully');
     }
 
-        public function forceDelete($id)
+    public function forceDelete($id)
     {
         $product = Product::withTrashed()->findOrFail($id);
 
-        if (!$product->trashed()) {
+        if (! $product->trashed()) {
             return redirect()->route('products.index')->with('warning', 'Product must be deleted first.');
         }
 
         $productName = e(strtoupper($product->product_name));
-        $serial      = e(strtoupper($product->serial_no));
-        $user        = auth()->user();
+        $serial = e(strtoupper($product->serial_no));
+        $user = auth()->user();
 
         $product->forceDelete();
 
@@ -244,41 +278,43 @@ class ProductController extends Controller
     // ──────── Export / Import ─────────
     public function export(Request $request)
     {
-        $format   = $request->get('format', 'csv');
-        $products = Product::with(['category', 'brand', 'model'])->get();
+        $format = $request->get('format', 'csv');
 
         if ($format === 'csv') {
-            $filename = 'products_export_' . now()->format('Ymd_His') . '.csv';
-            $headers  = [
-                'Content-Type'        => 'text/csv',
+            $filename = 'products_export_'.now()->format('Ymd_His').'.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
                 'Content-Disposition' => "attachment; filename=\"$filename\"",
             ];
 
-            $callback = function () use ($products) {
+            $callback = function () {
                 $handle = fopen('php://output', 'w');
 
                 fputcsv($handle, [
                     'Product Name', 'Category', 'Brand', 'Model', 'Price',
                     'Serial No', 'Project Serial No', 'Position',
-                    'User Description', 'Remarks', 'Warranty Start', 'Warranty End'
+                    'User Description', 'Remarks', 'Warranty Start', 'Warranty End',
                 ]);
 
-                foreach ($products as $p) {
-                    fputcsv($handle, [
-                        $p->product_name,
-                        $p->category?->category_name,
-                        $p->brand?->brand_name,
-                        $p->model?->model_name,
-                        $p->price,
-                        $p->serial_no,
-                        $p->project_serial_no,
-                        $p->position,
-                        str_replace(["\r", "\n"], ' ', $p->user_description),
-                        str_replace(["\r", "\n"], ' ', $p->remarks),
-                        optional($p->warranty_start)->format('d/m/Y'),
-                        optional($p->warranty_end)->format('d/m/Y'),
-                    ]);
-                }
+                Product::with(['category', 'brand', 'model'])
+                    ->chunk(500, function ($products) use ($handle) {
+                        foreach ($products as $p) {
+                            fputcsv($handle, [
+                                $p->product_name,
+                                $p->category?->category_name,
+                                $p->brand?->brand_name,
+                                $p->model?->model_name,
+                                $p->price,
+                                $p->serial_no,
+                                $p->project_serial_no,
+                                $p->position,
+                                str_replace(["\r", "\n"], ' ', $p->user_description),
+                                str_replace(["\r", "\n"], ' ', $p->remarks),
+                                optional($p->warranty_start)->format('d/m/Y'),
+                                optional($p->warranty_end)->format('d/m/Y'),
+                            ]);
+                        }
+                    });
 
                 fclose($handle);
             };
@@ -291,12 +327,12 @@ class ProductController extends Controller
 
     public function exportExcel()
     {
-        return Excel::download(new ProductExport, 'products_' . now()->format('Ymd_His') . '.xlsx');
+        return Excel::download(new ProductExport, 'products_'.now()->format('Ymd_His').'.xlsx');
     }
 
     public function exportCategoryWise()
     {
-        return Excel::download(new CategoryProductExport, 'products_by_category_' . now()->format('Ymd_His') . '.xlsx');
+        return Excel::download(new CategoryProductExport, 'products_by_category_'.now()->format('Ymd_His').'.xlsx');
     }
 
     public function exportBrandWise($id)
@@ -305,7 +341,7 @@ class ProductController extends Controller
 
         return Excel::download(
             new BrandProductExport($id),
-            'products_by_brand_' . Str::slug($brand->brand_name) . '_' . now()->format('Ymd_His') . '.xlsx'
+            'products_by_brand_'.Str::slug($brand->brand_name).'_'.now()->format('Ymd_His').'.xlsx'
         );
     }
 
@@ -315,7 +351,7 @@ class ProductController extends Controller
 
         return Excel::download(
             new AssetModelProductExport($id),
-            'products_by_model_' . Str::slug($model->model_name) . '_' . now()->format('Ymd_His') . '.xlsx'
+            'products_by_model_'.Str::slug($model->model_name).'_'.now()->format('Ymd_His').'.xlsx'
         );
     }
 
@@ -328,12 +364,11 @@ class ProductController extends Controller
         $import = new ProductImport;
         Excel::import($import, $request->file('file'));
 
-        $message = "{$import->imported} products imported, {$import->skipped} rows skipped.";
+        $message = "Import completed: {$import->created} created, {$import->updated} updated, {$import->skipped} skipped.";
 
-        // Persist skipped rows until cleared
         session()->put('skippedRows', $import->skippedRows);
 
-        return redirect()->back()->with('success', $message);
+        return redirect()->route('products.index')->with('success', $message);
     }
 
     public function exportSkippedRows()
@@ -344,9 +379,9 @@ class ProductController extends Controller
             return redirect()->route('products.index')->with('warning', 'No skipped rows available to export.');
         }
 
-        $filename = 'skipped_rows_' . now()->format('Ymd_His') . '.csv';
+        $filename = 'skipped_rows_'.now()->format('Ymd_His').'.csv';
         $headers = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
+            'Content-Type' => 'text/csv; charset=UTF-8',
             'Content-Disposition' => "attachment; filename=\"$filename\"",
         ];
 
@@ -358,8 +393,8 @@ class ProductController extends Controller
 
             // Header row
             fputcsv($handle, [
-                'product_name','serial_no','project_serial_no','category','brand','model',
-                'price','position','user_description','remarks','warranty_start','warranty_end','skip_reason'
+                'product_name', 'serial_no', 'project_serial_no', 'category', 'brand', 'model',
+                'price', 'position', 'user_description', 'remarks', 'warranty_start', 'warranty_end', 'skip_reason',
             ]);
 
             foreach ($skippedRows as $row) {
@@ -390,16 +425,15 @@ class ProductController extends Controller
             }
 
             fclose($handle);
-        }, 200, $headers);
 
-        // ✅ Clear skipped rows after download
-        session()->forget('skippedRows');
-        session()->flash('success', 'Skipped rows exported and cleared.');
+            session()->forget('skippedRows');
+        }, 200, $headers);
     }
 
     public function clearSkippedRows()
     {
         session()->forget('skippedRows');
+
         return redirect()->route('products.index')->with('success', 'Skipped rows cleared.');
     }
 
@@ -407,7 +441,7 @@ class ProductController extends Controller
     public function warranties(Request $request)
     {
         $perPage = $request->input('per_page', 10);
-        $status  = $request->input('warranty_status');
+        $status = $request->input('warranty_status');
 
         $query = Product::whereNotNull('warranty_end');
 
@@ -418,7 +452,7 @@ class ProductController extends Controller
         }
 
         $query->select('*')
-            ->selectRaw("
+            ->selectRaw('
                 CASE
                     WHEN warranty_end IS NULL THEN 4
                     WHEN warranty_end < NOW() THEN 0
@@ -426,7 +460,7 @@ class ProductController extends Controller
                     WHEN DATEDIFF(warranty_end, NOW()) <= 30 THEN 2
                     ELSE 3
                 END AS urgency_level
-            ")
+            ')
             ->orderBy('urgency_level')
             ->orderBy('warranty_end');
 
@@ -440,7 +474,7 @@ class ProductController extends Controller
     {
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="product.csv"',
+            'Content-Disposition' => 'attachment; filename="product_sample.csv"',
         ];
 
         $columns = [
@@ -462,18 +496,18 @@ class ProductController extends Controller
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
             fputcsv($file, [
-                'Product Name',
-                'Price',
-                'Category',
-                'Brand',
-                'Model',
-                'Serial',
-                'Project Serial',
-                'Position',
-                'User Description',
+                'Sample Product',
+                '1000',
+                'Laptop',
+                'HP',
+                'ThinkPad X1',
+                'SN123456',
+                'PSN123456',
+                'Office',
+                'User description',
                 'Remarks',
-                'Warranty Start',
-                'Warranty End',
+                '01/01/2025',
+                '01/01/2026',
             ]);
             fclose($file);
         };

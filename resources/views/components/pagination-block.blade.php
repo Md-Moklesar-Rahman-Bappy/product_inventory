@@ -1,6 +1,21 @@
 @if ($paginator->hasPages())
     <nav class="pagination-block mt-4" aria-label="Pagination Navigation">
-        <ul class="pagination justify-content-center flex-wrap gap-2">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            
+            {{-- Per Page Selector --}}
+            <div class="d-flex align-items-center">
+                <label for="perPage" class="me-2 small text-muted">Show:</label>
+                <select id="perPage" onchange="window.location.href=updateQueryStringParameter(this.value)" 
+                        class="form-select form-select-sm" style="width: auto;">
+                    @foreach([10, 25, 50, 100] as $perPage)
+                        <option value="{{ $perPage }}" {{ request('per_page', 10) == $perPage ? 'selected' : '' }}>
+                            {{ $perPage }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
+            <ul class="pagination justify-content-center flex-wrap gap-2 mb-0">
 
             {{-- First Page Link --}}
             @if ($paginator->onFirstPage())
@@ -50,5 +65,14 @@
             @endif
 
         </ul>
+        </div>
     </nav>
+
+    <script>
+        function updateQueryStringParameter(perPage) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('per_page', perPage);
+            return url.toString();
+        }
+    </script>
 @endif

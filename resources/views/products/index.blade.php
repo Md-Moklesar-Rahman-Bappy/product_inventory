@@ -1,360 +1,306 @@
 @extends('layouts.app')
 
-@section('title', 'Home Product')
+@section('title', 'Products')
 
 @section('contents')
 <div class="row">
     <div class="col-lg-12">
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-
-            {{-- Header --}}
-                <div class="card-header text-white py-2" 
-                    style="background: linear-gradient(90deg, #00bcd4, #2196f3); position: sticky; top: 0; z-index: 1020;">
-                    <div class="row gy-2 align-items-center">
-
-                        {{-- Title & Count --}}
-                        <div class="col-12 col-md-3 d-flex align-items-center">
-                            <h5 class="mb-0 fw-bold">
-                                <i class="fa fa-boxes me-2"></i> Product Inventory
-                            </h5>
-                            <span class="badge bg-light text-dark ms-3">
-                                {{ $products->total() }} items
-                            </span>
+        <div class="modern-table-card">
+            <div class="table-header-section">
+                <div class="row gy-3 align-items-center">
+                    <div class="col-12 col-lg-2 d-flex align-items-center">
+                        <div class="header-icon">
+                            <i class="bi bi-box-seam"></i>
                         </div>
-
-                        {{-- Search Bar --}}
-                        <div class="col-12 col-md-3">
-                            <form method="GET" action="{{ route('products.index') }}" 
-                                class="d-flex justify-content-md-start justify-content-center">
-                                <div class="input-group input-group-sm w-100" style="max-width: 320px;">
-                                    <input type="text" name="search" value="{{ request('search') }}"
-                                        class="form-control bg-light border-0"
-                                        placeholder="Search Product, Serial No, or Project Serial No"
-                                        aria-label="Search">
-                                    <button class="btn btn-primary" type="submit">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                            </form>
+                        <div>
+                            <h5 class="mb-0 fw-bold text-white">Products</h5>
+                            <small class="text-white opacity-75">{{ $products->total() }} total items</small>
                         </div>
+                    </div>
 
-                        {{-- Action Buttons --}}
-                        <div class="col-12 col-md-6 text-md-end">
-                            @if(auth()->user()->permission <= 1)
-                                <div class="d-flex flex-wrap justify-content-md-end justify-content-center gap-2">
+                    <div class="col-12 col-lg-4">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="liveSearch" placeholder="Search products..." autocomplete="off">
+                            <div id="searchResults" class="search-results"></div>
+                        </div>
+                        <form id="searchForm" method="GET" action="{{ route('products.index') }}" class="d-none">
+                            <input type="hidden" name="search" id="searchInput">
+                        </form>
+                    </div>
 
-                                    <a href="{{ route('products.sample') }}" 
-                                    class="btn btn-sm btn-secondary shadow-sm">
-                                        <i class="fa fa-file-csv me-1"></i> Sample CSV
-                                    </a>
-
-                                    <form action="{{ route('products.import') }}" method="POST" 
-                                        enctype="multipart/form-data" 
-                                        class="d-flex align-items-center gap-2">
-                                        @csrf
-                                        <input type="file" name="file" 
-                                            class="form-control form-control-sm" 
-                                            style="max-width: 140px;" required>
-                                        <button type="submit" class="btn btn-sm btn-primary shadow-sm">
-                                            <i class="fa fa-file-import me-1"></i> Import
-                                        </button>
-                                    </form>
-
-                                    <a href="{{ route('products.export.excel') }}" 
-                                    class="btn btn-sm btn-success shadow-sm">
-                                        <i class="fa fa-file-export me-1"></i> Export All
-                                    </a>
-
-                                    <a href="{{ route('products.create') }}" 
-                                    class="btn btn-sm btn-warning fw-bold shadow-sm">
-                                        <i class="fa fa-plus me-1"></i> Add Product
-                                    </a>
-
-                                </div>
+                    <div class="col-12 col-lg-3">
+                        <div class="d-flex gap-2">
+                            <select name="category_id" class="form-select form-select-sm filter-select" onchange="this.form.submit()">
+                                <option value="">All Categories</option>
+                                @foreach(\App\Models\Category::all() as $cat)
+                                    <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>
+                                        {{ $cat->category_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <select name="brand_id" class="form-select form-select-sm filter-select" onchange="this.form.submit()">
+                                <option value="">All Brands</option>
+                                @foreach(\App\Models\Brand::all() as $brand)
+                                    <option value="{{ $brand->id }}" {{ request('brand_id') == $brand->id ? 'selected' : '' }}>
+                                        {{ $brand->brand_name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @if(request('search'))
+                                <input type="hidden" name="search" value="{{ request('search') }}">
                             @endif
                         </div>
                     </div>
-                </div>
-            {{-- Skipped Rows Alert --}}
-            @if(Session::has('skippedRows') && count(Session::get('skippedRows')) > 0)
-                <div class="alert alert-warning alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-                    <i class="fa fa-exclamation-triangle me-1"></i>
-                    Some rows were skipped during import:
 
-                    <div class="table-responsive mt-2">
-                        <table class="table table-sm table-bordered table-striped mb-0 small">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Reason</th>
-                                    <th>Product Name</th>
-                                    <th>Serial No</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(Session::get('skippedRows') as $row)
-                                    <tr>
-                                        <td>{{ $row['skip_reason'] ?? 'Unknown' }}</td>
-                                        <td>{{ $row['product_name'] ?? 'N/A' }}</td>
-                                        <td>{{ $row['serial_no'] ?? 'N/A' }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                    <div class="col-12 col-lg-3 text-lg-end">
+                        @if(auth()->user()->permission <= 1)
+                            <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                                <a href="{{ route('products.sample') }}" class="btn btn-sm btn-light">
+                                    <i class="bi bi-download me-1"></i>Sample
+                                </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="bi bi-file-earmark-excel me-1"></i>Export
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{{ route('products.export.excel') }}">Excel Format</a></li>
+                                        <li><a class="dropdown-item" href="{{ route('products.export.category') }}">By Category</a></li>
+                                    </ul>
+                                </div>
+                                <a href="{{ route('products.create') }}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-plus-lg me-1"></i>Add
+                                </a>
+                            </div>
+                        @endif
                     </div>
+                </div>
+            </div>
 
-                    {{-- Download skipped rows --}}
-                    <a href="{{ route('products.skipped.export') }}" class="btn btn-sm btn-outline-dark mt-2">
-                        <i class="fa fa-download"></i> Download Skipped Rows CSV
-                    </a>
+            @if(auth()->user()->permission <= 1)
+            <div class="import-section">
+                <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
+                    @csrf
+                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" required>
+                    <button type="submit" class="btn btn-sm btn-primary">
+                        <i class="bi bi-upload me-1"></i>Import
+                    </button>
+                    <small class="text-muted ms-auto">Supported: .xlsx, .csv, .xls</small>
+                </form>
+            </div>
+            @endif
 
-                    {{-- X button that clears skipped rows session --}}
-                    <form action="{{ route('products.skipped.clear') }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn-close" aria-label="Close"></button>
-                    </form>
+            @if(Session::has('skippedRows') && count(Session::get('skippedRows')) > 0)
+                <div class="m-3 alert alert-warning d-flex align-items-start" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Skipped Rows ({{ count(Session::get('skippedRows')) }})</strong>
+                        <div class="table-responsive mt-2" style="max-height: 150px;">
+                            <table class="table table-sm table-bordered mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Reason</th>
+                                        <th>Product Name</th>
+                                        <th>Serial No</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach(Session::get('skippedRows') as $row)
+                                    <tr>
+                                        <td><span class="badge bg-warning text-dark">{{ $row['skip_reason'] ?? 'Unknown' }}</span></td>
+                                        <td>{{ $row['product_name'] ?? 'N/A' }}</td>
+                                        <td><code>{{ $row['serial_no'] ?? 'N/A' }}</code></td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="d-flex gap-2 ms-3">
+                        <a href="{{ route('products.skipped.export') }}" class="btn btn-sm btn-outline-dark" title="Export">
+                            <i class="bi bi-download"></i>
+                        </a>
+                        <form action="{{ route('products.skipped.clear') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-close" aria-label="Close"></button>
+                        </form>
+                    </div>
                 </div>
             @endif
 
-            {{-- Body --}}
-            <div class="card-body bg-light p-4">
-                @if(Session::has('success'))
-                    <div class="alert alert-success alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-                        <i class="fa fa-check-circle me-1"></i> {{ Session::get('success') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
+            <div class="table-container">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-header-gradient">
+                        <tr>
+                            <th class="ps-4" style="width: 60px;">#</th>
+                            <th>Product Info</th>
+                            <th>Serial No</th>
+                            <th class="d-none d-md-table-cell">Category</th>
+                            <th class="d-none d-lg-table-cell">Location</th>
+                            <th class="d-none d-lg-table-cell">Price</th>
+                            <th style="width: 130px;">Warranty</th>
+                            <th class="text-center" style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($products as $index => $p)
+                        <tr>
+                            <td class="ps-4">
+                                <span class="row-number">{{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}</span>
+                            </td>
 
-                @if(Session::has('error'))
-                    <div class="alert alert-danger alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-                        <i class="fa fa-exclamation-circle me-1"></i> {{ Session::get('error') }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                @endif
+                            <td>
+                                <div class="product-info">
+                                    <div class="product-avatar">
+                                        <i class="bi bi-box"></i>
+                                    </div>
+                                    <div>
+                                        <div class="product-name">{{ $p->product_name }}</div>
+                                        <div class="product-meta">
+                                            {{ $p->brand->brand_name ?? 'N/A' }} | {{ $p->model->model_name ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
 
+                            <td>
+                                <code class="serial-code">{{ $p->serial_no ?? '-' }}</code>
+                            </td>
+
+                            <td class="d-none d-md-table-cell">
+                                <span class="category-badge">
+                                    <i class="bi bi-tag-fill"></i>
+                                    {{ $p->category->category_name ?? 'N/A' }}
+                                </span>
+                            </td>
+
+                            <td class="d-none d-lg-table-cell">
+                                <span class="location-text">{{ $p->position ?? '—' }}</span>
+                            </td>
+
+                            <td class="d-none d-lg-table-cell">
+                                <span class="price-value">
+                                    <span class="price-symbol">৳</span>{{ number_format($p->price ?? 0, 2) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                @if($p->warranty_end)
+                                    @php
+                                        $daysLeft = now()->diffInDays($p->warranty_end, false);
+                                        $warrantyClass = $daysLeft < 0 ? 'warranty-expired' : ($daysLeft <= 30 ? 'warranty-expiring' : 'warranty-active');
+                                        $warrantyIcon = $daysLeft < 0 ? 'x-circle-fill' : ($daysLeft <= 30 ? 'exclamation-circle-fill' : 'check-circle-fill');
+                                        $warrantyText = $daysLeft < 0 ? 'Expired' : $daysLeft . ' days';
+                                    @endphp
+                                    <span class="warranty-badge {{ $warrantyClass }}">
+                                        <i class="bi bi-{{ $warrantyIcon }}"></i>
+                                        {{ $warrantyText }}
+                                    </span>
+                                @else
+                                    <span class="warranty-none">— No Warranty</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ route('products.show', $p->id) }}" class="action-btn action-btn-view" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    @if(auth()->user()->permission <= 1)
+                                        <a href="{{ route('products.edit', $p->id) }}" class="action-btn action-btn-edit" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+
+                                        <a href="{{ route('maintenance.create', ['product_id' => $p->id]) }}" class="action-btn action-btn-maintenance" title="Maintenance">
+                                            <i class="bi bi-tools"></i>
+                                        </a>
+
+                                        <form action="{{ route('products.destroy', $p->id) }}" method="POST" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="action-btn action-btn-delete delete-btn" title="Delete" data-title="Delete Product" data-text="Delete {{ $p->product_name }}?">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mt-3">No Products Found</h6>
+                                    <p class="text-muted mb-3">Get started by adding your first product</p>
+                                    @if(auth()->user()->permission <= 1)
+                                        <a href="{{ route('products.create') }}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-plus-lg me-1"></i>Add Product
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if($products->hasPages())
+            <div class="table-footer">
+                {{ $products->links('vendor.pagination.bootstrap-5') }}
+            </div>
+            @endif
+
+            @if(\App\Models\Product::onlyTrashed()->count() > 0)
+            <div class="recycle-bin-section">
+                <div class="px-3 py-2 d-flex align-items-center">
+                    <i class="bi bi-trash text-danger me-2"></i>
+                    <h6 class="mb-0 text-danger fw-bold">Recycle Bin</h6>
+                    <span class="badge bg-danger ms-2">{{ \App\Models\Product::onlyTrashed()->count() }}</span>
+                </div>
                 <div class="table-responsive">
-                    <table class="table table-bordered table-hover align-middle text-center shadow-sm product-table">
-                        <thead class="text-uppercase fw-bold text-primary" style="background-color: #e3f2fd;">
+                    <table class="table table-sm mb-0">
+                        <thead class="bg-light">
                             <tr>
-                                <th style="width: 50px;">SL</th>
-                                <th style="min-width: 80px;">Product</th>
-                                {{-- <th style="min-width: 90px;">Price</th> --}}
-                                <th style="min-width: 90px;">Serial No</th>
-                                <th class="d-none-xs" style="min-width: 80px;">Project Serial</th>
-                                <th class="d-none-xs" style="min-width: 70px;">Location</th>
-                                <th class="d-none-md" style="min-width: 100px;">User Description</th>
-                                <th class="d-none-sm" style="min-width: 80px;">Remarks</th>
-                                <th style="min-width: 90px;">Warranty</th>
-                                <th style="min-width: 120px;">Actions</th>
+                                <th class="ps-3">Product</th>
+                                <th>Serial No</th>
+                                <th>Deleted</th>
+                                <th class="pe-3">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($products as $p)
+                            @foreach(\App\Models\Product::onlyTrashed()->get() as $deleted)
                             <tr>
-                                <td data-label="SL" class="fw-bold text-primary">
-                                    {{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}
-                                </td>
-
-                                <td data-label="Product" class="fw-semibold text-dark text-truncate tooltip-cell" title="{{ $p->product_name }}">
-                                    @if(request('search'))
-                                        {!! str_replace(request('search'), '<mark>' . e(request('search')) . '</mark>', e($p->product_name)) !!}
-                                    @else
-                                        {{ $p->product_name }}
-                                    @endif
-                                </td>
-
-                                {{-- <td data-label="Price">{{ number_format($p->price, 2) }} ৳</td> --}}
-
-                                <td data-label="Serial No" class="tooltip-cell text-truncate" title="{{ $p->serial_no }}">
-                                    @if(request('search'))
-                                        {!! str_replace(request('search'), '<mark>' . e(request('search')) . '</mark>', e($p->serial_no)) !!}
-                                    @else
-                                        {{ $p->serial_no ?? '-' }}
-                                    @endif
-                                </td>
-
-                                <td data-label="Project Serial" class="d-none-xs tooltip-cell text-truncate" title="{{ $p->project_serial_no }}">
-                                    @if(request('search'))
-                                        {!! str_replace(request('search'), '<mark>' . e(request('search')) . '</mark>', e($p->project_serial_no)) !!}
-                                    @else
-                                        {{ $p->project_serial_no ?? '-' }}
-                                    @endif
-                                </td>
-
-                                <td data-label="Location" class="d-none-xs tooltip-cell text-truncate" title="{{ $p->position }}">
-                                    {{ $p->position ?? '-' }}
-                                </td>
-
-                                <td data-label="User Description" class="d-none-md tooltip-cell text-truncate" title="{{ $p->user_description }}">
-                                    {{ $p->user_description ?? '-' }}
-                                </td>
-
-                                <td data-label="Remarks" class="d-none-sm tooltip-cell text-truncate" title="{{ $p->remarks }}">
-                                    {{ $p->remarks ?? '-' }}
-                                </td>
-
-                                <td data-label="Warranty"><x-warranty-countdown :start="$p->warranty_start" :end="$p->warranty_end" /></td>
-
-                                <td data-label="Actions">
-                                    <div class="d-flex flex-wrap gap-1 justify-content-center justify-content-md-start">
-                                        <a href="{{ route('products.show', $p->id) }}" 
-                                        class="btn btn-sm btn-outline-info" title="View">
-                                            <i class="fa fa-eye"></i>
-                                        </a>
-
-                                        @if(auth()->user()->permission <= 1)
-                                            <a href="{{ route('products.edit', $p->id) }}" 
-                                            class="btn btn-sm btn-outline-warning" title="Edit">
-                                                <i class="fa fa-edit"></i>
-                                            </a>
-
-                                            <form action="{{ route('products.destroy', $p->id) }}" 
-                                                method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" 
-                                                        class="btn btn-sm btn-outline-danger" 
-                                                        title="Delete">
-                                                    <i class="fa fa-trash"></i>
-                                                </button>
-                                            </form>
-
-                                            <a href="{{ route('maintenance.create', ['product_id' => $p->id]) }}" 
-                                            class="btn btn-sm btn-outline-primary" title="Send to Maintenance">
-                                                <i class="fa fa-tools me-1"></i>
-                                            </a>
-                                        @endif
-                                    </div>
+                                <td class="ps-3">{{ $deleted->product_name }}</td>
+                                <td><code>{{ $deleted->serial_no }}</code></td>
+                                <td>{{ $deleted->deleted_at->format('d M Y') }}</td>
+                                <td class="pe-3">
+                                    <form action="{{ route('products.restore', $deleted->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button class="btn btn-sm btn-success">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Restore
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('products.forceDelete', $deleted->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button class="btn btn-sm btn-danger delete-btn" data-title="Permanent Delete" data-text="Permanently delete {{ $deleted->product_name }}?">
+                                            <i class="bi bi-trash me-1"></i>Delete
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
-                            @empty
-                            <tr>
-                                <td colspan="12" class="text-center py-5 text-muted">
-                                    <div class="d-flex flex-column align-items-center justify-content-center">
-                                        <img src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png" alt="No products" width="100" class="mb-3 opacity-75">
-                                        <h5 class="fw-bold text-danger">No products found</h5>
-                                        <a href="{{ route('products.create') }}" class="btn btn-outline-primary btn-lg fw-bold">
-                                            <i class="fa fa-plus me-1"></i> Add Product
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforelse
+                            @endforeach
                         </tbody>
                     </table>
                 </div>
-
-                <!-- Pagination -->
-                <x-pagination-block :paginator="$products" />
-
-                <!-- Recycle Bin Section -->
-                @if(\App\Models\Product::onlyTrashed()->count() > 0)
-                <div class="mt-4">
-                    <h5 class="text-danger">🗑️ Recycle Bin</h5>
-                    <div class="table-responsive">
-                        <table class="table table-bordered product-table">
-                            <thead class="bg-light">
-                                <tr>
-                                    <th>Product Name</th>
-                                    <th>Serial No</th>
-                                    <th class="d-none-sm">Deleted At</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach(\App\Models\Product::onlyTrashed()->get() as $deleted)
-                                <tr>
-                                    <td class="tooltip-cell" title="{{ $deleted->product_name }}">
-                                        {{ Str::limit($deleted->product_name, 15, '...') }}
-                                    </td>
-                                    <td>{{ $deleted->serial_no }}</td>
-                                    <td class="d-none-sm">{{ $deleted->deleted_at->format('d M Y, h:i A') }}</td>
-                                    <td>
-                                        <form action="{{ route('products.restore', $deleted->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            <button class="btn btn-sm btn-success" title="Restore Product">
-                                                <i class="fa fa-undo"></i> Restore
-                                            </button>
-                                        </form>
-                                        <form action="{{ route('products.forceDelete', $deleted->id) }}" method="POST" style="display:inline;">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button class="btn btn-sm btn-danger" title="Permanently Delete">
-                                                <i class="fa fa-trash"></i> Delete Permanently
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                @endif
             </div>
+            @endif
         </div>
     </div>
 </div>
-
-<style>
-    /* Compact text for all tables */
-    .product-table {
-        font-size: 0.8rem;
-    }
-
-    .product-table td,
-    .product-table th {
-        padding-left: 0.5rem; /* reduce left gap */
-        text-align: left;     /* align everything left */
-    }
-
-    .table-responsive {
-        overflow-x: auto;
-    }
-
-    /* Mobile card layout */
-    @media (max-width: 767px) {
-        .product-table,
-        .product-table thead,
-        .product-table tbody,
-        .product-table th,
-        .product-table td,
-        .product-table tr {
-            display: block;
-            width: 100%;
-        }
-
-        .product-table thead {
-            display: none; /* hide header on mobile */
-        }
-
-        .product-table tr {
-            margin-bottom: 1rem;
-            border: 1px solid #dee2e6;
-            border-radius: 0.5rem;
-            background: #fff;
-            padding: 0.5rem;
-            text-align: left;
-        }
-
-        .product-table td {
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            padding: 0.4rem 0.6rem;
-            border: none;
-            font-size: 0.85rem;
-        }
-
-        .product-table td::before {
-            content: attr(data-label);
-            flex: 0 0 40%;
-            font-weight: 600;
-            color: #007bff;
-            text-align: left;
-            margin-right: 0.5rem;
-        }
-    }
-</style>
-
 @endsection
-

@@ -4,154 +4,165 @@
 
 @section('contents')
 <div class="row">
-  <div class="col-lg-12">
-    <div class="card">
+    <div class="col-lg-12">
+        <div class="modern-table-card">
+            <div class="table-header-section">
+                <div class="row gy-3 align-items-center">
+                    <div class="col-12 col-lg-3 d-flex align-items-center">
+                        <div class="header-icon">
+                            <i class="bi bi-layers-fill"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-0 fw-bold text-white">Products in {{ $model->model_name }}</h5>
+                            <small class="text-white opacity-75">{{ $products->total() }} total items</small>
+                        </div>
+                    </div>
 
-      {{-- 🔖 Header --}}
-      <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-3 px-4">
-        <div class="d-flex align-items-center gap-3">
-          <h3 class="mb-0 fw-bold">
-            <i class="fa fa-cubes me-2"></i> Products in {{ $model->model_name }}
-          </h3>
-          <span class="badge bg-light text-dark fs-6 fw-semibold">{{ $products->total() }} items</span>
-        </div>
-        <div class="d-flex flex-wrap gap-2 align-items-center">
+                    <div class="col-12 col-lg-4">
+                        <form method="GET" action="{{ route('models.products', $model->id) }}" class="d-flex gap-2">
+                            <div class="search-box flex-grow-1">
+                                <i class="bi bi-search"></i>
+                                <input type="text" name="search" value="{{ request('search') }}"
+                                    class="form-control form-control-sm" placeholder="Search products...">
+                            </div>
+                        </form>
+                    </div>
 
-          {{-- 🔍 Search --}}
-          <form method="GET" action="{{ route('models.products', $model->id) }}" class="d-flex" style="max-width: 400px;">
-            <div class="input-group">
-              <input type="text" name="search" value="{{ request('search') }}"
-                class="form-control bg-light border-0 small" placeholder="Search by Serial Number" aria-label="Search">
-              <button class="btn btn-info" type="submit">
-                <i class="fas fa-search fa-sm"></i>
-              </button>
+                    <div class="col-12 col-lg-5 text-lg-end">
+                        <a href="{{ route('models.index') }}" class="btn btn-sm btn-light me-2">
+                            <i class="bi bi-arrow-left me-1"></i>Back
+                        </a>
+                        @if(auth()->user()->permission <= 1)
+                            <div class="d-flex flex-wrap justify-content-lg-end gap-2 d-inline">
+                                <a href="{{ route('products.create', ['model_id' => $model->id]) }}" class="btn btn-sm btn-add">
+                                    <i class="bi bi-plus-lg me-1"></i>Add
+                                </a>
+                                <a href="{{ route('products.export.model', $model->id) }}" class="btn btn-sm btn-light">
+                                    <i class="bi bi-file-earmark-excel me-1"></i>Export
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
-          </form>
 
-          @if(auth()->user()->permission <= 1)
-            {{-- ➕ Add Product --}}
-            <a href="{{ route('products.create', ['model_id' => $model->id]) }}"
-               class="btn btn-success fw-semibold shadow-sm">
-              <i class="fa fa-plus me-1"></i> Add Product
-            </a>
+            <div class="table-container">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-header-gradient">
+                        <tr>
+                            <th class="ps-4" style="width: 50px;">#</th>
+                            <th>Product</th>
+                            <th>Serial No</th>
+                            <th class="d-none d-md-table-cell">Category</th>
+                            <th class="d-none d-lg-table-cell">Location</th>
+                            <th class="d-none d-lg-table-cell">Price</th>
+                            <th style="width: 130px;">Warranty</th>
+                            <th class="text-center" style="width: 120px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($products as $index => $p)
+                        <tr>
+                            <td class="ps-4">
+                                <span class="row-number">{{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}</span>
+                            </td>
 
-            {{-- 📤 Export --}}
-            <a href="{{ route('products.export.model', $model->id) }}" class="btn btn-outline-success">
-              📤 Export for {{ $model->model_name }}
-            </a>
-          @endif
+                            <td>
+                                <div class="product-info">
+                                    <div class="product-avatar">
+                                        <i class="bi bi-box"></i>
+                                    </div>
+                                    <div>
+                                        <div class="product-name">{{ $p->product_name }}</div>
+                                        <div class="product-meta">
+                                            {{ $p->category->category_name ?? 'N/A' }} | {{ $p->brand->brand_name ?? 'N/A' }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
 
-          {{-- 🔙 Back --}}
-          <a href="{{ route('models.index') }}"
-             class="btn btn-warning fw-semibold shadow-sm text-white">
-            <i class="fa fa-arrow-left me-1"></i> Back to Models
-          </a>
+                            <td>
+                                <code class="serial-code">{{ $p->serial_no ?? '-' }}</code>
+                            </td>
+
+                            <td class="d-none d-md-table-cell">
+                                <span class="category-badge">
+                                    <i class="bi bi-tag-fill"></i>
+                                    {{ $p->category->category_name ?? 'N/A' }}
+                                </span>
+                            </td>
+
+                            <td class="d-none d-lg-table-cell">
+                                <span class="location-text">{{ $p->position ?? '—' }}</span>
+                            </td>
+
+                            <td class="d-none d-lg-table-cell">
+                                <span class="price-value">
+                                    <span class="price-symbol">৳</span>{{ number_format($p->price ?? 0, 2) }}
+                                </span>
+                            </td>
+
+                            <td>
+                                @if($p->warranty_end)
+                                    @php
+                                        $daysLeft = now()->diffInDays($p->warranty_end, false);
+                                        $warrantyClass = $daysLeft < 0 ? 'warranty-expired' : ($daysLeft <= 30 ? 'warranty-expiring' : 'warranty-active');
+                                        $warrantyIcon = $daysLeft < 0 ? 'x-circle-fill' : ($daysLeft <= 30 ? 'exclamation-circle-fill' : 'check-circle-fill');
+                                        $warrantyText = $daysLeft < 0 ? 'Expired' : $daysLeft . ' days';
+                                    @endphp
+                                    <span class="warranty-badge {{ $warrantyClass }}">
+                                        <i class="bi bi-{{ $warrantyIcon }}"></i>
+                                        {{ $warrantyText }}
+                                    </span>
+                                @else
+                                    <span class="warranty-none">— No Warranty</span>
+                                @endif
+                            </td>
+
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ route('products.show', $p->id) }}" 
+                                       class="action-btn action-btn-view" title="View">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    @if(auth()->user()->permission <= 1)
+                                        <a href="{{ route('products.edit', $p->id) }}" 
+                                           class="action-btn action-btn-edit" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="8" class="text-center">
+                                <div class="empty-state">
+                                    <div class="empty-icon">
+                                        <i class="bi bi-box-seam"></i>
+                                    </div>
+                                    <h6 class="fw-bold text-dark mt-3">No Products Found</h6>
+                                    <p class="text-muted mb-3">Get started by adding your first product</p>
+                                    @if(auth()->user()->permission <= 1)
+                                        <a href="{{ route('products.create', ['model_id' => $model->id]) }}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-plus-lg me-1"></i>Add Product
+                                        </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            @if($products->hasPages())
+            <div class="table-footer px-3">
+                {{ $products->links('vendor.pagination.bootstrap-5') }}
+            </div>
+            @endif
         </div>
-      </div>
-
-      {{-- 📦 Body --}}
-      <div class="card-body bg-light p-4">
-
-        {{-- ✅ Success Toast --}}
-        @if(Session::has('success'))
-          <div class="alert alert-success alert-dismissible fade show shadow-sm fw-semibold" role="alert">
-            <i class="fa fa-check-circle me-1"></i> {{ Session::get('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
-        @endif
-
-        {{-- 📋 Product Table --}}
-        <div class="table-responsive">
-          <table class="table table-hover table-bordered align-middle text-center shadow-sm rounded"
-            style="min-width: 1200px; border-radius: 0.5rem; overflow: hidden;">
-            <thead style="background: linear-gradient(to right, #00C9FF, #92FE9D); color: white;">
-              <tr class="text-uppercase fw-bold" style="height: 60px;">
-                <th>SL</th>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Brand</th>
-                <th>Category</th>
-                <th>Serial No</th>
-                <th>Project Serial</th>
-                <th>Location</th>
-                <th>User Description</th>
-                <th>Remarks</th>
-                <th>Warranty</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @forelse($products as $product)
-                <tr style="height: 55px; background-color: {{ $loop->even ? '#f9f9f9' : '#ffffff' }};">
-                  <td class="fw-bold text-primary">
-                    {{ ($products->currentPage() - 1) * $products->perPage() + $loop->iteration }}
-                  </td>
-                  <td class="fw-semibold text-dark" title="{{ $product->product_name }}">
-                    {{ $product->product_name }}
-                  </td>
-                  <td>{{ number_format($product->price, 2) }} ৳</td>
-                  <td title="{{ $product->brand->brand_name ?? '-' }}">
-                    {{ $product->brand->brand_name ?? '-' }}
-                  </td>
-                  <td title="{{ $product->category->category_name ?? '-' }}">
-                    {{ $product->category->category_name ?? '-' }}
-                  </td>
-                  <td title="{{ $product->serial_no }}">
-                    {{ $product->serial_no }}
-                  </td>
-                  <td title="{{ $product->project_serial ?? '-' }}">
-                    {{ $product->project_serial ?? '-' }}
-                  </td>
-                  <td title="{{ $product->position ?? '-' }}">
-                    {{ $product->position ?? '-' }}
-                  </td>
-                  <td title="{{ $product->user_description ?? '-' }}">
-                    {{ $product->user_description ?? '-' }}
-                  </td>
-                  <td title="{{ $product->remarks ?? '-' }}">
-                    {{ $product->remarks ?? '-' }}
-                  </td>
-                  <td>
-                    <x-warranty-countdown :start="$product->warranty_start" :end="$product->warranty_end" />
-                  </td>
-                  <td>
-                    <div class="d-flex justify-content-center gap-2">
-                      <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-outline-info" title="View">
-                        <i class="fa fa-eye"></i>
-                      </a>
-                      @if(auth()->user()->permission <= 1)
-                        <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-outline-warning" title="Edit">
-                          <i class="fa fa-edit"></i>
-                        </a>
-                      @endif
-                    </div>
-                  </td>
-                </tr>
-              @empty
-                <tr>
-                  <td colspan="12" class="text-center py-5 text-muted">
-                    <div class="d-flex flex-column align-items-center justify-content-center">
-                      <i class="fa fa-box-open fa-2x mb-3 text-danger"></i>
-                      <h5 class="fw-bold">No products found for this model</h5>
-                      <p class="small">Try adding a new product under this model to populate the list.</p>
-                      @if(auth()->user()->permission <= 1)
-                        <a href="{{ route('products.create', ['model_id' => $model->id]) }}"
-                           class="btn btn-primary fw-bold mt-2 shadow-sm">
-                          <i class="fa fa-plus me-1"></i> Add Product
-                        </a>
-                      @endif
-                    </div>
-                  </td>
-                </tr>
-              @endforelse
-            </tbody>
-          </table>
-        </div>
-
-        {{-- 📄 Pagination --}}
-        <x-pagination-block :paginator="$products" />
-      </div>
     </div>
-  </div>
 </div>
 @endsection

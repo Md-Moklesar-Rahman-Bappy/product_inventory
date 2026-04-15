@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use App\Helpers\StringHelper;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use App\Notifications\SendCredentialsNotification;
-use App\Http\Controllers\ActivityLogController;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
     // 🧾 List Users
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(10);
+        $perPage = $request->input('per_page', 10);
+        $users = User::latest()->paginate($perPage);
         $deletedUsers = User::onlyTrashed()->get();
 
         return view('users.index', compact('users', 'deletedUsers'));
@@ -28,7 +26,7 @@ class UserController extends Controller
     // ➕ Show Create Form (Superadmin only)
     public function create()
     {
-        if (!Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isSuperadmin()) {
             abort(403, 'Access denied.');
         }
 
@@ -38,7 +36,7 @@ class UserController extends Controller
     // ✅ Store New User (Superadmin only)
     public function store(Request $request)
     {
-        if (!Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isSuperadmin()) {
             abort(403, 'Access denied.');
         }
 
@@ -47,29 +45,31 @@ class UserController extends Controller
         ]);
 
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email',
-            'password'    => 'required|min:6',
-            'mobile'      => 'nullable|string|max:20',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/|regex:/[!@#$%^&*]/',
+            'mobile' => 'nullable|string|max:20',
             'designation' => 'nullable|string|max:255',
-            'about'       => 'nullable|string',
-            'address'     => 'nullable|string',
-            'permission'  => 'required|integer|min:1|max:2',
+            'about' => 'nullable|string',
+            'address' => 'nullable|string',
+            'permission' => 'required|integer|min:0|max:2',
             'profile_photo_path' => 'nullable|image|max:2048',
+        ], [
+            'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
         ]);
 
-        $user = new User();
+        $user = new User;
         $user->fill([
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'password'    => bcrypt($request->password),
-            'mobile'      => $request->mobile,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'mobile' => $request->mobile,
             'designation' => $request->designation,
-            'about'       => $request->about,
-            'address'     => $request->address,
-            'permission'  => $request->permission,
-            'utype'       => $request->permission === 1 ? 'ADM' : 'USR',
-            'status'      => 'active',
+            'about' => $request->about,
+            'address' => $request->address,
+            'permission' => $request->permission,
+            'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
+            'status' => 'active',
             'initial_password' => Crypt::encryptString($request->password),
         ]);
 
@@ -86,14 +86,14 @@ class UserController extends Controller
             'create',
             'User',
             $user->id,
-            '<span class="text-success fw-bold">Created</span> user: <strong>' . e($user->name) . '</strong>'
+            '<span class="text-success fw-bold">Created</span> user: <strong>'.e($user->name).'</strong>'
         );
 
         ActivityLogController::logAction(
             'verification-init',
             'User',
             $user->id,
-            '<span class="text-warning fw-bold">Verification email sent</span> to user: <strong>' . e($user->name) . '</strong>'
+            '<span class="text-warning fw-bold">Verification email sent</span> to user: <strong>'.e($user->name).'</strong>'
         );
 
         return redirect()->route('users.index')->with('message', '✅ User created successfully.');
@@ -102,13 +102,17 @@ class UserController extends Controller
     // 👁️ View Single User
     public function show(User $user)
     {
+        if (! Auth::user()->isAdmin() && ! Auth::user()->isSuperadmin() && Auth::id() !== $user->id) {
+            abort(403, 'Access denied.');
+        }
+
         return view('users.show', compact('user'));
     }
 
     // ✏️ Edit User (Admin or Superadmin)
     public function edit(User $user)
     {
-        if (!Auth::user()->isAdmin() && !Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isAdmin() && ! Auth::user()->isSuperadmin()) {
             abort(403, 'Access denied.');
         }
 
@@ -118,7 +122,7 @@ class UserController extends Controller
     // 🔄 Update User (Admin or Superadmin)
     public function update(Request $request, User $user)
     {
-        if (!Auth::user()->isAdmin() && !Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isAdmin() && ! Auth::user()->isSuperadmin()) {
             abort(403, 'Access denied.');
         }
 
@@ -127,26 +131,28 @@ class UserController extends Controller
         ]);
 
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users,email,' . $user->id,
-            'password'    => 'nullable|min:6',
-            'mobile'      => 'nullable|string|max:20',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,'.$user->id,
+            'password' => 'nullable|min:8|regex:/[A-Z]/|regex:/[a-z]/|regex:/[0-9]/|regex:/[!@#$%^&*]/',
+            'mobile' => 'nullable|string|max:20',
             'designation' => 'nullable|string|max:255',
-            'about'       => 'nullable|string',
-            'address'     => 'nullable|string',
-            'permission'  => 'required|integer|min:0|max:3',
+            'about' => 'nullable|string',
+            'address' => 'nullable|string',
+            'permission' => 'required|integer|min:0|max:2',
             'profile_photo_path' => 'nullable|image|max:2048',
+        ], [
+            'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
         ]);
 
         $user->fill([
-            'name'        => $request->name,
-            'email'       => $request->email,
-            'mobile'      => $request->mobile,
+            'name' => $request->name,
+            'email' => $request->email,
+            'mobile' => $request->mobile,
             'designation' => $request->designation,
-            'about'       => $request->about,
-            'address'     => $request->address,
-            'permission'  => $request->permission,
-            'utype'       => $request->permission === 1 ? 'ADM' : 'USR',
+            'about' => $request->about,
+            'address' => $request->address,
+            'permission' => $request->permission,
+            'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
         ]);
 
         if ($request->filled('password')) {
@@ -168,7 +174,7 @@ class UserController extends Controller
             'update',
             'User',
             $user->id,
-            '<span class="text-primary fw-bold">Updated</span> user: <strong>' . e($user->name) . '</strong>'
+            '<span class="text-primary fw-bold">Updated</span> user: <strong>'.e($user->name).'</strong>'
         );
 
         return redirect()->route('users.index')->with('message', '✏️ User updated successfully.');
@@ -177,7 +183,7 @@ class UserController extends Controller
     // 🗑️ Delete User (Admin or Superadmin)
     public function destroy(User $user)
     {
-        if (!Auth::user()->isAdmin() && !Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isAdmin() && ! Auth::user()->isSuperadmin()) {
             abort(403, 'Access denied.');
         }
 
@@ -191,7 +197,7 @@ class UserController extends Controller
             'delete',
             'User',
             $user->id,
-            '<span class="text-danger fw-bold">Deleted</span> user: <strong>' . e($user->name) . '</strong>'
+            '<span class="text-danger fw-bold">Deleted</span> user: <strong>'.e($user->name).'</strong>'
         );
 
         return redirect()->route('users.index')->with('message', '🗑️ User deleted successfully.');
@@ -200,7 +206,7 @@ class UserController extends Controller
     // ♻️ Restore User (Superadmin only)
     public function restore($id)
     {
-        if (!Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isSuperadmin()) {
             abort(403, 'Access denied.');
         }
 
@@ -211,7 +217,7 @@ class UserController extends Controller
             'restore',
             'User',
             $user->id,
-            '<span class="text-success fw-bold">Restored</span> user: <strong>' . e($user->name) . '</strong>'
+            '<span class="text-success fw-bold">Restored</span> user: <strong>'.e($user->name).'</strong>'
         );
 
         return redirect()->route('users.index')->with('message', '♻️ User restored successfully.');
@@ -220,7 +226,7 @@ class UserController extends Controller
     // 🔁 Toggle Status (Superadmin only)
     public function toggleStatus(User $user)
     {
-        if (!Auth::user()->isSuperadmin()) {
+        if (! Auth::user()->isSuperadmin()) {
             abort(403, 'Only super admins can change user status.');
         }
 
@@ -242,47 +248,9 @@ class UserController extends Controller
             'status-toggle',
             'User',
             $user->id,
-            '<span class="text-warning fw-bold">Status changed</span> for user: <strong>' . e($user->name) . '</strong> from <em>' . ucfirst($oldStatus) . '</em> to <em>' . ucfirst($user->status) . '</em>'
+            '<span class="text-warning fw-bold">Status changed</span> for user: <strong>'.e($user->name).'</strong> from <em>'.ucfirst($oldStatus).'</em> to <em>'.ucfirst($user->status).'</em>'
         );
 
         return back()->with('success', 'User status updated successfully.');
-    }
-
-        // 🔐 Optional: Custom login method with status check
-    public function login(Request $request)
-    {
-        $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|string',
-        ]);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'No account found with this email.']);
-        }
-
-        if ($user->status !== 'active') {
-            return back()->withErrors(['email' => '🚫 Your account is currently deactivated. Please contact support.']);
-        }
-
-        if (!Hash::check($request->password, $user->password)) {
-            return back()->withErrors(['password' => '❌ Incorrect password.']);
-        }
-
-        if (!$user->hasVerifiedEmail()) {
-            return redirect()->route('verification.notice')->with('message', '📧 Please verify your email before logging in.');
-        }
-
-        Auth::login($user);
-
-        ActivityLogController::logAction(
-            'login',
-            'User',
-            $user->id,
-            '<span class="text-success fw-bold">Logged in</span> as user: <strong>' . e($user->name) . '</strong>'
-        );
-
-        return redirect()->intended('/dashboard')->with('message', '🎉 Welcome back, ' . $user->name . '!');
     }
 }

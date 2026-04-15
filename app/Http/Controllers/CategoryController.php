@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use App\Exports\CategoryProductExport;
-use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CategoryImport;
 use App\Models\Category;
 use App\Models\Product;
-use App\Http\Controllers\ActivityLogController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class CategoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Category::query();
+        $query = Category::query()->withCount('products');
 
         if ($request->has('show_trashed')) {
             $query->onlyTrashed();
@@ -42,7 +42,7 @@ class CategoryController extends Controller
             'create',
             'Category',
             $category->id,
-            '<span class="text-success fw-bold">Created</span> category: <strong>' . $category->category_name . '</strong>'
+            '<span class="text-success fw-bold">Created</span> category: <strong>'.$category->category_name.'</strong>'
         );
 
         return redirect()->route('categories.index')
@@ -52,19 +52,21 @@ class CategoryController extends Controller
     public function show(string $id)
     {
         $category = Category::withTrashed()->findOrFail($id);
+
         return view('categories.show', compact('category'));
     }
 
     public function edit(string $id)
     {
         $category = Category::withTrashed()->findOrFail($id);
+
         return view('categories.edit', compact('category'));
     }
 
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'category_name' => 'required|string|max:255|unique:categories,category_name,' . $id,
+            'category_name' => 'required|string|max:255|unique:categories,category_name,'.$id,
         ]);
 
         $category = Category::withTrashed()->findOrFail($id);
@@ -74,7 +76,7 @@ class CategoryController extends Controller
             'update',
             'Category',
             $category->id,
-            '<span class="text-primary fw-bold">Updated</span> category: <strong>' . $category->category_name . '</strong>'
+            '<span class="text-primary fw-bold">Updated</span> category: <strong>'.$category->category_name.'</strong>'
         );
 
         return redirect()->route('categories.index')
@@ -91,7 +93,7 @@ class CategoryController extends Controller
             'delete',
             'Category',
             $id,
-            '<span class="text-danger fw-bold">Archived</span> category: <strong>' . $categoryName . '</strong>'
+            '<span class="text-danger fw-bold">Archived</span> category: <strong>'.$categoryName.'</strong>'
         );
 
         return redirect()->route('categories.index')
@@ -107,7 +109,7 @@ class CategoryController extends Controller
             'restore',
             'Category',
             $id,
-            '<span class="text-success fw-bold">Restored</span> category: <strong>' . $category->category_name . '</strong>'
+            '<span class="text-success fw-bold">Restored</span> category: <strong>'.$category->category_name.'</strong>'
         );
 
         return redirect()->route('categories.index')
@@ -124,7 +126,7 @@ class CategoryController extends Controller
             'force_delete',
             'Category',
             $id,
-            '<span class="text-danger fw-bold">Permanently deleted</span> category: <strong>' . $categoryName . '</strong>'
+            '<span class="text-danger fw-bold">Permanently deleted</span> category: <strong>'.$categoryName.'</strong>'
         );
 
         return redirect()->route('categories.index')
@@ -141,7 +143,7 @@ class CategoryController extends Controller
             $searchTerm = $request->input('search');
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('serial_no', 'like', "%{$searchTerm}%")
-                  ->orWhere('project_serial_no', 'like', "%{$searchTerm}%");
+                    ->orWhere('project_serial_no', 'like', "%{$searchTerm}%");
             });
         }
 
@@ -153,8 +155,60 @@ class CategoryController extends Controller
     public function exportCategoryProducts($categoryId)
     {
         $category = Category::withTrashed()->findOrFail($categoryId);
-        $filename = 'products_' . Str::slug($category->category_name) . '_' . now()->format('Ymd_His') . '.xlsx';
+        $filename = 'products_'.Str::slug($category->category_name).'_'.now()->format('Ymd_His').'.xlsx';
 
         return Excel::download(new CategoryProductExport($categoryId), $filename);
+    }
+
+    // Import
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,xls|max:2048',
+        ]);
+
+        $import = new CategoryImport;
+        Excel::import($import, $request->file('file'));
+
+        $message = "Import completed: {$import->created} created, {$import->updated} updated, {$import->skipped} skipped.";
+
+        return redirect()->route('categories.index')->with('success', $message);
+    }
+
+    // Download Sample
+    public function downloadSample()
+    {
+        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="category_sample.csv"'];
+
+        $columns = ['category'];
+        $example = ['Laptop'];
+
+        $callback = function () use ($columns, $example) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+            fputcsv($file, $example);
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    // Export
+    public function export()
+    {
+        $categories = Category::all();
+
+        $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="categories_export_'.now()->format('Ymd_His').'.csv"'];
+
+        $callback = function () use ($categories) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, ['category', 'created_at']);
+            foreach ($categories as $c) {
+                fputcsv($file, [$c->category_name, $c->created_at->format('d/m/Y')]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

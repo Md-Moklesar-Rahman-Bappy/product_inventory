@@ -15,42 +15,42 @@ class ActivityLogController extends Controller
         $user = auth()->user();
 
         ActivityLog::create([
-            'user_id'     => $user?->id,
-            'action'      => $action,
-            'model'       => $model,
-            'model_id'    => $model_id ?? null,
+            'user_id' => $user?->id,
+            'action' => $action,
+            'model' => $model,
+            'model_id' => $model_id ?? null,
             'description' => $description,
-            'ip_address'  => request()->ip(),
-            'user_agent'  => request()->header('User-Agent'),
-            'role'        => $user?->role ?? 'guest',
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->header('User-Agent'),
+            'role' => $user?->utype ?? 'guest',
         ]);
     }
 
     /**
-     * Display a paginated list of activity logs with optional model filtering.
+     * Display a paginated list of activity logs with optional filtering.
      */
     public function index(Request $request)
     {
         $modelFilter = $request->query('model');
 
         $logsQuery = ActivityLog::with('user')
-            ->when($modelFilter, fn($q) => $q->where('model', $modelFilter))
+            ->when($modelFilter, function ($q) use ($modelFilter) {
+                // Check if filtering by action (like 'login', 'create', etc.)
+                $actions = ['login', 'logout', 'create', 'update', 'delete', 'restore', 'status-toggle', 'send-credentials', 'verification-init'];
+                if (in_array($modelFilter, $actions)) {
+                    return $q->where('action', $modelFilter);
+                }
+
+                // Otherwise filter by model type
+                return $q->where('model', $modelFilter);
+            })
             ->latest();
 
-        $logs = $logsQuery->paginate(10);
-
-        // Group logs by extracted serial number from description
-        $groupedLogs = $logs->getCollection()->groupBy(function ($log) {
-            if (preg_match('/Serial No:\s*([A-Za-z0-9\-]+)/', $log->description, $matches)) {
-                return $matches[1];
-            }
-            return 'No Serial';
-        });
+        $logs = $logsQuery->paginate(15);
 
         return view('activity_logs.index', [
-            'logs'         => $logs,
-            'groupedLogs'  => $groupedLogs,
-            'modelFilter'  => $modelFilter,
+            'logs' => $logs,
+            'modelFilter' => $modelFilter,
         ]);
     }
 

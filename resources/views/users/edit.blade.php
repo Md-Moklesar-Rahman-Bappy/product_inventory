@@ -2,164 +2,382 @@
 
 @section('title', 'Edit User')
 
+@push('styles')
+<style>
+    .profile-upload-card {
+        background: #ffffff;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        border: 1px solid #e2e8f0;
+    }
+
+    .profile-header {
+        background: linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #fb7185 100%);
+        padding: 24px;
+        color: white;
+    }
+
+    .profile-photo-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+    .profile-photo {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid white;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .profile-photo-placeholder {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 4px solid white;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .profile-photo-placeholder i {
+        font-size: 4rem;
+        color: #94a3b8;
+    }
+
+    .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+        width: 100%;
+    }
+
+    .upload-btn-wrapper .btn {
+        width: 100%;
+        margin-top: 12px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        border: none;
+        color: white;
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .upload-btn-wrapper .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+    }
+
+    .upload-btn-wrapper input[type=file] {
+        font-size: 100px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .form-section-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .form-section-title i {
+        color: #4f46e5;
+    }
+
+    .form-input {
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        padding: 12px 16px;
+        transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+    }
+
+    .form-label-custom {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #475569;
+        margin-bottom: 6px;
+    }
+
+    .password-requirements {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+    }
+
+    .req-item {
+        font-size: 0.8rem;
+        color: #92400e;
+    }
+
+    .req-item.met {
+        color: #047857;
+        font-weight: 600;
+    }
+
+    .progress {
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        border: none;
+        padding: 12px 32px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+
+    @media (max-width: 768px) {
+        .profile-photo, .profile-photo-placeholder {
+            width: 120px;
+            height: 120px;
+        }
+    }
+</style>
+@endpush
+
 @section('contents')
-
-<div class="app-content main-content mt-0">
-    <div class="side-app">
-        <div class="main-container container-fluid">
-
-            <!-- PAGE HEADER -->
-            <div class="page-header">
-                <div>
-                    <h1 class="page-title">
-                        <i class="fa fa-user-edit me-2 text-primary"></i> Edit User
-                    </h1>
-                </div>
-                <div class="ms-auto pageheader-btn">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('users.index') }}">Users</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Edit</li>
-                    </ol>
+<div class="row">
+    <div class="col-lg-10 offset-lg-1">
+        <div class="profile-upload-card">
+            <div class="profile-header">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="header-icon">
+                        <i class="bi bi-person-check-fill"></i>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold">Edit User</h4>
+                        <small class="opacity-75">Update user information</small>
+                    </div>
                 </div>
             </div>
-
-            <!-- FORM CARD -->
-            <div class="row">
-                <div class="col-lg-8 offset-lg-2">
-                    <div class="card border-0 shadow-sm rounded-4">
-                        <div class="card-header bg-gradient-info text-white text-center py-3">
-                            <h3 class="card-title fw-bold"><i class="fa fa-user-circle me-2"></i> Update Profile</h3>
+            
+            <div class="card-body p-4">
+                @if($errors->any())
+                    <div class="alert alert-danger mb-4" style="border-radius: 12px;">
+                        <div class="d-flex align-items-center">
+                            <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
+                            <strong>Please fix the following errors:</strong>
                         </div>
-                        <div class="card-body bg-light p-4">
+                        <ul class="mb-0 mt-2">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
-                            @if(session('message'))
-                                <div class="alert alert-success text-center fw-semibold">
-                                    <i class="fa fa-check-circle me-1"></i> {{ session('message') }}
+                <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data" id="userForm">
+                    @csrf
+                    @method('PUT')
+                    
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <div class="mb-3">
+                                <div class="profile-photo-wrapper" id="photoContainer">
+                                    <img src="{{ $user->profile_photo_url }}" alt="Profile Photo" 
+                                        class="profile-photo" id="photoPreview">
                                 </div>
-                            @endif
-
-                            @if ($errors->any())
-                                <div class="alert alert-danger shadow-sm">
-                                    <ul class="mb-0">
-                                        @foreach ($errors->all() as $error)
-                                            <li><i class="fa fa-exclamation-circle me-1 text-danger"></i> {{ $error }}</li>
-                                        @endforeach
-                                    </ul>
+                                <div class="upload-btn-wrapper">
+                                    <button class="btn" type="button">
+                                        <i class="bi bi-camera me-2"></i>Change Photo
+                                    </button>
+                                    <input type="file" name="profile_photo_path" accept="image/*" onchange="previewImage(this)">
                                 </div>
-                            @endif
+                                <small class="text-muted d-block mt-2">JPG, PNG (Max 2MB)</small>
+                            </div>
+                            <div class="mb-2">
+                                <span class="badge bg-info text-white">{{ $user->role_label }}</span>
+                                <span class="badge {{ $user->status === 'active' ? 'bg-success' : 'bg-secondary' }}">
+                                    {{ ucfirst($user->status) }}
+                                </span>
+                            </div>
+                        </div>
 
-                            <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-                                @method('PUT')
-
-                                {{-- Name --}}
-                                <div class="mb-4">
-                                    <label for="name" class="form-label fw-bold">User Name</label>
-                                    <input type="text" id="name" name="name" class="form-control"
-                                           value="{{ old('name', $user->name) }}" required>
+                        <div class="col-md-8">
+                            <div class="form-section-title">
+                                <i class="bi bi-person-badge"></i>
+                                Basic Information
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label-custom">User Name</label>
+                                    <input type="text" name="name" class="form-control form-input" 
+                                        placeholder="Enter user name" value="{{ old('name', $user->name) }}" required>
                                 </div>
-
-                                {{-- Email --}}
-                                <div class="mb-4">
-                                    <label for="email" class="form-label fw-bold">Email</label>
-                                    <input type="email" id="email" name="email" class="form-control"
-                                           value="{{ old('email', $user->email) }}" required>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label-custom">Email Address</label>
+                                    <input type="email" name="email" class="form-control form-input" 
+                                        placeholder="Enter email" value="{{ old('email', $user->email) }}" required>
                                 </div>
-
-                                {{-- Mobile --}}
-                                <div class="mb-4">
-                                    <label for="mobile" class="form-label fw-bold">Mobile Number</label>
-                                    <input type="text" id="mobile" name="mobile" class="form-control"
-                                           value="{{ old('mobile', $user->mobile) }}">
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label-custom">Mobile Number</label>
+                                    <input type="text" name="mobile" class="form-control form-input" 
+                                        placeholder="Enter mobile number" value="{{ old('mobile', $user->mobile) }}">
                                 </div>
-
-                                {{-- Permission --}}
-                                <div class="mb-4">
-                                    <label for="permission" class="form-label fw-bold">Permission</label>
-                                    <select name="permission" id="permission" class="form-control" required>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label-custom">Role / Permission</label>
+                                    <select name="permission" class="form-select form-input" required>
                                         <option value="1" {{ old('permission', $user->permission) == 1 ? 'selected' : '' }}>Admin</option>
                                         <option value="2" {{ old('permission', $user->permission) == 2 ? 'selected' : '' }}>User</option>
                                     </select>
                                 </div>
+                            </div>
 
-                                {{-- Designation --}}
-                                <div class="mb-4">
-                                    <label for="designation" class="form-label fw-bold">Designation</label>
-                                    <input type="text" id="designation" name="designation" class="form-control"
-                                           value="{{ old('designation', $user->designation) }}">
+                            <div class="form-section-title mt-4">
+                                <i class="bi bi-briefcase"></i>
+                                Work Details
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label-custom">Designation</label>
+                                    <input type="text" name="designation" class="form-control form-input" 
+                                        placeholder="Enter designation" value="{{ old('designation', $user->designation) }}">
                                 </div>
-
-                                {{-- Profile Photo --}}
-                                <div class="mb-4">
-                                    <label for="profile_photo_path" class="form-label fw-bold">Profile Photo</label>
-                                    <input type="file" id="profile_photo_path" name="profile_photo_path"
-                                           class="dropify form-control" data-height="200"
-                                           data-default-file="{{ $user->profile_photo_url }}"
-                                           accept="image/*">
-                                    <div class="mt-3 text-center">
-                                        <img src="{{ $user->profile_photo_url }}" alt="Current Photo"
-                                             class="rounded shadow-sm" width="120" height="120" style="object-fit: cover;">
-                                        <p class="small text-muted mt-2">Current photo</p>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label-custom">Password <small class="text-muted">(leave blank to keep current)</small></label>
+                                    <input type="password" name="password" id="newPassword" class="form-control form-input" 
+                                        placeholder="Enter new password" autocomplete="off">
+                                    <div class="mt-2">
+                                        <div class="progress" style="height: 6px;">
+                                            <div id="passwordStrengthBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                        </div>
+                                        <small class="text-muted mt-1 d-block">Strength: <span id="strengthText" class="fw-semibold">None</span></small>
                                     </div>
                                 </div>
-
-                                {{-- About --}}
-                                <div class="mb-4">
-                                    <label for="about" class="form-label fw-bold">About</label>
-                                    <textarea id="about" name="about" class="form-control" rows="3">{{ old('about', $user->about) }}</textarea>
-                                </div>
-
-                                {{-- Address --}}
-                                <div class="mb-4">
-                                    <label for="address" class="form-label fw-bold">Address</label>
-                                    <textarea id="address" name="address" class="form-control" rows="3">{{ old('address', $user->address) }}</textarea>
-                                </div>
-
-                                {{-- Password --}}
-                                <div class="mb-4">
-                                    <label for="password" class="form-label fw-bold">Password</label>
-                                    <input type="password" id="password" name="password" class="form-control"
-                                           placeholder="Leave blank to keep current password" autocomplete="off">
-                                </div>
-
-                                {{-- Submit --}}
-                                <div class="text-end mt-4">
-                                    <button type="submit" class="btn btn-primary fw-bold">
-                                        <i class="fa fa-save me-1"></i> Update User
-                                    </button>
-                                    <a href="{{ route('users.index') }}" class="btn btn-secondary fw-bold ms-2">
-                                        <i class="fa fa-arrow-left me-1"></i> Cancel
-                                    </a>
-                                </div>
-                            </form>
-
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label-custom">About</label>
+                                <textarea name="about" class="form-control form-input" rows="2" placeholder="Brief description about this user">{{ old('about', $user->about) }}</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label-custom">Address</label>
+                                <textarea name="address" class="form-control form-input" rows="2" placeholder="Enter address">{{ old('address', $user->address) }}</textarea>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <!-- END ROW -->
 
+                    <div class="alert alert-warning mt-3 password-requirements">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="bi bi-shield-lock me-2"></i>
+                            <strong>Password Requirements</strong>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="mb-0 ps-3">
+                                    <li class="req-item" id="req-length"><i class="bi bi-circle me-1"></i> At least 8 characters</li>
+                                    <li class="req-item" id="req-upper"><i class="bi bi-circle me-1"></i> At least 1 uppercase letter (A-Z)</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="mb-0 ps-3">
+                                    <li class="req-item" id="req-lower"><i class="bi bi-circle me-1"></i> At least 1 lowercase letter (a-z)</li>
+                                    <li class="req-item" id="req-number"><i class="bi bi-circle me-1"></i> At least 1 number (0-9)</li>
+                                    <li class="req-item" id="req-special"><i class="bi bi-circle me-1"></i> At least 1 special character (!@#$%^&*)</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-3 mt-4 pt-3 border-top">
+                        <a href="{{ route('users.index') }}" class="btn btn-outline-secondary px-4">
+                            <i class="bi bi-x-circle me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-submit text-white">
+                            <i class="bi bi-check-lg me-1"></i>Update User
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
-@push('styles')
-<link rel="stylesheet" href="{{ asset('assets/plugins/dropify/css/dropify.min.css') }}">
-@endpush
-
 @push('scripts')
-<script src="{{ asset('assets/plugins/dropify/js/dropify.min.js') }}"></script>
 <script>
-    $(document).ready(function () {
-        $('.dropify').dropify({
-            messages: {
-                'default': 'Drag and drop a file here or click',
-                'replace': 'Drag and drop or click to replace',
-                'remove':  'Remove',
-                'error':   'Ooops, something wrong happened.'
-            }
-        });
-    });
+function previewImage(input) {
+    const container = document.getElementById('photoContainer');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            container.innerHTML = `<img src="${e.target.result}" class="profile-photo" alt="Preview">`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+document.getElementById('newPassword').addEventListener('input', function() {
+    const password = this.value;
+    const bar = document.getElementById('passwordStrengthBar');
+    const text = document.getElementById('strengthText');
+    
+    let strength = 0;
+    const requirements = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*]/.test(password)
+    };
+    
+    const updateReq = (id, met) => {
+        const el = document.getElementById(id);
+        if (met) {
+            el.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> ' + el.textContent.replace(/<i class="[^"]*"><\/i>\s*/, '');
+            el.className = 'req-item met';
+        } else {
+            el.innerHTML = '<i class="bi bi-circle me-1"></i> ' + el.textContent.replace(/<i class="[^"]*"><\/i>\s*/, '');
+            el.className = 'req-item';
+        }
+    };
+    
+    updateReq('req-length', requirements.length);
+    updateReq('req-upper', requirements.upper);
+    updateReq('req-lower', requirements.lower);
+    updateReq('req-number', requirements.number);
+    updateReq('req-special', requirements.special);
+    
+    if (requirements.length) strength++;
+    if (requirements.upper) strength++;
+    if (requirements.lower) strength++;
+    if (requirements.number) strength++;
+    if (requirements.special) strength++;
+    
+    const percentage = (strength / 5) * 100;
+    bar.style.width = percentage + '%';
+    
+    const colors = ['bg-secondary', 'bg-danger', 'bg-warning', 'bg-info', 'bg-primary', 'bg-success'];
+    const labels = ['None', 'Very Weak', 'Weak', 'Good', 'Strong', 'Very Strong'];
+    
+    bar.className = 'progress-bar ' + colors[strength];
+    text.textContent = labels[strength];
+});
 </script>
 @endpush

@@ -18,7 +18,7 @@
           <small class="text-muted">{{ auth()->user()->role_label }}</small>
         </span>
         <img class="img-profile rounded-circle"
-             src="{{ asset(auth()->user()->profile_photo_url) }}"
+             src="{{ auth()->user()->profile_photo_url }}"
              alt="Profile Image"
              style="width: 40px; height: 40px; object-fit: cover;">
       </a>
