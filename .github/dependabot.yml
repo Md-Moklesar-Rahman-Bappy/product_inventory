@@ -14,10 +14,9 @@ updates:
     allow:
       - dependency-type: "direct"
     ignore:
-      - dependency-type: "indirect"
+      - dependency-name: "symfony/*"
+        versions: ["< 6.0.0"]
     versioning-strategy: increase
-    automerge: true
-    automerge-strategy: "merge"
 
   # npm (Node / Vite / Tailwind)
   - package-ecosystem: "npm"
@@ -30,8 +29,6 @@ updates:
       - "dependencies"
       - "security"
     open-pull-requests-limit: 10
-    automerge: true
-    automerge-strategy: "merge"
 
   # GitHub Actions (workflow updates)
   - package-ecosystem: "github-actions"
@@ -43,5 +40,3 @@ updates:
     labels:
       - "ci"
       - "dependencies"
-    automerge: true
-    automerge-strategy: "merge"
