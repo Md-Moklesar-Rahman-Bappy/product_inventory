@@ -5,7 +5,7 @@
       <span>
         <i class="fas fa-calendar-alt me-1 text-primary"></i>
         <strong id="datetime"></strong>
-        <span class="text-dark">DLRS SOCDS Project</span>
+        <span class="text-dark">{{ \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project') }}</span>
       </span>
     </div>
   </div>

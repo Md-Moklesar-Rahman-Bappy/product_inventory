@@ -7,6 +7,7 @@ use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Models\ActivityLog;
 use App\Models\AssetModel;
@@ -202,4 +203,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('profile', [AuthController::class, 'profile'])->name('profile');
     Route::post('profile', [AuthController::class, 'profileUpdate'])->name('profile.update');
     Route::post('password', [AuthController::class, 'passwordUpdate'])->name('password.update');
+
+    // ⚙️ Application Settings (Superadmin only)
+    Route::middleware(['auth'])->prefix('settings')->group(function () {
+        Route::get('/', [SettingController::class, 'index'])->name('settings.index');
+        Route::put('/', [SettingController::class, 'update'])->name('settings.update');
+    });
 });

@@ -4,10 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Product Inventory - @yield('title', 'Dashboard')</title>
+    @php
+        $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+        $faviconPath = \App\Models\Setting::get('favicon_path');
+        $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('favicon.ico');
+    @endphp
+    <title>{{ $appName }} - @yield('title', 'Dashboard')</title>
     
     <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -36,7 +41,7 @@
         <div class="sidebar-header">
             <a href="{{ route('dashboard') }}" class="brand">
                 <i class="bi bi-box-seam-fill"></i>
-                <span>Inventory</span>
+                <span>{{ $appName }}</span>
             </a>
             <button class="close-btn d-md-none" onclick="toggleSidebar()">
                 <i class="bi bi-x-lg"></i>
@@ -111,6 +116,12 @@
                     <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
                         <i class="bi bi-person-plus"></i>
                         <span>Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                        <i class="bi bi-gear"></i>
+                        <span>Application Settings</span>
                     </a>
                 </li>
                 @endif
@@ -210,7 +221,7 @@
                         </p>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <p class="mb-0 small text-muted">DLRS SOCDS Project</p>
+                        <p class="mb-0 small text-muted">{{ \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project') }}</p>
                     </div>
                 </div>
             </div>

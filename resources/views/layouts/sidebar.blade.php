@@ -2,12 +2,17 @@
 <ul class="navbar-nav sidebar sidebar-dark accordion bg-gradient-primary shadow-lg" id="accordionSidebar">
 
   {{-- 🌟 Brand --}}
+  @php
+    $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+    $logoPath = \App\Models\Setting::get('logo_path');
+    $logoUrl = $logoPath ? asset('storage/' . $logoPath) : asset('images/logo.svg');
+  @endphp
   <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="{{ route('dashboard') }}">
     <div class="sidebar-brand-icon rotate-n-15 text-warning">
-      <img src="{{ asset('images/logo.svg') }}" alt="SOCDS Logo" style="height: 50px; transition: transform 0.3s ease;">
+      <img src="{{ $logoUrl }}" alt="{{ $appName }} Logo" style="height: 50px; transition: transform 0.3s ease;">
     </div>
     <div class="sidebar-brand-text mx-3 text-white fw-bold text-uppercase">
-      Product Inventory
+      {{ $appName }}
     </div>
   </a>
 
@@ -120,7 +125,7 @@
 
   {{-- ⚙️ Settings --}}
   @php
-    $settingsActive = request()->routeIs('users.*', 'users.show');
+    $settingsActive = request()->routeIs('users.*', 'users.show', 'settings.*');
   @endphp
   <li class="nav-item">
     <a class="nav-link collapsed {{ $settingsActive ? 'active' : '' }}" href="#" data-toggle="collapse" data-target="#collapseSettings"
@@ -133,6 +138,9 @@
         @if(auth()->user()->isSuperadmin())
           <a class="collapse-item" href="{{ route('users.index') }}">
             <i class="fas fa-user text-primary me-2"></i> User Management
+          </a>
+          <a class="collapse-item" href="{{ route('settings.index') }}">
+            <i class="fas fa-sliders-h text-primary me-2"></i> Application Settings
           </a>
         @endif
         <a class="collapse-item" href="{{ route('users.show', auth()->user()->id) }}">
