@@ -425,11 +425,9 @@ class ProductController extends Controller
             }
 
             fclose($handle);
-        }, 200, $headers);
 
-        // ✅ Clear skipped rows after download
-        session()->forget('skippedRows');
-        session()->flash('success', 'Skipped rows exported and cleared.');
+            session()->forget('skippedRows');
+        }, 200, $headers);
     }
 
     public function clearSkippedRows()

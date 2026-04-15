@@ -201,7 +201,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'about' => $request->about,
             'address' => $request->address,
             'permission' => $request->permission,
-            'utype' => $request->permission === 1 ? 'ADM' : 'USR',
+            'utype' => match ((int) $request->permission) {
+                0 => 'SA',
+                1 => 'ADM',
+                2 => 'USR',
+                default => 'USR',
+            },
             'password' => bcrypt($request->password),
             'status' => 'active',
         ]);
@@ -229,7 +234,12 @@ class User extends Authenticatable implements MustVerifyEmail
             'about' => $request->about,
             'address' => $request->address,
             'permission' => $request->permission,
-            'utype' => $request->permission === 1 ? 'ADM' : 'USR',
+            'utype' => match ((int) $request->permission) {
+                0 => 'SA',
+                1 => 'ADM',
+                2 => 'USR',
+                default => 'USR',
+            },
         ]);
 
         if ($request->filled('password')) {

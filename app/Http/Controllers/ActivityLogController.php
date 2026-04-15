@@ -22,7 +22,7 @@ class ActivityLogController extends Controller
             'description' => $description,
             'ip_address' => request()->ip(),
             'user_agent' => request()->header('User-Agent'),
-            'role' => $user?->role ?? 'guest',
+            'role' => $user?->utype ?? 'guest',
         ]);
     }
 

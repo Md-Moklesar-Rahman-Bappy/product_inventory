@@ -14,9 +14,10 @@ use Illuminate\Support\Facades\Storage;
 class UserController extends Controller
 {
     // 🧾 List Users
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::latest()->paginate(10);
+        $perPage = $request->input('per_page', 10);
+        $users = User::latest()->paginate($perPage);
         $deletedUsers = User::onlyTrashed()->get();
 
         return view('users.index', compact('users', 'deletedUsers'));
@@ -101,6 +102,10 @@ class UserController extends Controller
     // 👁️ View Single User
     public function show(User $user)
     {
+        if (! Auth::user()->isAdmin() && ! Auth::user()->isSuperadmin() && Auth::id() !== $user->id) {
+            abort(403, 'Access denied.');
+        }
+
         return view('users.show', compact('user'));
     }
 
@@ -133,7 +138,7 @@ class UserController extends Controller
             'designation' => 'nullable|string|max:255',
             'about' => 'nullable|string',
             'address' => 'nullable|string',
-            'permission' => 'required|integer|min:0|max:3',
+            'permission' => 'required|integer|min:0|max:2',
             'profile_photo_path' => 'nullable|image|max:2048',
         ], [
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',

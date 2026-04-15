@@ -187,10 +187,13 @@ Route::middleware(['auth'])->group(function () {
 
     // 🛠️ Maintenance
     Route::resource('maintenance', MaintenanceController::class);
-    Route::delete('maintenance/{id}/force-delete', [MaintenanceController::class, 'forceDelete'])->name('maintenance.forceDelete');
+    Route::get('maintenance/product/{serial}', [MaintenanceController::class, 'getProductBySerial'])->name('maintenance.getProductBySerial')->middleware('auth');
 
     // 📜 Activity Logs
     Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity.logs');
+    Route::get('activity-logs/product/{id}', [ActivityLogController::class, 'productLogs'])->name('activity.logs.product');
+    Route::get('activity-logs/user/{id}', [ActivityLogController::class, 'userLogs'])->name('activity.logs.user');
+    Route::get('activity-logs/model/{model}', [ActivityLogController::class, 'modelLogs'])->name('activity.logs.model');
 
     // 🛡️ Warranty Overview
     Route::get('warranties', [ProductController::class, 'warranties'])->name('warranties.index');

@@ -5,6 +5,67 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     // ===================================
+    // Live Search Functionality
+    // ===================================
+    const liveSearch = document.getElementById('liveSearch');
+    const searchResults = document.getElementById('searchResults');
+    const searchForm = document.getElementById('searchForm');
+    const searchHiddenInput = document.getElementById('searchInput');
+    let debounceTimer;
+
+    if (liveSearch) {
+        document.addEventListener('click', function(e) {
+            if (!liveSearch.contains(e.target) && searchResults && !searchResults.contains(e.target)) {
+                searchResults.classList.remove('show');
+            }
+        });
+
+        liveSearch.addEventListener('keyup', function() {
+            const query = this.value.trim();
+            clearTimeout(debounceTimer);
+            
+            if (query.length < 2) {
+                if (searchResults) searchResults.classList.remove('show');
+                return;
+            }
+
+            debounceTimer = setTimeout(function() {
+                fetch('/products/search?q=' + encodeURIComponent(query))
+                    .then(response => response.json())
+                    .then(data => {
+                        if (searchResults) {
+                            if (data.length === 0) {
+                                searchResults.innerHTML = '<div class="p-3 text-muted text-center">No products found</div>';
+                            } else {
+                                searchResults.innerHTML = data.map(product => `
+                                    <a href="/products/${product.id}" class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <div class="fw-semibold text-dark">${product.product_name}</div>
+                                            <small class="text-muted">${product.serial_no || 'No serial'}</small>
+                                        </div>
+                                        <i class="bi bi-chevron-right text-muted"></i>
+                                    </a>
+                                `).join('');
+                            }
+                            searchResults.classList.add('show');
+                        }
+                    })
+                    .catch(error => console.error('Search error:', error));
+            }, 300);
+        });
+
+        liveSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (searchHiddenInput && searchForm) {
+                    searchHiddenInput.value = liveSearch.value;
+                    searchForm.submit();
+                }
+            }
+        });
+    }
+
+    // ===================================
     // Sidebar Toggle - Only on mobile
     // ===================================
     window.toggleSidebar = function() {
