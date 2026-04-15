@@ -7,7 +7,10 @@
     @php
         $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
         $faviconPath = \App\Models\Setting::get('favicon_path');
-        $faviconUrl = $faviconPath ? asset('storage/' . $faviconPath) : asset('favicon.ico');
+        $faviconUrl = asset('favicon.ico');
+        if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
+            $faviconUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($faviconPath);
+        }
     @endphp
     <title>{{ $appName }} - @yield('title', 'Dashboard')</title>
     

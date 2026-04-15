@@ -190,11 +190,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('maintenance', MaintenanceController::class);
     Route::get('maintenance/product/{serial}', [MaintenanceController::class, 'getProductBySerial'])->name('maintenance.getProductBySerial')->middleware('auth');
 
-    // 📜 Activity Logs
-    Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity.logs');
-    Route::get('activity-logs/product/{id}', [ActivityLogController::class, 'productLogs'])->name('activity.logs.product');
-    Route::get('activity-logs/user/{id}', [ActivityLogController::class, 'userLogs'])->name('activity.logs.user');
-    Route::get('activity-logs/model/{model}', [ActivityLogController::class, 'modelLogs'])->name('activity.logs.model');
+    // 📜 Activity Logs (Admin/Superadmin only)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::get('activity-logs', [ActivityLogController::class, 'index'])->name('activity.logs');
+        Route::get('activity-logs/product/{id}', [ActivityLogController::class, 'productLogs'])->name('activity.logs.product');
+        Route::get('activity-logs/user/{id}', [ActivityLogController::class, 'userLogs'])->name('activity.logs.user');
+        Route::get('activity-logs/model/{model}', [ActivityLogController::class, 'modelLogs'])->name('activity.logs.model');
+    });
 
     // 🛡️ Warranty Overview
     Route::get('warranties', [ProductController::class, 'warranties'])->name('warranties.index');
@@ -205,7 +207,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('password', [AuthController::class, 'passwordUpdate'])->name('password.update');
 
     // ⚙️ Application Settings (Superadmin only)
-    Route::middleware(['auth'])->prefix('settings')->group(function () {
+    Route::middleware(['auth', 'isSuperadmin'])->prefix('settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/', [SettingController::class, 'update'])->name('settings.update');
     });

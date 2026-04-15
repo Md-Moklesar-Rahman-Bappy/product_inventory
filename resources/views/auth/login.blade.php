@@ -1,12 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Product Inventory - Login</title>
+  @php
+    $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+    $faviconPath = \App\Models\Setting::get('favicon_path');
+    $faviconUrl = asset('favicon.ico');
+    if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
+        $faviconUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($faviconPath);
+    }
+  @endphp
+  <title>{{ $appName }} - Login</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Favicon -->
-  <link rel="icon" href="{{ asset('favicon.ico') }}">
+  <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
 
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -143,7 +151,7 @@
         @foreach (['success', 'error', 'message'] as $msg)
           @if(session()->has($msg))
             <div class="alert alert-{{ $msg === 'error' ? 'danger' : 'success' }} alert-dismissible fade show" role="alert">
-              {!! session($msg) !!}
+              {{ session($msg) }}
               <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
           @endif

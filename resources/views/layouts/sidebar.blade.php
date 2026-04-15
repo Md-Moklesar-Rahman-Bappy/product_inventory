@@ -5,7 +5,10 @@
   @php
     $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
     $logoPath = \App\Models\Setting::get('logo_path');
-    $logoUrl = $logoPath ? asset('storage/' . $logoPath) : asset('images/logo.svg');
+    $logoUrl = asset('images/logo.svg');
+    if (!empty($logoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)) {
+        $logoUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($logoPath);
+    }
   @endphp
   <a class="sidebar-brand d-flex align-items-center justify-content-center py-4" href="{{ route('dashboard') }}">
     <div class="sidebar-brand-icon rotate-n-15 text-warning">
