@@ -6,15 +6,17 @@
     $faviconPath = \App\Models\Setting::get('favicon_path');
     $faviconUrl = asset('favicon.ico');
     if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
-        $faviconUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($faviconPath);
+        $faviconUrl = Storage::url($faviconPath);
     }
+    $faviconUrl = $faviconUrl . '?v=' . filemtime(public_path('favicon.ico'));
   @endphp
   <title>{{ $appName }} - Login</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
+  <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
+  <link rel="icon" href="{{ $faviconUrl }}" type="image/x-icon">
 
   <!-- Bootstrap 5 CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">

@@ -9,13 +9,15 @@
         $faviconPath = \App\Models\Setting::get('favicon_path');
         $faviconUrl = asset('favicon.ico');
         if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
-            $faviconUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($faviconPath);
+            $faviconUrl = Storage::url($faviconPath);
         }
+        $faviconUrl = $faviconUrl . '?v=' . filemtime(public_path('favicon.ico'));
     @endphp
     <title>{{ $appName }} - @yield('title', 'Dashboard')</title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ $faviconUrl }}">
+    <!-- Favicon - must be first -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
+    <link rel="icon" href="{{ $faviconUrl }}" type="image/x-icon">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
