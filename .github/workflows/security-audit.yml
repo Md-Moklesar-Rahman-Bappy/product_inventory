@@ -23,12 +23,24 @@ jobs:
           php-version: '8.2'
           tools: composer
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
+
       - name: Install dependencies
         run: composer install --no-interaction --no-progress
 
       - name: Run Composer Audit
-        run: composer audit --format=json
-        continue-on-error: false
+        run: composer audit --format=json > composer-audit.json
+        continue-on-error: true
+
+      - name: Upload Composer Audit Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: composer-audit-report
+          path: composer-audit.json
 
   npm-audit:
     name: NPM Audit
@@ -42,9 +54,21 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('**/package-lock.json') }}
+
       - name: Install dependencies
-        run: npm install --ignore-scripts
+        run: npm ci --ignore-scripts
 
       - name: Run NPM Audit
-        run: npm audit --json
-        continue-on-error: false
+        run: npm audit --json > npm-audit.json
+        continue-on-error: true
+
+      - name: Upload NPM Audit Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: npm-audit.json
