@@ -6,13 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     {{-- Styles --}}
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
     <link href="{{ asset('css/custom.css') }}" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     {{-- Scripts --}}
-    <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body class="bg-light">
 
