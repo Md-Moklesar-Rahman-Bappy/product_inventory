@@ -4,10 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Product Inventory - @yield('title', 'Dashboard')</title>
+    @php
+        $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+        $faviconPath = \App\Models\Setting::get('favicon_path');
+        $faviconUrl = asset('favicon.ico');
+        if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
+            $faviconUrl = Storage::url($faviconPath);
+        }
+        $faviconUrl = $faviconUrl . '?v=' . filemtime(public_path('favicon.ico'));
+    @endphp
+    <title>{{ $appName }} - @yield('title', 'Dashboard')</title>
     
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <!-- Favicon - must be first -->
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
+    <link rel="icon" href="{{ $faviconUrl }}" type="image/x-icon">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -36,7 +46,7 @@
         <div class="sidebar-header">
             <a href="{{ route('dashboard') }}" class="brand">
                 <i class="bi bi-box-seam-fill"></i>
-                <span>Inventory</span>
+                <span>{{ $appName }}</span>
             </a>
             <button class="close-btn d-md-none" onclick="toggleSidebar()">
                 <i class="bi bi-x-lg"></i>
@@ -111,6 +121,12 @@
                     <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
                         <i class="bi bi-person-plus"></i>
                         <span>Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                        <i class="bi bi-gear"></i>
+                        <span>Application Settings</span>
                     </a>
                 </li>
                 @endif
@@ -208,9 +224,38 @@
                             <i class="fas fa-calendar-alt me-1 text-primary"></i>
                             <span id="datetime"></span>
                         </p>
+                        @php
+                            $address = \App\Models\Setting::get('address');
+                        @endphp
+                        @if($address)
+                            <p class="mb-0 small text-muted mt-1">
+                                <i class="fas fa-map-marker-alt me-1 text-primary"></i>
+                                {{ $address }}
+                            </p>
+                        @endif
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <p class="mb-0 small text-muted">DLRS SOCDS Project</p>
+                        @php
+                            $website = \App\Models\Setting::get('website');
+                            $footerCredit = \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project');
+                            $phone = \App\Models\Setting::get('phone');
+                            $email = \App\Models\Setting::get('email');
+                        @endphp
+                        @if($website)
+                            <a href="{{ $website }}" target="_blank" class="text-muted text-decoration-none me-3">{{ $footerCredit }}</a>
+                        @else
+                            <span class="text-muted me-3">{{ $footerCredit }}</span>
+                        @endif
+                        @if($phone)
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-muted text-decoration-none me-3">
+                                <i class="fas fa-phone-alt me-1"></i>{{ $phone }}
+                            </a>
+                        @endif
+                        @if($email)
+                            <a href="mailto:{{ $email }}" class="text-muted text-decoration-none">
+                                <i class="fas fa-envelope me-1"></i>{{ $email }}
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>

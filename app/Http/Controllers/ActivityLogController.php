@@ -46,7 +46,10 @@ class ActivityLogController extends Controller
             })
             ->latest();
 
-        $logs = $logsQuery->paginate(15);
+        $perPage = $request->input('per_page', 10);
+        $perPage = is_numeric($perPage) ? (int) $perPage : 10;
+        $perPage = max(1, min(100, $perPage));
+        $logs = $logsQuery->paginate($perPage);
 
         return view('activity_logs.index', [
             'logs' => $logs,

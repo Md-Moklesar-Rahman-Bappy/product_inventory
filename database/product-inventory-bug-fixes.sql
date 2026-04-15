@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 15, 2026 at 06:32 AM
+-- Generation Time: Apr 15, 2026 at 08:55 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -628,7 +628,16 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `model`, `model_id`, `de
 (826, 0, 'update', 'Product', 992, '<span class=\"text-primary fw-bold\">Updated</span> product: <strong>HP Enterprise M612DN Laser Printer</strong><br>Serial No: <code>CNBRRCK5S4</code><br>Changes: <span class=\"badge bg-warning text-dark me-1\">Price: \"1.00\" → \"0\"</span> <span class=\"badge bg-warning text-dark me-1\">Updated At: \"2026-02-19 14:04:52\" → \"2026-04-15 09:14:12\"</span>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'guest', NULL, '2026-04-15 03:14:12', '2026-04-15 03:14:12'),
 (827, 0, 'update', 'User', 0, '<span class=\"text-primary fw-bold\">Updated</span> user: <strong>Md Moklesar Rahman</strong>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 03:58:16', '2026-04-15 03:58:16'),
 (828, 0, 'update', 'User', 0, '<span class=\"text-primary fw-bold\">Updated</span> user: <strong>Md Moklesar Rahman</strong>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 03:58:26', '2026-04-15 03:58:26'),
-(829, 0, 'create', 'Maintenance', 1, '<span class=\"text-success fw-bold\">Created</span> maintenance for <strong>Serial No: CNBRRCK5S4</strong> — Need to be Specified', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 04:02:00', '2026-04-15 04:02:00');
+(829, 0, 'create', 'Maintenance', 1, '<span class=\"text-success fw-bold\">Created</span> maintenance for <strong>Serial No: CNBRRCK5S4</strong> — Need to be Specified', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 04:02:00', '2026-04-15 04:02:00'),
+(830, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:38:07', '2026-04-15 06:38:07'),
+(831, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:38:13', '2026-04-15 06:38:13'),
+(832, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:38:59', '2026-04-15 06:38:59'),
+(833, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:39:13', '2026-04-15 06:39:13'),
+(834, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:40:40', '2026-04-15 06:40:40'),
+(835, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:42:13', '2026-04-15 06:42:13'),
+(836, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:43:29', '2026-04-15 06:43:29'),
+(837, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:50:53', '2026-04-15 06:50:53'),
+(838, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 06:52:36', '2026-04-15 06:52:36');
 
 -- --------------------------------------------------------
 
@@ -834,7 +843,8 @@ CREATE TABLE `migrations` (
 --
 
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES
-(14, '2026_04_15_095147_add_status_to_brands_table', 1);
+(14, '2026_04_15_095147_add_status_to_brands_table', 1),
+(15, '2026_04_15_100000_create_settings_table', 2);
 
 -- --------------------------------------------------------
 
@@ -1696,7 +1706,36 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('fxXK9z0BeE5uHdIl62MKObWT5gmUjfzvDOqyk3fE', 0, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiWURSS0laVDhIN3F0R0E3RnU2T0ZubGtjZzlTWDhhNEVTUFBOYnJoOCI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MDtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMToiaHR0cDovLzEyNy4wLjAuMTo4MDAwL2Rhc2hib2FyZCI7fXM6NjoiX2ZsYXNoIjthOjI6e3M6Mzoib2xkIjthOjA6e31zOjM6Im5ldyI7YTowOnt9fX0=', 1776227456);
+('fxXK9z0BeE5uHdIl62MKObWT5gmUjfzvDOqyk3fE', 0, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiWURSS0laVDhIN3F0R0E3RnU2T0ZubGtjZzlTWDhhNEVTUFBOYnJoOCI7czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MDtzOjk6Il9wcmV2aW91cyI7YToxOntzOjM6InVybCI7czozMDoiaHR0cDovLzEyNy4wLjAuMTo4MDAwL3NldHRpbmdzIjt9czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319fQ==', 1776235962);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `settings`
+--
+
+CREATE TABLE `settings` (
+  `id` bigint(20) UNSIGNED NOT NULL,
+  `key` varchar(255) NOT NULL,
+  `value` varchar(255) DEFAULT NULL,
+  `type` varchar(255) NOT NULL DEFAULT 'text',
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Dumping data for table `settings`
+--
+
+INSERT INTO `settings` (`id`, `key`, `value`, `type`, `created_at`, `updated_at`) VALUES
+(1, 'app_name', 'Product Inventory Management System', 'text', '2026-04-15 06:25:35', '2026-04-15 06:52:36'),
+(2, 'website', 'https://socds.portal.gov.bd', 'text', '2026-04-15 06:25:36', '2026-04-15 06:52:36'),
+(3, 'address', 'ভূমি ভবন ৯৮, শহিদ তাজউদ্দীন আহমদ সরণি, তেজগাঁও, সাতরাস্তা, ঢাকা-১২০৮', 'text', '2026-04-15 06:25:36', '2026-04-15 06:52:36'),
+(4, 'footer_credit', 'ডিজিটাল পদ্ধতিতে ভূমি জরিপ করার জন্য ভূমি রেকর্ড ও জরিপ অধিদপ্তরের ডিজিটাল জরিপ পরিচালনার সক্ষমতা বৃদ্ধিকরণ (১ম সংশোধিত) প্রকল্প', 'text', '2026-04-15 06:25:36', '2026-04-15 06:52:36'),
+(5, 'logo_path', 'images/logo.svg', 'image', '2026-04-15 06:25:36', '2026-04-15 06:52:19'),
+(6, 'favicon_path', '', 'image', '2026-04-15 06:25:36', '2026-04-15 06:52:19'),
+(7, 'phone', '02-41024902', 'text', '2026-04-15 06:46:35', '2026-04-15 06:52:36'),
+(8, 'email', 'info.socdsproject@gmail.com', 'text', '2026-04-15 06:52:19', '2026-04-15 06:52:36');
 
 -- --------------------------------------------------------
 
@@ -1840,6 +1879,13 @@ ALTER TABLE `sessions`
   ADD KEY `sessions_last_activity_index` (`last_activity`);
 
 --
+-- Indexes for table `settings`
+--
+ALTER TABLE `settings`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `settings_key_unique` (`key`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -1854,7 +1900,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=830;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=839;
 
 --
 -- AUTO_INCREMENT for table `asset_models`
@@ -1896,13 +1942,19 @@ ALTER TABLE `maintenances`
 -- AUTO_INCREMENT for table `migrations`
 --
 ALTER TABLE `migrations`
-  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
   MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=993;
+
+--
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `users`
