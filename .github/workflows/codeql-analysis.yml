@@ -33,11 +33,25 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Cache npm dependencies
+        if: matrix.language == 'javascript'
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: npm-${{ hashFiles('**/package-lock.json') }}
+
       - name: Setup PHP
         if: matrix.language == 'php'
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
+
+      - name: Cache Composer dependencies
+        if: matrix.language == 'php'
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('**/composer.lock') }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v3
@@ -51,9 +65,9 @@ jobs:
       # - name: Install dependencies
       #   run: |
       #     if [ "${{ matrix.language }}" == "javascript" ]; then
-      #       npm install && npm run build
+      #       npm ci && npm run build
       #     elif [ "${{ matrix.language }}" == "php" ]; then
-      #       composer install
+      #       composer install --no-interaction --no-progress
       #     fi
 
       - name: Perform CodeQL Analysis
