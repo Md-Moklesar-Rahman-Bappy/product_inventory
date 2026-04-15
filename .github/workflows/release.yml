@@ -3,7 +3,7 @@ name: 🚀 Release
 on:
   push:
     tags:
-      - 'v*.*.*'   # Runs when you push a version tag like v1.0.0
+      - 'v*.*.*'
 
 jobs:
   release:
@@ -15,16 +15,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
       - name: Extract changelog entry
         id: changelog
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
-          awk "/## \\[$VERSION\\]/,/## \\[/" CHANGELOG.md | head -n -1 > release_notes.md
+          awk "/## \\[$VERSION\\]/,/^## \\[/" CHANGELOG.md | sed '$d' > release_notes.md || true
           echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
           cat release_notes.md >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV

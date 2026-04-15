@@ -1,14 +1,15 @@
 # 🔐 Security Policy
 
 ## 📌 Supported Versions
-We provide security updates for the following versions:
+We actively maintain the following dependency versions:
 
-| Version | Supported |
-|---------|-----------|
-| 5.1.x   | ✅         |
-| 5.0.x   | ❌         |
-| 4.0.x   | ✅         |
-| < 4.0   | ❌         |
+| Package                 | Status        | Notes                                                                 |
+|--------------------------|---------------|------------------------------------------------------------------------|
+| league/commonmark        | ✅ Patched    | Updated to 2.8.2+ (fixed Embed + RawHtml bypasses)                     |
+| psy/psysh                | ✅ Patched    | Updated to 0.12.19+                                                    |
+| symfony/http-foundation  | ✅ Patched    | Updated to 7.3.7+                                                      |
+| symfony/process          | ✅ Patched    | Updated to 7.4.8+ (fixed MSYS2/Git Bash escaping issue)                |
+| phpunit/phpunit          | ⚠️ Vulnerable | Pinned at 11.5.33 due to Pest v3.8.3 conflict. Upgrade blocked until Pest supports 11.5.50+ |
 
 We follow [Semantic Versioning](https://semver.org/). Only actively maintained branches receive security updates.
 
@@ -45,6 +46,7 @@ If you discover a security vulnerability in this repository:
 - Do not commit `.env` files or secrets.
 - Validate all user input using Laravel Form Requests.
 - Keep dependencies updated (`composer update`, `npm audit fix`).
+- Run CodeQL and Dependabot scans regularly.
 <<<<<<< HEAD
 - Run CodeQL and Dependabot scans regularly.
 =======

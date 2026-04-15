@@ -97,7 +97,7 @@ class Product extends Model
         return $this->warranty_end->isPast() ? 'expired' : 'active';
     }
 
-    public function getWarrantyCountdownAttribute()
+    public function getIsExpiredAttribute()
     {
         if (! $this->warranty_end || ! $this->warranty_start) {
             return '<span class="text-muted">—</span>';
@@ -157,11 +157,6 @@ class Product extends Model
     public function getWarrantyEndDateAttribute()
     {
         return optional($this->warranty_end)->format('m/d/Y');
-    }
-
-    public function getWarrantyEndTooltipAttribute()
-    {
-        return $this->warranty_end ? $this->warranty_end->format('d M Y') : '—';
     }
 
     // ──────── Urgency Helpers ─────────

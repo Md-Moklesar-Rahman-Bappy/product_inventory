@@ -71,16 +71,6 @@ class User extends Authenticatable implements MustVerifyEmail
             : asset('images/default-profile.png');
     }
 
-    public function getMobileDisplayAttribute(): string
-    {
-        return $this->mobile ?: '<span class="text-muted">—</span>';
-    }
-
-    public function getDesignationDisplayAttribute(): string
-    {
-        return $this->designation ?: '<span class="text-muted">—</span>';
-    }
-
     public function getRoleLabelAttribute(): string
     {
         return match ($this->permission) {
@@ -91,16 +81,19 @@ class User extends Authenticatable implements MustVerifyEmail
         };
     }
 
-    public function getStatusBadgeAttribute(): string
-    {
-        return $this->status === 'active'
-            ? '<span class="badge bg-success">Active</span>'
-            : '<span class="badge bg-danger">Deactivated</span>';
-    }
-
     public function getFullNameAttribute(): string
     {
         return $this->name;
+    }
+
+    public function getDisplayMobileAttribute(): string
+    {
+        return $this->mobile ?: '—';
+    }
+
+    public function getDisplayDesignationAttribute(): string
+    {
+        return $this->designation ?: '—';
     }
 
     // ──────── Role Helpers ─────────

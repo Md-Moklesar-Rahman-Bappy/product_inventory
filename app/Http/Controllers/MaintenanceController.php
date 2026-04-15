@@ -170,7 +170,8 @@ class MaintenanceController extends Controller
                 'category_name' => optional($product->category)->category_name,
                 'brand_name' => optional($product->brand)->brand_name,
                 'warranty_status' => $product->warranty_status,
-                'warranty_countdown' => $product->warranty_countdown,
+                'warranty_start' => $product->warranty_start?->format('Y-m-d'),
+                'warranty_end' => $product->warranty_end?->format('Y-m-d'),
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => 'Product not found'], 404);

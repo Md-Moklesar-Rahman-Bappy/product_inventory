@@ -44,7 +44,7 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 ## 🛠️ Tech Stack
 | Layer        | Tools & Frameworks               |
 |-------------|----------------------------------|
-| Backend      | Laravel 10+, Eloquent ORM        |
+| Backend      | Laravel 12.0+, Eloquent ORM      |
 | Frontend     | Blade, Bootstrap 5, Font Awesome |
 | UI/UX        | Custom CSS, gradient buttons     |
 | Database     | MySQL / MariaDB                  |
@@ -92,12 +92,15 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 - Matching serials are highlighted using <mark>
 - Clean UI with instant feedback
 
-📸 Screenshots
+## 📸 Screenshots
+
 ![Dashboard](docs/screenshots/dashboard.png)
+
 ![Product Form](docs/screenshots/product-form.png)
+
 ![Empty State](docs/screenshots/empty-state.png)
 
-📖 Documentation
+
 ## 📖 Documentation
 - [UI Guidelines](docs/ui-guidelines.md)
 - [Architecture](docs/architecture.md)
