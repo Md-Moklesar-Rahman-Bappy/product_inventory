@@ -219,9 +219,38 @@
                             <i class="fas fa-calendar-alt me-1 text-primary"></i>
                             <span id="datetime"></span>
                         </p>
+                        @php
+                            $address = \App\Models\Setting::get('address');
+                        @endphp
+                        @if($address)
+                            <p class="mb-0 small text-muted mt-1">
+                                <i class="fas fa-map-marker-alt me-1 text-primary"></i>
+                                {{ $address }}
+                            </p>
+                        @endif
                     </div>
                     <div class="col-md-6 text-md-end">
-                        <p class="mb-0 small text-muted">{{ \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project') }}</p>
+                        @php
+                            $website = \App\Models\Setting::get('website');
+                            $footerCredit = \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project');
+                            $phone = \App\Models\Setting::get('phone');
+                            $email = \App\Models\Setting::get('email');
+                        @endphp
+                        @if($website)
+                            <a href="{{ $website }}" target="_blank" class="text-muted text-decoration-none me-3">{{ $footerCredit }}</a>
+                        @else
+                            <span class="text-muted me-3">{{ $footerCredit }}</span>
+                        @endif
+                        @if($phone)
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-muted text-decoration-none me-3">
+                                <i class="fas fa-phone-alt me-1"></i>{{ $phone }}
+                            </a>
+                        @endif
+                        @if($email)
+                            <a href="mailto:{{ $email }}" class="text-muted text-decoration-none">
+                                <i class="fas fa-envelope me-1"></i>{{ $email }}
+                            </a>
+                        @endif
                     </div>
                 </div>
             </div>

@@ -40,6 +40,28 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
+                                    id="phone" name="phone" 
+                                    value="{{ old('phone', $settings['phone'] ?? '') }}" placeholder="+880-1234-567890">
+                                @error('phone')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email Address</label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                    id="email" name="email" 
+                                    value="{{ old('email', $settings['email'] ?? '') }}" placeholder="info@example.com">
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                         <div class="col-12">
                             <div class="mb-3">
                                 <label for="address" class="form-label">Address</label>
@@ -56,7 +78,7 @@
                                 <label for="footer_credit" class="form-label">Footer Credit</label>
                                 <input type="text" class="form-control @error('footer_credit') is-invalid @enderror" 
                                     id="footer_credit" name="footer_credit" 
-                                    value="{{ old('footer_credit', $settings['footer_credit'] ?? '') }}" placeholder="DLRS SOCDS Project">
+                                    value="{{ old('footer_credit', $settings['footer_credit'] ?? '') }}" placeholder="Footer Credit Name">
                                 @error('footer_credit')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

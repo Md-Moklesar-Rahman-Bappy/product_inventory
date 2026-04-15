@@ -20,6 +20,8 @@ class SettingController extends Controller
         $request->validate([
             'app_name' => 'required|string|max:255',
             'website' => 'nullable|url|max:255',
+            'phone' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:500',
             'footer_credit' => 'nullable|string|max:255',
             'logo' => 'nullable|image|max:2048',
@@ -28,6 +30,8 @@ class SettingController extends Controller
 
         Setting::set('app_name', $request->app_name);
         Setting::set('website', $request->website);
+        Setting::set('phone', $request->phone);
+        Setting::set('email', $request->email);
         Setting::set('address', $request->address);
         Setting::set('footer_credit', $request->footer_credit);
 
