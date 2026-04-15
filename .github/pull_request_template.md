@@ -1,7 +1,7 @@
 # 📥 Pull Request Template
 
 ## 📝 Description
-Please provide a clear and concise description of what this PR does.
+Provide a clear and concise description of what this PR does.
 
 ---
 
@@ -16,13 +16,15 @@ Link to the issue this PR resolves (if applicable).
 - [ ] Updated documentation
 - [ ] Improved tests
 - [ ] Refactored code
+- [ ] Breaking change (describe impact)
 
 ---
 
 ## 🧪 Testing
 Describe how you tested your changes:
-- Steps followed
-- Test cases covered
+- [ ] Unit tests added/updated
+- [ ] Integration tests added/updated
+- [ ] Manual verification steps
 - Screenshots or logs (if applicable)
 
 ---
@@ -33,6 +35,12 @@ Describe how you tested your changes:
 - [ ] Documentation updated (README, docs/)
 - [ ] No new warnings or errors
 - [ ] Ready for review
+- [ ] Labels applied (dependencies, bug, enhancement, etc.)
+
+---
+
+## 🔍 Review Notes
+Highlight any areas that need special attention during review.
 
 ---
 
