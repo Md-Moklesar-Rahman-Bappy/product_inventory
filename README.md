@@ -96,9 +96,17 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 
 ![Dashboard](docs/screenshots/dashboard.png)
 
-![Product Form](docs/screenshots/product-form.png)
+![Activity Logs ](docs/screenshots/activity-log.png)
 
-![Empty State](docs/screenshots/empty-state.png)
+![Products Page](docs/screenshots/products.png)
+
+![Maintenance Page](docs/screenshots/maintenance.png)
+
+![Product Warranty Page](docs/screenshots/product-warranty.png)
+
+![User Management](docs/screenshots/user-management.png)
+
+![Application Settings](docs/screenshots/user-management.png)
 
 
 ## 📖 Documentation

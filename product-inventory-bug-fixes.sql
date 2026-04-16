@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 15, 2026 at 11:44 AM
+-- Generation Time: Apr 16, 2026 at 06:30 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -642,7 +642,8 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `model`, `model_id`, `de
 (840, 0, 'update', 'User', 0, '<span class=\"text-primary fw-bold\">Updated</span> user: <strong>Md Moklesar Rahman</strong>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 07:49:32', '2026-04-15 07:49:32'),
 (841, 0, 'update', 'Setting', 0, '<span class=\"text-primary fw-bold\">Updated</span> application settings', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 07:56:28', '2026-04-15 07:56:28'),
 (842, 0, 'logout', 'User', 0, '<span class=\"text-warning fw-bold\">Logged out</span>: <strong>Md Moklesar Rahman</strong>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 08:53:18', '2026-04-15 08:53:18'),
-(843, 0, 'login', 'User', 0, '<span class=\"text-success fw-bold\">Logged in</span> as: <strong>Md Moklesar Rahman</strong> <span class=\"text-muted\">(superadmin@gmail.com)</span>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 08:53:25', '2026-04-15 08:53:25');
+(843, 0, 'login', 'User', 0, '<span class=\"text-success fw-bold\">Logged in</span> as: <strong>Md Moklesar Rahman</strong> <span class=\"text-muted\">(superadmin@gmail.com)</span>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-15 08:53:25', '2026-04-15 08:53:25'),
+(844, 0, 'login', 'User', 0, '<span class=\"text-success fw-bold\">Logged in</span> as: <strong>Md Moklesar Rahman</strong> <span class=\"text-muted\">(superadmin@gmail.com)</span>', '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'USR', NULL, '2026-04-16 04:27:01', '2026-04-16 04:27:01');
 
 -- --------------------------------------------------------
 
@@ -718,8 +719,8 @@ CREATE TABLE `cache` (
 --
 
 INSERT INTO `cache` (`key`, `value`, `expiration`) VALUES
-('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1776243265),
-('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1776243265;', 1776243265),
+('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba', 'i:1;', 1776313681),
+('laravel-cache-5c785c036466adea360111aa28563bfd556b5fba:timer', 'i:1776313681;', 1776313681),
 ('laravel-cache-b6589fc6ab0dc82cf12099d1c2d40ab994e8410c', 'i:1;', 1776239212),
 ('laravel-cache-b6589fc6ab0dc82cf12099d1c2d40ab994e8410c:timer', 'i:1776239212;', 1776239212);
 
@@ -1721,7 +1722,7 @@ CREATE TABLE `sessions` (
 --
 
 INSERT INTO `sessions` (`id`, `user_id`, `ip_address`, `user_agent`, `payload`, `last_activity`) VALUES
-('9WuLGDNfDHcyGVLicKfZ700OzN678PJy0aFRDNao', 0, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiQnRyRjROakpUd201c2g0Q0tWbGVUVHdHbDY1UXNMZkt5WXUxaG1zYyI7czo2OiJfZmxhc2giO2E6Mjp7czozOiJvbGQiO2E6MDp7fXM6MzoibmV3IjthOjA6e319czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzU6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9hY3Rpdml0eS1sb2dzIjt9czo1MDoibG9naW5fd2ViXzU5YmEzNmFkZGMyYjJmOTQwMTU4MGYwMTRjN2Y1OGVhNGUzMDk4OWQiO2k6MDt9', 1776246049);
+('NrCQpWSRfxS3oSojLjl1bMOFNu0xMatwCpTjSuqP', 0, '127.0.0.1', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36 OPR/129.0.0.0', 'YTo0OntzOjY6Il90b2tlbiI7czo0MDoiNGF2UHplNUtPUFB5U1hJRVZITEt0V2tVZE54WE1ycDRFYzVhdDZaRiI7czo5OiJfcHJldmlvdXMiO2E6MTp7czozOiJ1cmwiO3M6MzE6Imh0dHA6Ly8xMjcuMC4wLjE6ODAwMC9kYXNoYm9hcmQiO31zOjY6Il9mbGFzaCI7YToyOntzOjM6Im9sZCI7YTowOnt9czozOiJuZXciO2E6MDp7fX1zOjUwOiJsb2dpbl93ZWJfNTliYTM2YWRkYzJiMmY5NDAxNTgwZjAxNGM3ZjU4ZWE0ZTMwOTg5ZCI7aTowO30=', 1776313803);
 
 -- --------------------------------------------------------
 
@@ -1915,7 +1916,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=844;
+  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=845;
 
 --
 -- AUTO_INCREMENT for table `asset_models`

@@ -36,8 +36,12 @@ This dashboard follows a vibrant, consistent design language focused on clarity,
 Screenshots are stored in `docs/screenshots/`:
 
 - `dashboard.png` → Main dashboard view with product stats
-- `product-form.png` → Product creation/edit form
-- `empty-state.png` → Example of empty state with illustration
+- `activity-log.png` → Full application log
+- `products.png` → Products Page
+- `maintenance.png` → Product Maintenance
+- `product-warranty.png` → Product Warranty
+- `user-management.png` → User Management Section
+- `application-settings.png` → Application Setting
 
 Add more screenshots here as features evolve.
 
