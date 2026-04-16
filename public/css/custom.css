@@ -1292,6 +1292,14 @@ body {
     border: 2px solid #e2e8f0;
 }
 
+.user-avatar-sm {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e2e8f0;
+}
+
 .user-name {
     font-weight: 600;
     color: #1e293b;
