@@ -8,7 +8,7 @@
         <div class="modern-table-card">
             <div class="table-header-section">
                 <div class="row gy-3 align-items-center">
-                    <div class="col-12 col-lg-3 d-flex align-items-center">
+                    <div class="col-12 col-lg-2 d-flex align-items-center">
                         <div class="header-icon">
                             <i class="bi bi-tag-fill"></i>
                         </div>
@@ -19,26 +19,40 @@
                     </div>
 
                     <div class="col-12 col-lg-4">
-                        <form method="GET" action="{{ route('categories.products', $category->id) }}" class="d-flex gap-2">
-                            <div class="search-box flex-grow-1">
-                                <i class="bi bi-search"></i>
-                                <input type="text" name="search" value="{{ request('search') }}"
-                                    class="form-control form-control-sm" placeholder="Search products...">
-                            </div>
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="liveSearch" placeholder="Search products..." autocomplete="off">
+                            <div id="searchResults" class="search-results"></div>
+                        </div>
+                        <form id="searchForm" method="GET" action="{{ route('categories.products', $category->id) }}" class="d-none">
+                            <input type="hidden" name="search" id="searchInput">
                         </form>
                     </div>
 
-                    <div class="col-12 col-lg-5 text-lg-end">
-                        <a href="{{ route('categories.index') }}" class="btn btn-sm btn-light me-2">
-                            <i class="bi bi-arrow-left me-1"></i>Back
-                        </a>
+                    <div class="col-12 col-lg-3">
+                        <div class="d-flex gap-2">
+                            <select name="filter" class="form-select form-select-sm filter-select" onchange="this.form.submit()">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-3 text-lg-end">
                         @if(auth()->user()->permission <= 1)
-                            <div class="d-flex flex-wrap justify-content-lg-end gap-2 d-inline">
-                                <a href="{{ route('products.create', ['category_id' => $category->id]) }}" class="btn btn-sm btn-add">
-                                    <i class="bi bi-plus-lg me-1"></i>Add
+                            <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                                <a href="{{ route('categories.index') }}" class="btn btn-sm btn-light">
+                                    <i class="bi bi-arrow-left me-1"></i>Back
                                 </a>
-                                <a href="{{ route('category.products.export', $category->id) }}" class="btn btn-sm btn-light">
-                                    <i class="bi bi-file-earmark-excel me-1"></i>Export
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="bi bi-file-earmark-excel me-1"></i>Export
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{{ route('category.products.export', $category->id) }}">Export</a></li>
+                                    </ul>
+                                </div>
+                                <a href="{{ route('products.create', ['category_id' => $category->id]) }}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-plus-lg me-1"></i>Add
                                 </a>
                             </div>
                         @endif
@@ -158,7 +172,7 @@
             </div>
 
             @if($products->hasPages())
-            <div class="table-footer px-3">
+            <div class="table-footer">
                 {{ $products->links('vendor.pagination.bootstrap-5') }}
             </div>
             @endif

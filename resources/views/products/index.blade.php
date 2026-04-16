@@ -79,9 +79,39 @@
 
             @if(auth()->user()->permission <= 1)
             <div class="import-section">
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show mb-2" role="alert">
+                        <strong>Import Error:</strong> {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
+                @if(session('import_stats'))
+                    @php
+                        $stats = session('import_stats');
+                        $totalProcessed = $stats['created'] + $stats['updated'] + $stats['skipped'];
+                    @endphp
+                    <div class="alert alert-success alert-dismissible fade show mb-2" role="alert">
+                        <strong>Import Complete!</strong>
+                        <div class="mt-1">
+                            @if($stats['created'] > 0)
+                                <span class="badge bg-success me-1">{{ $stats['created'] }} Created</span>
+                            @endif
+                            @if($stats['updated'] > 0)
+                                <span class="badge bg-primary me-1">{{ $stats['updated'] }} Updated</span>
+                            @endif
+                            @if($stats['skipped'] > 0)
+                                <span class="badge bg-warning text-dark me-1">{{ $stats['skipped'] }} Skipped</span>
+                            @endif
+                            <span class="badge bg-secondary">{{ $totalProcessed }} Total</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                @endif
+
                 <form action="{{ route('products.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
                     @csrf
-                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" required>
+                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" accept=".xlsx,.xls,.csv" required>
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-upload me-1"></i>Import
                     </button>

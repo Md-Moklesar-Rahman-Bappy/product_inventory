@@ -10,9 +10,16 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class AssetModelController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $models = AssetModel::latest()->withCount('products')->paginate(10);
+        $query = AssetModel::query()->withCount('products');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('model_name', 'like', "%{$search}%");
+        }
+
+        $models = $query->latest()->paginate(10);
         $trashedModels = AssetModel::onlyTrashed()->paginate(5);
 
         return view('models.index', compact('models', 'trashedModels'));
@@ -131,7 +138,8 @@ class AssetModelController extends Controller
         $model = AssetModel::withTrashed()->findOrFail($id);
 
         $query = Product::with(['brand', 'category'])
-            ->where('model_id', $model->id);
+            ->where('model_id', $model->id)
+            ->orderBy('created_at', 'desc');
 
         if (request()->has('search')) {
             $query->where('serial_no', 'like', '%'.request('search').'%');
@@ -178,7 +186,7 @@ class AssetModelController extends Controller
     // Export
     public function export()
     {
-        $models = AssetModel::all();
+        $models = AssetModel::latest()->get();
 
         $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="models_export_'.now()->format('Ymd_His').'.csv"'];
 

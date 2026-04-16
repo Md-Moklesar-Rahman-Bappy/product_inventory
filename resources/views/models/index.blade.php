@@ -8,28 +8,53 @@
         <div class="modern-table-card">
             <div class="table-header-section">
                 <div class="row gy-3 align-items-center">
-                    <div class="col-12 col-lg-4 d-flex align-items-center">
+                    <div class="col-12 col-lg-2 d-flex align-items-center">
                         <div class="header-icon">
                             <i class="bi bi-layers"></i>
                         </div>
                         <div>
                             <h5 class="mb-0 fw-bold text-white">Models</h5>
-                            <small class="text-white opacity-75">{{ $models->total() }} total models</small>
+                            <small class="text-white opacity-75">{{ $models->total() }} total</small>
                         </div>
                     </div>
-                    <div class="col-12 col-lg-8 text-lg-end">
-                        @if(auth()->user()->permission <= 1)
-                        <div class="d-flex flex-wrap justify-content-lg-end gap-2">
-                            <a href="{{ route('models.sample') }}" class="btn btn-sm btn-light">
-                                <i class="bi bi-download me-1"></i>Sample
-                            </a>
-                            <a href="{{ route('models.export') }}" class="btn btn-sm btn-light">
-                                <i class="bi bi-file-earmark-excel me-1"></i>Export
-                            </a>
-                            <a href="{{ route('models.create') }}" class="btn btn-sm btn-add">
-                                <i class="bi bi-plus-lg me-1"></i>Add
-                            </a>
+
+                    <div class="col-12 col-lg-4">
+                        <div class="search-box">
+                            <i class="bi bi-search"></i>
+                            <input type="text" id="liveSearch" placeholder="Search models..." autocomplete="off">
+                            <div id="searchResults" class="search-results"></div>
                         </div>
+                        <form id="searchForm" method="GET" action="{{ route('models.index') }}" class="d-none">
+                            <input type="hidden" name="search" id="searchInput">
+                        </form>
+                    </div>
+
+                    <div class="col-12 col-lg-3">
+                        <div class="d-flex gap-2">
+                            <select name="filter" class="form-select form-select-sm filter-select" onchange="this.form.submit()">
+                                <option value="">All</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-12 col-lg-3 text-lg-end">
+                        @if(auth()->user()->permission <= 1)
+                            <div class="d-flex flex-wrap justify-content-lg-end gap-2">
+                                <a href="{{ route('models.sample') }}" class="btn btn-sm btn-light">
+                                    <i class="bi bi-download me-1"></i>Sample
+                                </a>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                                        <i class="bi bi-file-earmark-excel me-1"></i>Export
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="{{ route('models.export') }}">Export</a></li>
+                                    </ul>
+                                </div>
+                                <a href="{{ route('models.create') }}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-plus-lg me-1"></i>Add
+                                </a>
+                            </div>
                         @endif
                     </div>
                 </div>
@@ -39,11 +64,11 @@
             <div class="import-section">
                 <form action="{{ route('models.import') }}" method="POST" enctype="multipart/form-data" class="d-flex align-items-center gap-2">
                     @csrf
-                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" required>
+                    <input type="file" name="file" class="form-control form-control-sm" style="max-width: 200px;" accept=".xlsx,.xls,.csv" required>
                     <button type="submit" class="btn btn-sm btn-primary">
                         <i class="bi bi-upload me-1"></i>Import
                     </button>
-                    <small class="text-muted ms-auto">Supported: .xlsx, .csv</small>
+                    <small class="text-muted ms-auto">Supported: .xlsx, .csv, .xls</small>
                 </form>
             </div>
             @endif
@@ -62,7 +87,7 @@
                         @forelse($models as $m)
                         <tr @if($m->trashed()) class="bg-danger-subtle" @endif>
                             <td class="ps-4">
-                                <span class="row-number">{{ $loop->iteration }}</span>
+                                <span class="row-number">{{ ($models->currentPage() - 1) * $models->perPage() + $loop->iteration }}</span>
                             </td>
                             <td>
                                 <a href="{{ route('models.products', $m->id) }}" class="product-name text-decoration-none">
@@ -130,7 +155,7 @@
             </div>
 
             @if($models->hasPages())
-            <div class="table-footer px-3">
+            <div class="table-footer">
                 {{ $models->links('vendor.pagination.bootstrap-5') }}
             </div>
             @endif

@@ -16,6 +16,11 @@ class CategoryController extends Controller
     {
         $query = Category::query()->withCount('products');
 
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('category_name', 'like', "%{$search}%");
+        }
+
         if ($request->has('show_trashed')) {
             $query->onlyTrashed();
         }
@@ -137,7 +142,7 @@ class CategoryController extends Controller
     {
         $category = Category::withTrashed()->findOrFail($id);
 
-        $query = Product::where('category_id', $id)->with(['brand', 'model']);
+        $query = Product::where('category_id', $id)->with(['brand', 'model'])->orderBy('created_at', 'desc');
 
         if ($request->filled('search')) {
             $searchTerm = $request->input('search');
@@ -196,7 +201,7 @@ class CategoryController extends Controller
     // Export
     public function export()
     {
-        $categories = Category::all();
+        $categories = Category::latest()->get();
 
         $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="categories_export_'.now()->format('Ymd_His').'.csv"'];
 

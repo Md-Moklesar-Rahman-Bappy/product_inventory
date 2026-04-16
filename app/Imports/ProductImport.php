@@ -29,11 +29,24 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
 
     public $skippedRows = [];
 
-    protected $userId;
+    public $errorMessage = '';
 
-    public function __construct()
+    private const MAX_PRODUCT_NAME_LENGTH = 255;
+
+    private const MAX_TEXT_FIELD_LENGTH = 1000;
+
+    private const MAX_PRICE = 999999999.99;
+
+    private const MIN_YEAR = 1990;
+
+    private const MAX_YEAR = 2099;
+
+    public function onError(\Throwable $e)
     {
-        $this->userId = auth()->id();
+        $this->errorMessage = $e->getMessage();
+        \Log::error('Product Import Error: '.$e->getMessage(), [
+            'trace' => $e->getTraceAsString(),
+        ]);
     }
 
     private function skipRow(&$row, $reason)
@@ -41,6 +54,53 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
         $this->skipped++;
         $row['skip_reason'] = $reason;
         $this->skippedRows[] = $row;
+    }
+
+    private function validateFieldLength($value, $maxLength, $fieldName, &$row)
+    {
+        if (mb_strlen($value) > $maxLength) {
+            $this->skipRow($row, "{$fieldName} exceeds maximum length ({$maxLength} characters)");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function validatePrice($price, &$row)
+    {
+        $priceNum = (float) $price;
+
+        if ($priceNum < 0) {
+            $this->skipRow($row, 'Price cannot be negative');
+
+            return false;
+        }
+
+        if ($priceNum > self::MAX_PRICE) {
+            $this->skipRow($row, 'Price exceeds maximum allowed value');
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function validateDateRange($date, $fieldName, &$row)
+    {
+        if (empty($date)) {
+            return true;
+        }
+
+        $carbonDate = Carbon::parse($date);
+
+        if ($carbonDate->year < self::MIN_YEAR || $carbonDate->year > self::MAX_YEAR) {
+            $this->skipRow($row, "{$fieldName} date must be between ".self::MIN_YEAR.' and '.self::MAX_YEAR);
+
+            return false;
+        }
+
+        return true;
     }
 
     private function normalizeDate($value, &$row, $field)
@@ -54,6 +114,8 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
                 return Carbon::instance(ExcelDate::excelToDateTimeObject($value))
                     ->format('Y-m-d');
             } catch (\Exception $e) {
+                $this->skipRow($row, "Invalid {$field} date format");
+
                 return null;
             }
         }
@@ -69,6 +131,8 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
 
         $timestamp = strtotime($value);
         if ($timestamp === false) {
+            $this->skipRow($row, "Invalid {$field} date format");
+
             return null;
         }
 
@@ -90,6 +154,35 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
             return null;
         }
 
+        if (! $this->validateFieldLength($row['product_name'], self::MAX_PRODUCT_NAME_LENGTH, 'Product name', $row)) {
+            return null;
+        }
+
+        if (! empty($row['user_description']) && ! $this->validateFieldLength($row['user_description'], self::MAX_TEXT_FIELD_LENGTH, 'User description', $row)) {
+            return null;
+        }
+
+        if (! empty($row['remarks']) && ! $this->validateFieldLength($row['remarks'], self::MAX_TEXT_FIELD_LENGTH, 'Remarks', $row)) {
+            return null;
+        }
+
+        $price = isset($row['price']) ? preg_replace('/[^0-9.]/', '', $row['price']) : 0;
+
+        if (! $this->validatePrice($price, $row)) {
+            return null;
+        }
+
+        $warrantyStart = $this->normalizeDate($row['warranty_start'] ?? null, $row, 'warranty_start');
+        $warrantyEnd = $this->normalizeDate($row['warranty_end'] ?? null, $row, 'warranty_end');
+
+        if (! $this->validateDateRange($warrantyStart, 'Warranty start', $row)) {
+            return null;
+        }
+
+        if (! $this->validateDateRange($warrantyEnd, 'Warranty end', $row)) {
+            return null;
+        }
+
         $existingProduct = Product::where('serial_no', $row['serial_no'])->first();
 
         $categoryId = ! empty($row['category'])
@@ -104,26 +197,17 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
             ? AssetModel::firstOrCreate(['model_name' => trim($row['model'])])->id
             : null;
 
-        $price = isset($row['price'])
-            ? preg_replace('/[^0-9.\-]/', '', $row['price'])
-            : 0;
-
-        $warrantyStart = $this->normalizeDate($row['warranty_start'] ?? null, $row, 'warranty_start');
-        $warrantyEnd = $this->normalizeDate($row['warranty_end'] ?? null, $row, 'warranty_end');
-
         if ($existingProduct) {
-            $oldData = $existingProduct->toArray();
-
             $existingProduct->update([
-                'product_name' => $row['product_name'],
-                'price' => $price,
+                'product_name' => substr($row['product_name'], 0, self::MAX_PRODUCT_NAME_LENGTH),
+                'price' => (float) $price,
                 'category_id' => $categoryId,
                 'brand_id' => $brandId,
                 'model_id' => $modelId,
                 'project_serial_no' => $row['project_serial_no'] ?? null,
-                'position' => $row['position'] ?? null,
-                'user_description' => $row['user_description'] ?? null,
-                'remarks' => $row['remarks'] ?? null,
+                'position' => ! empty($row['position']) ? (int) $row['position'] : null,
+                'user_description' => substr($row['user_description'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
+                'remarks' => substr($row['remarks'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
                 'warranty_start' => $warrantyStart,
                 'warranty_end' => $warrantyEnd,
             ]);
@@ -142,16 +226,16 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
         }
 
         $product = Product::create([
-            'product_name' => $row['product_name'],
-            'price' => $price,
+            'product_name' => substr($row['product_name'], 0, self::MAX_PRODUCT_NAME_LENGTH),
+            'price' => (float) $price,
             'category_id' => $categoryId,
             'brand_id' => $brandId,
             'model_id' => $modelId,
             'serial_no' => $row['serial_no'],
             'project_serial_no' => $row['project_serial_no'] ?? null,
-            'position' => $row['position'] ?? null,
-            'user_description' => $row['user_description'] ?? null,
-            'remarks' => $row['remarks'] ?? null,
+            'position' => ! empty($row['position']) ? (int) $row['position'] : null,
+            'user_description' => substr($row['user_description'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
+            'remarks' => substr($row['remarks'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
             'warranty_start' => $warrantyStart,
             'warranty_end' => $warrantyEnd,
         ]);

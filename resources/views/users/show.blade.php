@@ -82,13 +82,13 @@
                                 <div class="col-md-6">
                                     <div class="detail-card">
                                         <span class="detail-label">Mobile Number</span>
-                                        <span class="detail-value">{!! $user->formatted_mobile !!}</span>
+                                        <span class="detail-value">{{ $user->formatted_mobile ?? '—' }}</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="detail-card">
                                         <span class="detail-label">Designation</span>
-                                        <span class="detail-value">{!! $user->designation_display !!}</span>
+                                        <span class="detail-value">{{ $user->designation ?? '—' }}</span>
                                     </div>
                                 </div>
                             </div>

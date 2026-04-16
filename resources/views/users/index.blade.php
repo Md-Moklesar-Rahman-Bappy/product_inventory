@@ -49,9 +49,9 @@
                             <td>
                                 <div class="fw-semibold text-dark">{{ $user->name }}</div>
                             </td>
-                            <td>{!! $user->designation_display !!}</td>
+                            <td>{{ $user->designation ?? '—' }}</td>
                             <td><span class="text-muted">{{ $user->email }}</span></td>
-                            <td>{!! $user->formatted_mobile !!}</td>
+                            <td>{{ $user->formatted_mobile ?? '—' }}</td>
                             <td>
                                 @php
                                     $roleClass = match($user->role_label) {

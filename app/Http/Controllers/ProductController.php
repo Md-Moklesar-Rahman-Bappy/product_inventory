@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\AllCategoriesExport;
 use App\Exports\AssetModelProductExport;
 use App\Exports\BrandProductExport;
-use App\Exports\CategoryProductExport;
 use App\Exports\ProductExport;
 use App\Imports\ProductImport;
 use App\Models\AssetModel;
@@ -74,6 +74,7 @@ class ProductController extends Controller
                 ->orWhere('project_serial_no', 'like', '%'.$search.'%');
         })
             ->select('id', 'product_name', 'serial_no', 'project_serial_no', 'position')
+            ->orderBy('created_at', 'desc')
             ->limit(10)
             ->get();
 
@@ -222,8 +223,14 @@ class ProductController extends Controller
             return redirect()->route('products.index')
                 ->with('success', 'Product deleted successfully');
         } catch (\Exception $e) {
+            \Log::error('Product deletion failed', [
+                'product_id' => $id,
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+
             return redirect()->route('products.index')
-                ->with('error', 'Failed to delete product: '.$e->getMessage());
+                ->with('error', 'Failed to delete product. Please try again.');
         }
     }
 
@@ -297,6 +304,7 @@ class ProductController extends Controller
                 ]);
 
                 Product::with(['category', 'brand', 'model'])
+                    ->orderBy('id', 'desc')
                     ->chunk(500, function ($products) use ($handle) {
                         foreach ($products as $p) {
                             fputcsv($handle, [
@@ -332,7 +340,7 @@ class ProductController extends Controller
 
     public function exportCategoryWise()
     {
-        return Excel::download(new CategoryProductExport, 'products_by_category_'.now()->format('Ymd_His').'.xlsx');
+        return Excel::download(new AllCategoriesExport, 'products_by_category_'.now()->format('Ymd_His').'.xlsx');
     }
 
     public function exportBrandWise($id)
@@ -358,17 +366,43 @@ class ProductController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,csv,xls|max:2048',
+            'file' => 'required|mimes:xlsx,xls,csv|max:2048',
         ]);
 
-        $import = new ProductImport;
-        Excel::import($import, $request->file('file'));
+        try {
+            $file = $request->file('file');
+            $import = new ProductImport;
+            Excel::import($import, $file);
 
-        $message = "Import completed: {$import->created} created, {$import->updated} updated, {$import->skipped} skipped.";
+            if ($import->errorMessage) {
+                session()->flash('error', 'Import failed: '.$import->errorMessage);
 
-        session()->put('skippedRows', $import->skippedRows);
+                return redirect()->route('products.index');
+            }
 
-        return redirect()->route('products.index')->with('success', $message);
+            $created = $import->created;
+            $updated = $import->updated;
+            $skipped = $import->skipped;
+
+            session()->put('skippedRows', $import->skippedRows);
+
+            session()->flash('import_stats', [
+                'created' => $created,
+                'updated' => $updated,
+                'skipped' => $skipped,
+            ]);
+
+            return redirect()->route('products.index');
+        } catch (\Throwable $e) {
+            \Log::error('Product Import Exception: '.$e->getMessage(), [
+                'file' => $file?->getClientOriginalName(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            session()->flash('error', 'Import failed: '.$e->getMessage());
+
+            return redirect()->route('products.index');
+        }
     }
 
     public function exportSkippedRows()

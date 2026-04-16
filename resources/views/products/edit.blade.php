@@ -161,7 +161,7 @@
 
                     @if($product->warranty_end)
                         <div class="alert alert-info mb-4" style="border-radius: 12px;">
-                            <strong>Warranty Status:</strong> {!! $product->warranty_countdown !!}
+                            <strong>Warranty Status:</strong> {!! \App\Helpers\StringHelper::sanitizeHtml($product->warranty_countdown) !!}
                         </div>
                     @endif
 

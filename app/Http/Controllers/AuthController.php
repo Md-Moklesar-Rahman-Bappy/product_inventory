@@ -131,7 +131,7 @@ class AuthController extends Controller
             'designation' => 'nullable|string|max:255',
             'about' => 'nullable|string',
             'address' => 'nullable|string',
-            'profile_photo_path' => 'nullable|image|max:2048',
+            'profile_photo_path' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:2048',
         ]);
 
         $user->fill([

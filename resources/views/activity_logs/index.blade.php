@@ -102,7 +102,7 @@
                             </td>
                             <td><span class="product-meta">{{ $log->model ?? '—' }}</span></td>
                             <td class="{{ $isNoChange ? 'text-muted fst-italic' : '' }}">
-                                {!! $log->description !!}
+                                {!! \App\Helpers\StringHelper::sanitizeHtml($log->description) !!}
                             </td>
                             <td>
                                 <div class="text-nowrap">

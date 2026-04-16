@@ -125,30 +125,27 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function hasVerifiedEmail(): bool
     {
-        return $this->isVerified(); // alias for consistency
+        return $this->isVerified();
     }
 
-    public function shouldSendCredentials(): bool
+    public function shouldNotifyAccountCreated(): bool
     {
-        return $this->hasVerifiedEmail() &&
-            is_null($this->credentials_sent_at) &&
-            ! is_null($this->initial_password);
+        return $this->hasVerifiedEmail() && is_null($this->credentials_sent_at);
     }
 
-    public function sendCredentialsAndLog(string $password): void
+    public function notifyAccountCreated(): void
     {
-        $this->notify(new \App\Notifications\SendCredentialsNotification($password));
+        $this->notify(new \App\Notifications\SendCredentialsNotification);
 
         $this->update([
             'credentials_sent_at' => now(),
-            'initial_password' => null,
         ]);
 
         \App\Http\Controllers\ActivityLogController::logAction(
             'send-credentials',
             'User',
             $this->id,
-            '<span class="text-info fw-bold">Sent credentials</span> to user: <strong>'.e($this->name).'</strong>'
+            '<span class="text-info fw-bold">Sent account notification</span> to user: <strong>'.e($this->name).'</strong>'
         );
     }
 

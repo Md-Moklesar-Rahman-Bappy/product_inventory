@@ -24,8 +24,8 @@ class SettingController extends Controller
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string|max:500',
             'footer_credit' => 'nullable|string|max:255',
-            'logo' => 'nullable|image|max:2048',
-            'favicon' => 'nullable|image|max:512',
+            'logo' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'favicon' => 'nullable|mimes:jpeg,jpg,png,gif,webp,ico|max:512',
         ]);
 
         Setting::set('app_name', $request->app_name);

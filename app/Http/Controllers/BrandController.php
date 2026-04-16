@@ -10,9 +10,16 @@ use Maatwebsite\Excel\Facades\Excel;
 
 class BrandController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $brands = Brand::latest()->withCount('products')->paginate(10);
+        $query = Brand::query()->withCount('products');
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('brand_name', 'like', "%{$search}%");
+        }
+
+        $brands = $query->latest()->paginate(10);
         $trashedBrands = Brand::onlyTrashed()->paginate(5);
 
         return view('brands.index', compact('brands', 'trashedBrands'));
@@ -131,7 +138,8 @@ class BrandController extends Controller
         $brand = Brand::withTrashed()->findOrFail($id);
 
         $query = Product::with(['model', 'category'])
-            ->where('brand_id', $brand->id);
+            ->where('brand_id', $brand->id)
+            ->orderBy('created_at', 'desc');
 
         if (request()->filled('search')) {
             $query->where('serial_no', 'like', '%'.request('search').'%');
@@ -178,7 +186,7 @@ class BrandController extends Controller
     // Export
     public function export()
     {
-        $brands = Brand::all();
+        $brands = Brand::latest()->get();
 
         $headers = ['Content-Type' => 'text/csv', 'Content-Disposition' => 'attachment; filename="brands_export_'.now()->format('Ymd_His').'.csv"'];
 

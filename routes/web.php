@@ -12,51 +12,37 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
 use App\Models\Maintenance;
 use App\Models\User;
-use App\Notifications\SendCredentialsNotification;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 // 🌐 Public Routes
 Route::view('/', 'auth.login')->name('login');
+
+// 🔐 Registration Routes (with rate limiting)
+Route::middleware('throttle:5,10')->group(function () {
+    Route::get('register', [AuthController::class, 'register'])->name('register');
+    Route::post('register', [AuthController::class, 'registerSave'])->name('register.save');
+});
 
 // ✅ Public Email Verification Route
 Route::get('/verify-email/{id}/{hash}', function ($id, $hash) {
     $user = User::findOrFail($id);
 
     if (! hash_equals((string) $hash, sha1($user->getEmailForVerification()))) {
-        abort(403, 'Invalid verification link.');
+        abort(422, 'Invalid verification link.');
     }
 
     if (! $user->hasVerifiedEmail()) {
         $user->markEmailAsVerified();
         event(new Verified($user));
 
-        if ($user->shouldSendCredentials()) {
-            try {
-                $password = Crypt::decryptString($user->initial_password);
-                $user->notify(new SendCredentialsNotification($password));
-
-                $user->update([
-                    'credentials_sent_at' => now(),
-                    'initial_password' => null,
-                ]);
-
-                ActivityLogController::logAction(
-                    'send-credentials',
-                    'User',
-                    $user->id,
-                    '<span class="text-info fw-bold">Verified email</span> and sent credentials to user: <strong>'.e($user->name).'</strong>'
-                );
-            } catch (\Exception $e) {
-                Log::error('Credential decryption failed for user ID '.$user->id, ['error' => $e->getMessage()]);
-            }
+        if ($user->shouldNotifyAccountCreated()) {
+            $user->notifyAccountCreated();
         }
     }
 
-    return redirect()->route('login')->with('success', 'Your email has been verified. Please check your inbox for login credentials.');
+    return redirect()->route('login')->with('success', 'Your email has been verified. Please use the password reset feature to set your password.');
 })->middleware('signed')->name('verification.verify.public');
 
 // 🔐 Custom Authentication
@@ -80,57 +66,54 @@ Route::middleware(['auth'])->group(function () {
     // 📊 Dashboard
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // 👤 Users
-    Route::resource('users', UserController::class);
-    Route::post('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore');
-    Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus');
+    // 👤 Users (Admin/Superadmin management)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::post('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore')->middleware('isSuperadmin');
+        Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus')->middleware('isSuperadmin');
+    });
 
-    // 📁 Categories
-    Route::resource('categories', CategoryController::class);
-    Route::get('categories/{id}/products', [CategoryController::class, 'products'])->name('categories.products');
-    Route::get('category/{id}/products/export', [CategoryController::class, 'exportCategoryProducts'])->name('category.products.export');
-    Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
-    Route::delete('categories/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete');
-    Route::post('categories/import', [CategoryController::class, 'import'])->name('categories.import');
-    Route::get('categories/sample', [CategoryController::class, 'downloadSample'])->name('categories.sample');
-    Route::get('categories/export', [CategoryController::class, 'export'])->name('categories.export');
+    // 📁 Categories (Admin only)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::resource('categories', CategoryController::class)->except(['show']);
+        Route::get('categories/{id}/products', [CategoryController::class, 'products'])->name('categories.products');
+        Route::get('category/{id}/products/export', [CategoryController::class, 'exportCategoryProducts'])->name('category.products.export');
+        Route::post('categories/import', [CategoryController::class, 'import'])->name('categories.import');
+        Route::get('categories/sample', [CategoryController::class, 'downloadSample'])->name('categories.sample');
+        Route::get('categories/export', [CategoryController::class, 'export'])->name('categories.export');
+        Route::post('categories/{id}/restore', [CategoryController::class, 'restore'])->name('categories.restore');
+    });
+    Route::delete('categories/{id}/force-delete', [CategoryController::class, 'forceDelete'])->name('categories.forceDelete')->middleware(['auth', 'isSuperadmin']);
 
-    // 🏷️ Brands
-    Route::resource('brands', BrandController::class);
-    Route::get('brands/{id}/products', [BrandController::class, 'products'])->name('brands.products');
-    Route::post('brands/{id}/restore', [BrandController::class, 'restore'])->name('brands.restore');
-    Route::delete('brands/{id}/force-delete', [BrandController::class, 'forceDelete'])->name('brands.forceDelete');
-    Route::post('brands/import', [BrandController::class, 'import'])->name('brands.import');
-    Route::get('brands/sample', [BrandController::class, 'downloadSample'])->name('brands.sample');
-    Route::get('brands/export', [BrandController::class, 'export'])->name('brands.export');
+    // 🏷️ Brands (Admin only)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::resource('brands', BrandController::class)->except(['show']);
+        Route::get('brands/{id}/products', [BrandController::class, 'products'])->name('brands.products');
+        Route::post('brands/import', [BrandController::class, 'import'])->name('brands.import');
+        Route::get('brands/sample', [BrandController::class, 'downloadSample'])->name('brands.sample');
+        Route::get('brands/export', [BrandController::class, 'export'])->name('brands.export');
+        Route::post('brands/{id}/restore', [BrandController::class, 'restore'])->name('brands.restore');
+    });
+    Route::delete('brands/{id}/force-delete', [BrandController::class, 'forceDelete'])->name('brands.forceDelete')->middleware(['auth', 'isSuperadmin']);
 
-    // 🧩 Models
-    Route::resource('models', AssetModelController::class);
-    Route::get('models/{id}/products', [AssetModelController::class, 'products'])->name('models.products');
-    Route::post('models/{id}/restore', [AssetModelController::class, 'restore'])->name('models.restore');
-    Route::delete('models/{id}/force-delete', [AssetModelController::class, 'forceDelete'])->name('models.forceDelete');
-    Route::post('models/import', [AssetModelController::class, 'import'])->name('models.import');
-    Route::get('models/sample', [AssetModelController::class, 'downloadSample'])->name('models.sample');
-    Route::get('models/export', [AssetModelController::class, 'export'])->name('models.export');
+    // 🧩 Models (Admin only)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::resource('models', AssetModelController::class)->except(['show']);
+        Route::get('models/{id}/products', [AssetModelController::class, 'products'])->name('models.products');
+        Route::post('models/import', [AssetModelController::class, 'import'])->name('models.import');
+        Route::get('models/sample', [AssetModelController::class, 'downloadSample'])->name('models.sample');
+        Route::get('models/export', [AssetModelController::class, 'export'])->name('models.export');
+        Route::post('models/{id}/restore', [AssetModelController::class, 'restore'])->name('models.restore');
+    });
+    Route::delete('models/{id}/force-delete', [AssetModelController::class, 'forceDelete'])->name('models.forceDelete')->middleware(['auth', 'isSuperadmin']);
 
-    // 📦 Products Import/Export grouped
-    Route::prefix('products')->group(function () {
-        // Sample CSV download
+    // 📦 Products Import/Export grouped (Admin only)
+    Route::middleware(['auth', 'isAdmin'])->prefix('products')->group(function () {
         Route::get('sample', [ProductController::class, 'downloadSample'])->name('products.sample');
-
-        // Import products
-        Route::post('import', [ProductController::class, 'import'])->name('products.import');
-
-        // 🚨 New route for exporting skipped rows
-        Route::get('skipped/export', [ProductController::class, 'exportSkippedRows'])->name('products.skipped.export');
-
-        // 🚨 New route for clearing skipped rows
+        Route::post('import', [ProductController::class, 'import'])->name('products.import')->middleware('throttle:10,1');
+        Route::post('skipped/export', [ProductController::class, 'exportSkippedRows'])->name('products.skipped.export');
         Route::post('skipped/clear', [ProductController::class, 'clearSkippedRows'])->name('products.skipped.clear');
-
-        // 🔍 AJAX Live Search
         Route::get('search', [ProductController::class, 'search'])->name('products.search');
-
-        // Export products
         Route::prefix('export')->group(function () {
             Route::get('excel', [ProductController::class, 'exportExcel'])->name('products.export.excel');
             Route::get('category-wise', [ProductController::class, 'exportCategoryWise'])->name('products.export.category');
@@ -139,14 +122,19 @@ Route::middleware(['auth'])->group(function () {
         });
     });
 
-    // 📦 Products resource routes
-    Route::resource('products', ProductController::class);
-    Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
-    Route::delete('products/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete');
+    // 📦 Products resource routes (Admin only)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::resource('products', ProductController::class);
+        Route::post('products/{id}/restore', [ProductController::class, 'restore'])->name('products.restore');
+    });
+    Route::delete('products/{id}/force-delete', [ProductController::class, 'forceDelete'])->name('products.forceDelete')->middleware(['auth', 'isSuperadmin']);
 
-    // 🛠️ Maintenance
-    Route::resource('maintenance', MaintenanceController::class);
-    Route::get('maintenance/product/{serial}', [MaintenanceController::class, 'getProductBySerial'])->name('maintenance.getProductBySerial')->middleware('auth');
+    // 🛠️ Maintenance (Admin only)
+    Route::middleware(['auth', 'isAdmin'])->group(function () {
+        Route::resource('maintenance', MaintenanceController::class)->except(['show']);
+        Route::get('maintenance/product/{serial}', [MaintenanceController::class, 'getProductBySerial'])->name('maintenance.getProductBySerial');
+    });
+    Route::get('maintenance/{id}', [MaintenanceController::class, 'show'])->name('maintenance.show')->middleware('auth');
 
     // 📜 Activity Logs (Admin/Superadmin only)
     Route::middleware(['auth', 'isAdmin'])->group(function () {

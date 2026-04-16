@@ -6,7 +6,6 @@ use App\Helpers\StringHelper;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -53,7 +52,7 @@ class UserController extends Controller
             'about' => 'nullable|string',
             'address' => 'nullable|string',
             'permission' => 'required|integer|min:0|max:2',
-            'profile_photo_path' => 'nullable|image|max:2048',
+            'profile_photo_path' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:2048',
         ], [
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
         ]);
@@ -70,7 +69,6 @@ class UserController extends Controller
             'permission' => $request->permission,
             'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
             'status' => 'active',
-            'initial_password' => Crypt::encryptString($request->password),
         ]);
 
         if ($request->hasFile('profile_photo_path')) {
@@ -139,7 +137,7 @@ class UserController extends Controller
             'about' => 'nullable|string',
             'address' => 'nullable|string',
             'permission' => 'required|integer|min:0|max:2',
-            'profile_photo_path' => 'nullable|image|max:2048',
+            'profile_photo_path' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:2048',
         ], [
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
         ]);

@@ -3,32 +3,35 @@
 namespace App\Exports;
 
 use App\Models\Product;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class ProductExport implements FromCollection, WithHeadings
+class ProductExport implements FromQuery, WithHeadings, WithMapping
 {
-    public function collection()
+    public function query(): Builder
     {
-        return Product::with(['category', 'brand', 'model'])->get()->map(function ($product) {
-            return [
-                'product_name'      => $product->product_name,
-                // Export plain numeric price for easier re-import
-                'price'             => $product->price,
-                'category'          => $product->category?->category_name,
-                'brand'             => $product->brand?->brand_name,
-                'model'             => $product->model?->model_name,
-                'serial_no'         => $product->serial_no,
-                'project_serial_no' => $product->project_serial_no,
-                'position'          => $product->position,
-                // Clean up newlines so CSV/XLSX stays tidy
-                'user_description'  => str_replace(["\r", "\n"], ' ', $product->user_description),
-                'remarks'           => str_replace(["\r", "\n"], ' ', $product->remarks),
-                // Format warranty dates for readability
-                'warranty_start'    => optional($product->warranty_start)->format('m/d/Y'),
-                'warranty_end'      => optional($product->warranty_end)->format('m/d/Y'),
-            ];
-        });
+        return Product::with(['category', 'brand', 'model'])
+            ->orderBy('id', 'desc');
+    }
+
+    public function map($product): array
+    {
+        return [
+            'product_name' => $product->product_name,
+            'price' => $product->price,
+            'category' => $product->category?->category_name,
+            'brand' => $product->brand?->brand_name,
+            'model' => $product->model?->model_name,
+            'serial_no' => $product->serial_no,
+            'project_serial_no' => $product->project_serial_no,
+            'position' => $product->position,
+            'user_description' => str_replace(["\r", "\n"], ' ', $product->user_description),
+            'remarks' => str_replace(["\r", "\n"], ' ', $product->remarks),
+            'warranty_start' => optional($product->warranty_start)->format('d/m/Y'),
+            'warranty_end' => optional($product->warranty_end)->format('d/m/Y'),
+        ];
     }
 
     public function headings(): array
