@@ -134,7 +134,7 @@
                 {{-- Profile --}}
                 <li class="nav-item">
                     <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
-                        <i class="bi bi-person-circle"></i>
+                        <img src="{{ auth()->user()->profile_photo_url }}" alt="Profile" class="user-avatar-sm">
                         <span>Profile</span>
                     </a>
                 </li>
