@@ -5,19 +5,14 @@ use App\Http\Controllers\AssetModelController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UserController;
-use App\Models\ActivityLog;
-use App\Models\AssetModel;
-use App\Models\Brand;
-use App\Models\Category;
 use App\Models\Maintenance;
-use App\Models\Product;
 use App\Models\User;
 use App\Notifications\SendCredentialsNotification;
-use Carbon\Carbon;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -83,44 +78,7 @@ Route::middleware(['auth'])->group(function () {
     })->middleware('throttle:3,1')->name('verification.resend');
 
     // 📊 Dashboard
-    Route::get('dashboard', function () {
-        $logs = ActivityLog::with('user')->latest()->paginate(10);
-
-        $entityCounts = [
-            'Categories' => Category::count(),
-            'Brands' => Brand::count(),
-            'Models' => AssetModel::count(),
-            'Products' => Product::count(),
-            'Maintenance' => Maintenance::count(),
-            'Warranty' => Product::whereNotNull('warranty_end')->count(),
-        ];
-
-        $now = Carbon::now();
-        $soon = $now->copy()->addDays(30);
-
-        $warrantyBreakdown = [
-            'Active' => Product::where('warranty_end', '>', $soon)->count(),
-            'Expiring Soon' => Product::whereBetween('warranty_end', [$now, $soon])->count(),
-            'Expired' => Product::where('warranty_end', '<', $now)->count(),
-        ];
-
-        // Additional data for enhanced dashboard
-        $recentProducts = Product::latest()->take(5)->get();
-        $expiringWarranties = Product::whereBetween('warranty_end', [$now, $soon])->take(5)->get();
-        $pendingMaintenance = Maintenance::where('end_time', '>', $now)->where('start_time', '<=', $now)->take(5)->get();
-
-        // Product trend data (last 6 months)
-        $productTrend = [];
-        for ($i = 5; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
-            $productTrend[] = [
-                'month' => $month->format('M'),
-                'count' => Product::whereYear('created_at', $month->year)->whereMonth('created_at', $month->month)->count(),
-            ];
-        }
-
-        return view('dashboard', compact('logs', 'entityCounts', 'warrantyBreakdown', 'recentProducts', 'expiringWarranties', 'pendingMaintenance', 'productTrend'));
-    })->name('dashboard');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // 👤 Users
     Route::resource('users', UserController::class);
