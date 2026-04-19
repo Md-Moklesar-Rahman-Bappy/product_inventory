@@ -34,6 +34,7 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password),
+            'permission' => 2,
         ]);
 
         event(new Registered($user));
@@ -71,12 +72,6 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         $user = Auth::user();
-
-        if ($user->status !== 'active') {
-            Auth::logout();
-
-            return back()->with('error', 'Your account has been deactivated. Please contact support.');
-        }
 
         ActivityLogController::logAction(
             'login',

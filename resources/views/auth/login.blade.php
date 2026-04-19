@@ -34,10 +34,6 @@
       min-height: 100vh;
     }
 
-    body.dark-mode {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-    }
-
     .login-wrapper {
       min-height: 100vh;
       display: flex;
@@ -57,11 +53,6 @@
       text-align: center;
     }
 
-    body.dark-mode .login-card {
-      background: rgba(30, 41, 59, 0.95);
-      border: 1px solid #334155;
-    }
-
     .login-icon {
       width: 80px;
       margin-bottom: 20px;
@@ -72,10 +63,6 @@
       font-weight: 600;
       margin-bottom: 25px;
       color: #1e293b;
-    }
-
-    body.dark-mode .login-title {
-      color: #e2e8f0;
     }
 
     .form-group {
@@ -92,33 +79,10 @@
       color: #1e293b;
     }
 
-    body.dark-mode .form-control {
-      background-color: #334155;
-      border-color: #475569;
-      color: #e2e8f0;
-    }
-
     .form-control:focus {
       box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
       border-color: #4f46e5;
       outline: none;
-    }
-
-    body.dark-mode .form-control:focus {
-      background-color: #334155;
-      border-color: #4f46e5;
-      color: #e2e8f0;
-    }
-
-    body.dark-mode .form-control::placeholder {
-      color: #64748b;
-    }
-
-    body.dark-mode .form-control:-webkit-autofill,
-    body.dark-mode .form-control:-webkit-autofill:hover,
-    body.dark-mode .form-control:-webkit-autofill:focus {
-      -webkit-text-fill-color: #e2e8f0;
-      -webkit-box-shadow: 0 0 0px 1000px #334155 inset;
     }
 
     .form-icon {
@@ -128,10 +92,6 @@
       transform: translateY(-50%);
       color: #4f46e5;
       font-size: 1.1rem;
-    }
-
-    body.dark-mode .form-icon {
-      color: #818cf8;
     }
 
     .toggle-password {
@@ -144,10 +104,6 @@
       font-size: 1.1rem;
       background: none;
       border: none;
-    }
-
-    body.dark-mode .toggle-password {
-      color: #94a3b8;
     }
 
     .toggle-password:hover {
@@ -181,70 +137,12 @@
       color: #64748b;
     }
 
-    body.dark-mode footer {
-      color: #94a3b8;
-    }
-
     .form-check-label {
       color: #64748b;
-    }
-
-    body.dark-mode .form-check-label {
-      color: #94a3b8;
-    }
-
-    body.dark-mode .form-check-input {
-      background-color: #334155;
-      border-color: #475569;
-    }
-
-    body.dark-mode .form-check-input:checked {
-      background-color: #4f46e5;
-      border-color: #4f46e5;
-    }
-
-    body.dark-mode .invalid-feedback {
-      color: #fca5a5;
-    }
-
-    .theme-toggle {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s ease;
-      z-index: 1000;
-    }
-
-    .theme-toggle:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
-    }
-
-    .theme-toggle i {
-      color: white;
-      font-size: 1.2rem;
-    }
-
-    body.dark-mode .theme-toggle {
-      background: rgba(0, 0, 0, 0.3);
     }
   </style>
 </head>
 <body>
-
-  <!-- Theme Toggle -->
-  <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
-    <i class="bi bi-moon-stars" id="themeIcon"></i>
-  </button>
 
   <div class="login-wrapper">
     <div class="login-card">
@@ -326,33 +224,6 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Check saved theme on load
-    document.addEventListener('DOMContentLoaded', function() {
-      const savedTheme = localStorage.getItem('theme');
-      if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        document.getElementById('themeIcon').classList.remove('bi-moon-stars');
-        document.getElementById('themeIcon').classList.add('bi-sun');
-      }
-    });
-
-    function toggleTheme() {
-      const body = document.body;
-      const icon = document.getElementById('themeIcon');
-      
-      body.classList.toggle('dark-mode');
-      
-      if (body.classList.contains('dark-mode')) {
-        localStorage.setItem('theme', 'dark');
-        icon.classList.remove('bi-moon-stars');
-        icon.classList.add('bi-sun');
-      } else {
-        localStorage.setItem('theme', 'light');
-        icon.classList.remove('bi-sun');
-        icon.classList.add('bi-moon-stars');
-      }
-    }
-
     function togglePassword() {
       const passwordInput = document.getElementById('password');
       const eyeIcon = document.getElementById('eyeIcon');

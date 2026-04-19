@@ -444,21 +444,10 @@
     color: #6b7280;
   }
 
-  body.dark-mode .quick-action-item {
-    background: #334155;
-    border-color: #475569;
-    color: #e2e8f0;
-  }
-
   .quick-action-item:hover {
     background: #f3f4f6;
     transform: translateY(-2px);
     border-color: #e5e7eb;
-  }
-
-  body.dark-mode .quick-action-item:hover {
-    background: #475569;
-    border-color: #64748b;
   }
 
   .action-icon-wrapper {
@@ -511,19 +500,8 @@
     border: 1px solid #e5e7eb;
   }
 
-  body.dark-mode .alert-list-item,
-  body.dark-mode .recent-list-item {
-    background: #334155;
-    border-color: #475569;
-  }
-
   .alert-list-item:hover, .recent-list-item:hover {
     background: #f9fafb;
-  }
-
-  body.dark-mode .alert-list-item:hover, 
-  body.dark-mode .recent-list-item:hover {
-    background: #475569;
   }
 
   .list-icon {
@@ -555,17 +533,9 @@
     text-overflow: ellipsis;
   }
 
-  body.dark-mode .list-text {
-    color: #e2e8f0;
-  }
-
   .list-meta {
     font-size: 0.7rem;
     color: #9ca3af;
-  }
-
-  body.dark-mode .list-meta {
-    color: #94a3b8;
   }
 
   .empty-state {
@@ -693,12 +663,6 @@
     outline: none;
   }
 
-  body.dark-mode .chart-select {
-    background: #334155;
-    border-color: #475569;
-    color: #e2e8f0;
-  }
-
   .chart-select:focus {
     border-color: #6366f1;
   }
@@ -706,10 +670,6 @@
   .chart-body {
     position: relative;
     height: 280px;
-  }
-
-  body.dark-mode .chart-body {
-    background: transparent;
   }
 
   .chart-legend, .warranty-legend {
