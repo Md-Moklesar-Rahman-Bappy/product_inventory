@@ -693,6 +693,12 @@
     outline: none;
   }
 
+  body.dark-mode .chart-select {
+    background: #334155;
+    border-color: #475569;
+    color: #e2e8f0;
+  }
+
   .chart-select:focus {
     border-color: #6366f1;
   }
@@ -700,6 +706,10 @@
   .chart-body {
     position: relative;
     height: 280px;
+  }
+
+  body.dark-mode .chart-body {
+    background: transparent;
   }
 
   .chart-legend, .warranty-legend {

@@ -12,10 +12,19 @@
         border: 1px solid #e2e8f0;
     }
 
+    body.dark-mode .profile-upload-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
     .profile-header {
         background: linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #fb7185 100%);
         padding: 24px;
         color: white;
+    }
+
+    body.dark-mode .profile-header {
+        background: linear-gradient(135deg, #be185d 0%, #9f1239 50%, #be123c 100%);
     }
 
     .header-icon {
@@ -23,6 +32,48 @@
         width: 48px;
         height: 48px;
         border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .detail-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    body.dark-mode .detail-section {
+        background: #334155;
+    }
+
+    body.dark-mode .detail-section {
+        background: #334155;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    body.dark-mode .detail-section {
+        background: #334155;
+    }
+
+    body.dark-mode .detail-section {
+        background: #334155;
+    }
+
+    .section-header {
+        margin-bottom: 16px;
+    }
+
+    body.dark-mode .section-header {
+        color: #e2e8f0;
+    }
+
+    .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -86,8 +137,16 @@
         padding: 16px;
     }
 
+    body.dark-mode .detail-section {
+        background: #334155;
+    }
+
     .section-header {
         margin-bottom: 16px;
+    }
+
+    body.dark-mode .section-header {
+        color: #e2e8f0;
     }
 
     .section-icon {

@@ -56,7 +56,7 @@
 
                         @if($urgency !== $lastUrgency)
                         <tr>
-                            <td colspan="7" class="bg-light fw-bold text-dark px-4 py-2">
+                            <td colspan="7" class="bg-light-subtle fw-bold text-dark px-4 py-2 warranty-section-header">
                                 @switch($urgency)
                                     @case(0) <i class="bi bi-exclamation-triangle text-danger me-2"></i> Expired Warranties @break
                                     @case(1) <i class="bi bi-exclamation-circle text-warning me-2"></i> Expiring in 7 Days @break

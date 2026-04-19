@@ -12,6 +12,11 @@
         border: 1px solid #e2e8f0;
     }
 
+    body.dark-mode .profile-upload-card {
+        background: #1e293b;
+        border-color: #334155;
+    }
+
     .profile-header {
         background: linear-gradient(135deg, #ec4899 0%, #f43f5e 50%, #fb7185 100%);
         padding: 24px;

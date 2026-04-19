@@ -1550,6 +1550,34 @@
         body.dark-mode .link-light {
             color: #e2e8f0 !important;
         }
+
+        body.dark-mode .warranty-section-header {
+            background: #334155 !important;
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode .empty-state h6 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .empty-state p {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .table thead th {
+            background: #334155;
+            color: #e2e8f0;
+            border-color: #475569;
+        }
+
+        body.dark-mode .table td {
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .table tbody + tbody {
+            border-color: #334155;
+        }
     </style>
     
     <!-- Theme Toggle Script -->
