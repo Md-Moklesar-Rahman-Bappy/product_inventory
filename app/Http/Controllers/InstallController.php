@@ -182,6 +182,7 @@ class InstallController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
+            'mobile' => 'nullable|string|max:20',
             'password' => [
                 'required',
                 'confirmed',
@@ -222,12 +223,14 @@ class InstallController extends Controller
             $user = new User();
             $user->name = $request->name;
             $user->email = $request->email;
+            $user->mobile = $request->mobile;
             $user->password = Hash::make($request->password);
             $user->permission = 0;
             $user->utype = 'SA';
             $user->status = 'active';
-            $user->email_verified_at = now();
             $user->save();
+
+            $user->sendEmailVerificationNotification();
 
             Log::info('Super admin created during installation', [
                 'email' => $request->email,

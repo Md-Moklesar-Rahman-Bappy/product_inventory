@@ -33,6 +33,15 @@
         </div>
 
         <div class="mb-3">
+            <label for="mobile" class="form-label">Phone Number</label>
+            <input type="text" name="mobile" id="mobile" class="form-control @error('mobile') is-invalid @enderror"
+                   value="{{ old('mobile') }}" placeholder="e.g. 01XXXXXXXXX">
+            @error('mobile')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
             <label for="password" class="form-label">Password</label>
             <input type="password" name="password" id="password"
                    class="form-control @error('password') is-invalid @enderror" required>
