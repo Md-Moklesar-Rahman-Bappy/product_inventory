@@ -10,25 +10,25 @@ use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
 use App\Policies\ProductPolicy;
 use App\Policies\UserPolicy;
+use App\Services\LicenseService;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
+        $this->app->singleton(LicenseService::class, function ($app) {
+            return new LicenseService();
+        });
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
+        $this->configureSessionForInstall();
+
         Gate::policy(User::class, UserPolicy::class);
         Gate::policy(Product::class, ProductPolicy::class);
         Gate::policy(Category::class, CategoryPolicy::class);
@@ -36,5 +36,17 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::defaultView('vendor.pagination.bootstrap-5');
         Paginator::defaultSimpleView('vendor.pagination.simple-bootstrap-5');
+    }
+
+    protected function configureSessionForInstall(): void
+    {
+        try {
+            if (Schema::hasTable('sessions')) {
+                return;
+            }
+            config(['session.driver' => 'file']);
+        } catch (\Exception $e) {
+            config(['session.driver' => 'file']);
+        }
     }
 }
