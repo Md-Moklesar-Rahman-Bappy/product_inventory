@@ -240,7 +240,13 @@
                                 <div class="col-md-6">
                                     <div class="detail-card">
                                         <span class="detail-label">Mobile Number</span>
-                                        <span class="detail-value">{{ $user->formatted_mobile ?? '—' }}</span>
+                                        <span class="detail-value">
+                                            @if($user->formatted_mobile)
+                                                {{ $user->formatted_mobile }}
+                                            @else
+                                                <span class="text-muted">—</span>
+                                            @endif
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">

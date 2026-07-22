@@ -9,7 +9,7 @@
         $faviconPath = \App\Models\Setting::get('favicon_path');
         $faviconUrl = asset('favicon.ico');
         if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
-            $faviconUrl = Storage::url($faviconPath);
+            $faviconUrl = Storage::disk('public')->url($faviconPath);
         }
         $faviconUrl = $faviconUrl . '?v=' . filemtime(public_path('favicon.ico'));
     @endphp

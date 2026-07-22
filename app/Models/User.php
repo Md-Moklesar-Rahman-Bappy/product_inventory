@@ -58,10 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getFormattedMobileAttribute(): string
     {
         if (! $this->mobile) {
-            return '<span class="text-muted">—</span>';
+            return '';
         }
 
-        $code = $this->country_code ?? '880'; // fallback to Bangladesh
+        $code = $this->country_code ?? '880';
 
         return "+{$code} {$this->mobile}";
     }
@@ -69,7 +69,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public function getProfilePhotoUrlAttribute(): string
     {
         return $this->profile_photo_path && Storage::disk('public')->exists($this->profile_photo_path)
-            ? Storage::url($this->profile_photo_path)
+            ? Storage::disk('public')->url($this->profile_photo_path)
             : asset('images/default-profile.png');
     }
 

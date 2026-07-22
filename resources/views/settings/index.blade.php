@@ -96,7 +96,7 @@
                                 @if(!empty($settings['logo_path']))
                                     <div class="mt-2">
                                         <small class="text-muted">Current logo:</small>
-                                        <img src="{{ Storage::url($settings['logo_path']) }}" alt="Current Logo" 
+                                        <img src="{{ Storage::disk('public')->url($settings['logo_path']) }}" alt="Current Logo" 
                                             class="img-thumbnail" style="max-height: 60px;">
                                     </div>
                                 @endif
@@ -113,7 +113,7 @@
                                 @if(!empty($settings['favicon_path']))
                                     <div class="mt-2">
                                         <small class="text-muted">Current favicon:</small>
-                                        <img src="{{ Storage::url($settings['favicon_path']) }}" alt="Current Favicon" 
+                                        <img src="{{ Storage::disk('public')->url($settings['favicon_path']) }}" alt="Current Favicon" 
                                             class="img-thumbnail" style="max-height: 32px;">
                                     </div>
                                 @endif

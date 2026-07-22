@@ -51,7 +51,13 @@
                             </td>
                             <td>{{ $user->designation ?? '—' }}</td>
                             <td><span class="text-muted">{{ $user->email }}</span></td>
-                            <td>{{ $user->formatted_mobile ?? '—' }}</td>
+                            <td>
+                                @if($user->formatted_mobile)
+                                    {{ $user->formatted_mobile }}
+                                @else
+                                    <span class="text-muted">—</span>
+                                @endif
+                            </td>
                             <td>
                                 @php
                                     $roleClass = match($user->role_label) {
