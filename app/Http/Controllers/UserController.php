@@ -142,7 +142,7 @@ class UserController extends Controller
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
         ]);
 
-        if (auth()->id() === $user->id && auth()->user()->isSuperadmin() && $request->permission !== 0) {
+        if (auth()->id() === $user->id && auth()->user()->isSuperadmin() && $request->permission != 0) {
             return back()->withErrors(['permission' => 'You cannot demote your own Super Admin account.'])->withInput();
         }
 
