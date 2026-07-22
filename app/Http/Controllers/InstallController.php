@@ -182,7 +182,7 @@ class InstallController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'mobile' => 'nullable|string|max:20',
+            'mobile' => 'required|string|max:20',
             'password' => [
                 'required',
                 'confirmed',

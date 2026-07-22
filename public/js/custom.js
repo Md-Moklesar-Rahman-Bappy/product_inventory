@@ -66,23 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ===================================
-    // Sidebar Toggle - Only on mobile
-    // ===================================
-    window.toggleSidebar = function() {
-        if (window.innerWidth < 992) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            
-            if (sidebar) {
-                sidebar.classList.toggle('open');
-            }
-            if (overlay) {
-                overlay.classList.toggle('active');
-            }
-        }
-    };
-
-    // ===================================
     // Close sidebar on Escape key
     // ===================================
     document.addEventListener('keydown', function(e) {

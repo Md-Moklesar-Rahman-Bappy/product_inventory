@@ -373,8 +373,9 @@ body {
         transform: translateX(0);
     }
     
-    .main-content {
-        margin-left: 0;
+    .main-content,
+    .main-content.collapsed {
+        margin-left: 0 !important;
     }
     
     /* On mobile, don't use collapsed style */
@@ -387,11 +388,6 @@ body {
     .sidebar.collapsed .sidebar-footer .btn-logout span {
         display: inline;
     }
-}
-
-/* Collapsed state */
-.main-content.collapsed {
-    margin-left: var(--sidebar-collapsed);
 }
 
 /* ===================================
