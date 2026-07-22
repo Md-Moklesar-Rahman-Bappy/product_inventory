@@ -244,6 +244,9 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label-custom">Role / Permission</label>
                                     <select name="permission" class="form-select form-input" required>
+                                        @if(auth()->user()->permission === 0)
+                                        <option value="0" {{ old('permission', $user->permission) == 0 ? 'selected' : '' }}>Super Admin</option>
+                                        @endif
                                         <option value="1" {{ old('permission', $user->permission) == 1 ? 'selected' : '' }}>Admin</option>
                                         <option value="2" {{ old('permission', $user->permission) == 2 ? 'selected' : '' }}>User</option>
                                     </select>

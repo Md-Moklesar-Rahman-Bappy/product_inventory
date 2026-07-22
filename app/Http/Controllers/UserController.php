@@ -51,7 +51,7 @@ class UserController extends Controller
             'designation' => 'nullable|string|max:255',
             'about' => 'nullable|string',
             'address' => 'nullable|string',
-            'permission' => 'required|integer|min:0|max:2',
+            'permission' => 'required|integer|min:1|max:2',
             'profile_photo_path' => 'nullable|mimes:jpeg,jpg,png,gif,webp|max:2048',
         ], [
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
@@ -141,6 +141,10 @@ class UserController extends Controller
         ], [
             'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
         ]);
+
+        if (auth()->id() === $user->id && auth()->user()->isSuperadmin() && $request->permission !== 0) {
+            return back()->withErrors(['permission' => 'You cannot demote your own Super Admin account.'])->withInput();
+        }
 
         $user->fill([
             'name' => $request->name,
