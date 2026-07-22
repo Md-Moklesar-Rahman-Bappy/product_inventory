@@ -76,6 +76,7 @@
       border: 1px solid #e2e8f0;
       background-color: #f8fafc;
       transition: box-shadow 0.3s ease;
+      color: #1e293b;
     }
 
     .form-control:focus {
@@ -133,6 +134,10 @@
     footer {
       margin-top: 30px;
       font-size: 0.875rem;
+      color: #64748b;
+    }
+
+    .form-check-label {
       color: #64748b;
     }
   </style>

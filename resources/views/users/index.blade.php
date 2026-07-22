@@ -47,7 +47,7 @@
                         <tr>
                             <td class="ps-4 text-muted">{{ $loop->iteration }}</td>
                             <td>
-                                <div class="fw-semibold text-dark">{{ $user->name }}</div>
+                                <div class="fw-semibold">{{ $user->name }}</div>
                             </td>
                             <td>{{ $user->designation ?? '—' }}</td>
                             <td><span class="text-muted">{{ $user->email }}</span></td>

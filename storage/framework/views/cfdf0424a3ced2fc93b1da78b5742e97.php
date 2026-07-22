@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @php
+    <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
+    <?php
         $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
         $faviconPath = \App\Models\Setting::get('favicon_path');
         $faviconUrl = asset('favicon.ico');
@@ -12,12 +12,12 @@
             $faviconUrl = Storage::url($faviconPath);
         }
         $faviconUrl = $faviconUrl . '?v=' . filemtime(public_path('favicon.ico'));
-    @endphp
-    <title>{{ $appName }} - @yield('title', 'Dashboard')</title>
+    ?>
+    <title><?php echo e($appName); ?> - <?php echo $__env->yieldContent('title', 'Dashboard'); ?></title>
     
     <!-- Favicon - must be first -->
-    <link rel="shortcut icon" type="image/x-icon" href="{{ $faviconUrl }}">
-    <link rel="icon" href="{{ $faviconUrl }}" type="image/x-icon">
+    <link rel="shortcut icon" type="image/x-icon" href="<?php echo e($faviconUrl); ?>">
+    <link rel="icon" href="<?php echo e($faviconUrl); ?>" type="image/x-icon">
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -32,10 +32,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+    <link rel="stylesheet" href="<?php echo e(asset('css/custom.css')); ?>">
     
     <!-- Page-specific styles -->
-    @stack('styles')
+    <?php echo $__env->yieldPushContent('styles'); ?>
 </head>
 <body>
     <!-- Mobile Overlay -->
@@ -44,9 +44,9 @@
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <a href="{{ route('dashboard') }}" class="brand">
+            <a href="<?php echo e(route('dashboard')); ?>" class="brand">
                 <i class="bi bi-box-seam-fill"></i>
-                <span>{{ $appName }}</span>
+                <span><?php echo e($appName); ?></span>
             </a>
             <button class="close-btn d-md-none" onclick="toggleSidebar()">
                 <i class="bi bi-x-lg"></i>
@@ -55,86 +55,86 @@
         
         <nav class="sidebar-nav">
             <ul class="nav flex-column">
-                {{-- Dashboard --}}
+                
                 <li class="nav-item">
-                    <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('dashboard')); ?>" class="nav-link <?php echo e(request()->routeIs('dashboard') ? 'active' : ''); ?>">
                         <i class="bi bi-grid-1x2"></i>
                         <span>Dashboard</span>
                     </a>
                 </li>
                 
-                {{-- Activity Log --}}
+                
                 <li class="nav-item">
-                    <a href="{{ route('activity.logs') }}" class="nav-link {{ request()->routeIs('activity.logs') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('activity.logs')); ?>" class="nav-link <?php echo e(request()->routeIs('activity.logs') ? 'active' : ''); ?>">
                         <i class="bi bi-clock-history"></i>
                         <span>Activity Log</span>
                     </a>
                 </li>
                 
-                {{-- Categories, Brands, Models, Products (Admin only) --}}
-                @if(in_array(auth()->user()->permission, [0, 1]))
+                
+                <?php if(in_array(auth()->user()->permission, [0, 1])): ?>
                 <li class="nav-item">
-                    <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('categories.index')); ?>" class="nav-link <?php echo e(request()->routeIs('categories.*') ? 'active' : ''); ?>">
                         <i class="bi bi-tags"></i>
                         <span>Categories</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('brands.index') }}" class="nav-link {{ request()->routeIs('brands.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('brands.index')); ?>" class="nav-link <?php echo e(request()->routeIs('brands.*') ? 'active' : ''); ?>">
                         <i class="bi bi-award"></i>
                         <span>Brands</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('models.index') }}" class="nav-link {{ request()->routeIs('models.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('models.index')); ?>" class="nav-link <?php echo e(request()->routeIs('models.*') ? 'active' : ''); ?>">
                         <i class="bi bi-layers"></i>
                         <span>Models</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('products.index')); ?>" class="nav-link <?php echo e(request()->routeIs('products.*') ? 'active' : ''); ?>">
                         <i class="bi bi-box"></i>
                         <span>Products</span>
                     </a>
                 </li>
                 
-                {{-- Warranty --}}
+                
                 <li class="nav-item">
-                    <a href="{{ route('warranties.index') }}" class="nav-link {{ request()->routeIs('warranties.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('warranties.index')); ?>" class="nav-link <?php echo e(request()->routeIs('warranties.*') ? 'active' : ''); ?>">
                         <i class="bi bi-shield-check"></i>
                         <span>Warranty</span>
                     </a>
                 </li>
                 
-                {{-- Maintenance --}}
+                
                 <li class="nav-item">
-                    <a href="{{ route('maintenance.index') }}" class="nav-link {{ request()->routeIs('maintenance.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('maintenance.index')); ?>" class="nav-link <?php echo e(request()->routeIs('maintenance.*') ? 'active' : ''); ?>">
                         <i class="bi bi-tools"></i>
                         <span>Maintenance</span>
                     </a>
                 </li>
-                @endif
+                <?php endif; ?>
                 
-                {{-- Manage Users (Superadmin only) --}}
-                @if(auth()->user()->permission === 0)
+                
+                <?php if(auth()->user()->permission === 0): ?>
                 <li class="nav-item">
-                    <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('users.index')); ?>" class="nav-link <?php echo e(request()->routeIs('users.*') ? 'active' : ''); ?>">
                         <i class="bi bi-person-plus"></i>
                         <span>Manage Users</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ route('settings.index') }}" class="nav-link {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                    <a href="<?php echo e(route('settings.index')); ?>" class="nav-link <?php echo e(request()->routeIs('settings.*') ? 'active' : ''); ?>">
                         <i class="bi bi-gear"></i>
                         <span>Application Settings</span>
                     </a>
                 </li>
-                @endif
+                <?php endif; ?>
                 
-                {{-- Profile --}}
+                
                 <li class="nav-item">
-                    <a href="{{ route('profile') }}" class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
-                        <img src="{{ auth()->user()->profile_photo_url }}" alt="Profile" class="user-avatar-sm">
+                    <a href="<?php echo e(route('profile')); ?>" class="nav-link <?php echo e(request()->routeIs('profile') ? 'active' : ''); ?>">
+                        <img src="<?php echo e(auth()->user()->profile_photo_url); ?>" alt="Profile" class="user-avatar-sm">
                         <span>Profile</span>
                     </a>
                 </li>
@@ -142,8 +142,8 @@
         </nav>
         
         <div class="sidebar-footer">
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('logout')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <button type="submit" class="btn btn-logout">
                     <i class="bi bi-box-arrow-right"></i>
                     <span>Logout</span>
@@ -164,12 +164,12 @@
                         </button>
                     </div>
                     <div class="col">
-                        <h1 class="page-title">@yield('title', 'Dashboard')</h1>
+                        <h1 class="page-title"><?php echo $__env->yieldContent('title', 'Dashboard'); ?></h1>
                     </div>
                     <div class="col-auto d-flex align-items-center gap-2">
                         <!-- Global Search -->
                         <div class="global-search d-none d-lg-block">
-                            <form action="{{ route('products.index') }}" method="GET" class="d-flex">
+                            <form action="<?php echo e(route('products.index')); ?>" method="GET" class="d-flex">
                                 <input type="text" name="search" class="form-control form-control-sm" 
                                     placeholder="Search products..." 
                                     style="width: 200px; border-radius: 20px 0 0 20px;">
@@ -183,15 +183,15 @@
                         <!-- User Menu -->
                             <div class="dropdown">
                                 <button class="btn user-btn dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                                    <img src="{{ auth()->user()->profile_photo_url }}" alt="Profile" class="user-avatar">
-                                    <span class="user-name d-none d-md-inline">{{ auth()->user()->name }}</span>
+                                    <img src="<?php echo e(auth()->user()->profile_photo_url); ?>" alt="Profile" class="user-avatar">
+                                    <span class="user-name d-none d-md-inline"><?php echo e(auth()->user()->name); ?></span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{{ route('profile') }}"><i class="bi bi-person"></i> Profile</a></li>
+                                    <li><a class="dropdown-item" href="<?php echo e(route('profile')); ?>"><i class="bi bi-person"></i> Profile</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <form action="{{ route('logout') }}" method="POST">
-                                            @csrf
+                                        <form action="<?php echo e(route('logout')); ?>" method="POST">
+                                            <?php echo csrf_field(); ?>
                                             <button type="submit" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right"></i> Logout</button>
                                         </form>
                                     </li>
@@ -206,7 +206,7 @@
         <!-- Page Content -->
         <div class="page-content">
             <div class="container-fluid">
-                @yield('contents')
+                <?php echo $__env->yieldContent('contents'); ?>
             </div>
         </div>
 
@@ -219,38 +219,41 @@
                             <i class="fas fa-calendar-alt me-1 text-primary"></i>
                             <span id="datetime"></span>
                         </p>
-                        @php
+                        <?php
                             $address = \App\Models\Setting::get('address');
-                        @endphp
-                        @if($address)
+                        ?>
+                        <?php if($address): ?>
                             <p class="mb-0 small text-muted mt-1">
                                 <i class="fas fa-map-marker-alt me-1 text-primary"></i>
-                                {{ $address }}
+                                <?php echo e($address); ?>
+
                             </p>
-                        @endif
+                        <?php endif; ?>
                     </div>
                     <div class="col-md-6 text-md-end">
-                        @php
+                        <?php
                             $website = \App\Models\Setting::get('website');
                             $footerCredit = \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project');
                             $phone = \App\Models\Setting::get('phone');
                             $email = \App\Models\Setting::get('email');
-                        @endphp
-                        @if($website)
-                            <a href="{{ $website }}" target="_blank" class="text-muted text-decoration-none me-3">{{ $footerCredit }}</a>
-                        @else
-                            <span class="text-muted me-3">{{ $footerCredit }}</span>
-                        @endif
-                        @if($phone)
-                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-muted text-decoration-none me-3">
-                                <i class="fas fa-phone-alt me-1"></i>{{ $phone }}
+                        ?>
+                        <?php if($website): ?>
+                            <a href="<?php echo e($website); ?>" target="_blank" class="text-muted text-decoration-none me-3"><?php echo e($footerCredit); ?></a>
+                        <?php else: ?>
+                            <span class="text-muted me-3"><?php echo e($footerCredit); ?></span>
+                        <?php endif; ?>
+                        <?php if($phone): ?>
+                            <a href="tel:<?php echo e(preg_replace('/[^0-9+]/', '', $phone)); ?>" class="text-muted text-decoration-none me-3">
+                                <i class="fas fa-phone-alt me-1"></i><?php echo e($phone); ?>
+
                             </a>
-                        @endif
-                        @if($email)
-                            <a href="mailto:{{ $email }}" class="text-muted text-decoration-none">
-                                <i class="fas fa-envelope me-1"></i>{{ $email }}
+                        <?php endif; ?>
+                        <?php if($email): ?>
+                            <a href="mailto:<?php echo e($email); ?>" class="text-muted text-decoration-none">
+                                <i class="fas fa-envelope me-1"></i><?php echo e($email); ?>
+
                             </a>
-                        @endif
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -307,7 +310,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
     <!-- Custom Scripts -->
-    <script src="{{ asset('js/custom.js') }}"></script>
+    <script src="<?php echo e(asset('js/custom.js')); ?>"></script>
     
     <script>
         // Toggle Sidebar - Collapse/Expand
@@ -378,24 +381,24 @@
         
         // Display Toastr notifications from session
         document.addEventListener('DOMContentLoaded', function() {
-            @if(session('success'))
-                toastr.success('{{ strip_tags(session('success')) }}', 'Success');
-            @endif
+            <?php if(session('success')): ?>
+                toastr.success('<?php echo e(strip_tags(session('success'))); ?>', 'Success');
+            <?php endif; ?>
             
-            @if(session('error'))
-                toastr.error('{{ strip_tags(session('error')) }}', 'Error');
-            @endif
+            <?php if(session('error')): ?>
+                toastr.error('<?php echo e(strip_tags(session('error'))); ?>', 'Error');
+            <?php endif; ?>
             
-            @if(session('warning'))
-                toastr.warning('{{ strip_tags(session('warning')) }}', 'Warning');
-            @endif
+            <?php if(session('warning')): ?>
+                toastr.warning('<?php echo e(strip_tags(session('warning'))); ?>', 'Warning');
+            <?php endif; ?>
             
-            @if(session('message'))
-                toastr.info('{{ strip_tags(session('message')) }}', 'Info');
-            @endif
+            <?php if(session('message')): ?>
+                toastr.info('<?php echo e(strip_tags(session('message'))); ?>', 'Info');
+            <?php endif; ?>
         });
     </script>
     
-    @stack('scripts')
+    <?php echo $__env->yieldPushContent('scripts'); ?>
 </body>
-</html>
+</html><?php /**PATH C:\xampp\htdocs\bug-fixes\resources\views/layouts/app.blade.php ENDPATH**/ ?>

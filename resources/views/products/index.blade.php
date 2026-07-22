@@ -138,7 +138,7 @@
                                     @foreach(Session::get('skippedRows') as $row)
                                     <tr>
                                         <td><span class="badge bg-warning text-dark">{{ $row['skip_reason'] ?? 'Unknown' }}</span></td>
-                                        <td>{{ $row['product_name'] ?? 'N/A' }}</td>
+                                        <td class="text-dark">{{ $row['product_name'] ?? 'N/A' }}</td>
                                         <td><code>{{ $row['serial_no'] ?? 'N/A' }}</code></td>
                                     </tr>
                                     @endforeach

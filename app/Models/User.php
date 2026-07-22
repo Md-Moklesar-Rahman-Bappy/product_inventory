@@ -26,12 +26,14 @@ class User extends Authenticatable implements MustVerifyEmail
         'about',
         'address',
         'profile_photo_path',
+        'permission',
+        'utype',
+        'status',
     ];
 
     // ──────── Guarded Fields (Mass Assignment Protection) ─────────
     protected $guarded = [
         'id',
-        'permission',
         'utype',
         'initial_password',
         'credentials_sent_at',

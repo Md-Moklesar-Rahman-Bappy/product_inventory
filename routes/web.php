@@ -68,7 +68,8 @@ Route::middleware(['auth'])->group(function () {
 
     // 👤 Users (Admin/Superadmin management)
     Route::middleware(['auth', 'isAdmin'])->group(function () {
-        Route::resource('users', UserController::class);
+        Route::resource('users', UserController::class)->except(['show']);
+        Route::get('users/{user}/show', [UserController::class, 'show'])->name('users.show')->middleware('isSuperadmin');
         Route::post('users/{id}/restore', [UserController::class, 'restore'])->name('users.restore')->middleware('isSuperadmin');
         Route::patch('users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggleStatus')->middleware('isSuperadmin');
     });

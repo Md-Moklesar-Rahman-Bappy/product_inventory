@@ -1,14 +1,12 @@
-@extends('layouts.app')
+<?php $__env->startSection('title', 'Dashboard'); ?>
 
-@section('title', 'Dashboard')
-
-@section('contents')
+<?php $__env->startSection('contents'); ?>
 <div class="dashboard-container">
   <!-- Welcome Section -->
   <div class="welcome-section mb-4">
     <div class="welcome-content">
       <div class="welcome-text">
-        <h4 class="welcome-title">Welcome back, {{ auth()->user()->name }}! 👋</h4>
+        <h4 class="welcome-title">Welcome back, <?php echo e(auth()->user()->name); ?>! 👋</h4>
         <p class="welcome-subtitle">Here's what's happening with your inventory today.</p>
       </div>
       <div class="welcome-badge">
@@ -21,8 +19,8 @@
 
   <!-- Stats Cards -->
   <div class="stats-grid">
-    @foreach($entityCounts as $label => $count)
-      @php
+    <?php $__currentLoopData = $entityCounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $label => $count): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+      <?php
         $routeMap = [
           'Categories' => 'categories.index',
           'Brands' => 'brands.index',
@@ -50,18 +48,18 @@
         $route = $routeMap[$label] ?? '#';
         $icon = $iconMap[$label] ?? 'bi-box';
         $colors = $colorMap[$label] ?? ['#6366f1', '#818cf8'];
-      @endphp
+      ?>
 
-      <a href="{{ route($route) }}" class="stat-card">
-        <div class="stat-icon" style="background: linear-gradient(135deg, {{ $colors[0] }}, {{ $colors[1] }});">
-          <i class="bi {{ $icon }}"></i>
+      <a href="<?php echo e(route($route)); ?>" class="stat-card">
+        <div class="stat-icon" style="background: linear-gradient(135deg, <?php echo e($colors[0]); ?>, <?php echo e($colors[1]); ?>);">
+          <i class="bi <?php echo e($icon); ?>"></i>
         </div>
         <div class="stat-info">
-          <span class="stat-value">{{ $count }}</span>
-          <span class="stat-label">{{ $label }}</span>
+          <span class="stat-value"><?php echo e($count); ?></span>
+          <span class="stat-label"><?php echo e($label); ?></span>
         </div>
       </a>
-    @endforeach
+    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
   </div>
 
   <!-- Charts Section -->
@@ -82,8 +80,8 @@
         <canvas id="entityChart"></canvas>
       </div>
       <div class="chart-legend">
-        @foreach($entityCounts as $label => $count)
-          @php
+        <?php $__currentLoopData = $entityCounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $label => $count): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+          <?php
             $colorMap = [
               'Categories' => '#6366f1',
               'Brands' => '#ec4899',
@@ -92,12 +90,13 @@
               'Maintenance' => '#f59e0b',
               'Warranty' => '#10b981',
             ];
-          @endphp
+          ?>
           <span class="legend-item">
-            <span class="legend-dot" style="background: {{ $colorMap[$label] ?? '#6366f1' }}"></span>
-            {{ $label }}
+            <span class="legend-dot" style="background: <?php echo e($colorMap[$label] ?? '#6366f1'); ?>"></span>
+            <?php echo e($label); ?>
+
           </span>
-        @endforeach
+        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
       </div>
     </div>
 
@@ -147,39 +146,39 @@
           </div>
           <div class="widget-body">
             <div class="quick-actions-grid">
-              @if(auth()->user()->permission <= 1)
-              <a href="{{ route('products.create') }}" class="quick-action-item">
+              <?php if(auth()->user()->permission <= 1): ?>
+              <a href="<?php echo e(route('products.create')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #3b82f6, #60a5fa);">
                   <i class="bi bi-plus-lg"></i>
                 </div>
                 <span>Add Product</span>
               </a>
-              <a href="{{ route('categories.create') }}" class="quick-action-item">
+              <a href="<?php echo e(route('categories.create')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #6366f1, #818cf8);">
                   <i class="bi bi-tag"></i>
                 </div>
                 <span>Category</span>
               </a>
-              <a href="{{ route('brands.create') }}" class="quick-action-item">
+              <a href="<?php echo e(route('brands.create')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #ec4899, #f472b6);">
                   <i class="bi bi-award"></i>
                 </div>
                 <span>Brand</span>
               </a>
-              <a href="{{ route('users.create') }}" class="quick-action-item">
+              <a href="<?php echo e(route('users.create')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #10b981, #34d399);">
                   <i class="bi bi-person-plus"></i>
                 </div>
                 <span>Add User</span>
               </a>
-              @endif
-              <a href="{{ route('warranties.index') }}" class="quick-action-item">
+              <?php endif; ?>
+              <a href="<?php echo e(route('warranties.index')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
                   <i class="bi bi-shield-check"></i>
                 </div>
                 <span>Warranties</span>
               </a>
-              <a href="{{ route('maintenance.index') }}" class="quick-action-item">
+              <a href="<?php echo e(route('maintenance.index')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #14b8a6, #5eead4);">
                   <i class="bi bi-tools"></i>
                 </div>
@@ -203,51 +202,51 @@
                 <small class="text-muted">Notifications</small>
               </div>
             </div>
-            @if($expiringWarranties->count() + $pendingMaintenance->count() > 0)
-            <span class="badge-alert">{{ $expiringWarranties->count() + $pendingMaintenance->count() }}</span>
-            @endif
+            <?php if($expiringWarranties->count() + $pendingMaintenance->count() > 0): ?>
+            <span class="badge-alert"><?php echo e($expiringWarranties->count() + $pendingMaintenance->count()); ?></span>
+            <?php endif; ?>
           </div>
           <div class="widget-body">
-            @if($expiringWarranties->count() > 0)
+            <?php if($expiringWarranties->count() > 0): ?>
             <div class="alert-group">
               <h6 class="group-title"><i class="bi bi-clock me-1"></i>Expiring Warranties</h6>
-              @foreach($expiringWarranties as $product)
-              <a href="{{ route('products.show', $product->id) }}" class="alert-list-item">
+              <?php $__currentLoopData = $expiringWarranties; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <a href="<?php echo e(route('products.show', $product->id)); ?>" class="alert-list-item">
                 <div class="list-icon" style="background: #fef3c7;">
                   <i class="bi bi-shield-exclamation text-warning"></i>
                 </div>
                 <div class="list-content">
-                  <span class="list-text">{{ $product->product_name }}</span>
-                  <span class="list-meta">{{ $product->warranty_end->format('d M Y') }}</span>
+                  <span class="list-text"><?php echo e($product->product_name); ?></span>
+                  <span class="list-meta"><?php echo e($product->warranty_end->format('d M Y')); ?></span>
                 </div>
               </a>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-            @endif
+            <?php endif; ?>
 
-            @if($pendingMaintenance->count() > 0)
+            <?php if($pendingMaintenance->count() > 0): ?>
             <div class="alert-group">
               <h6 class="group-title"><i class="bi bi-tools me-1"></i>Ongoing Maintenance</h6>
-              @foreach($pendingMaintenance as $m)
-              <a href="{{ route('maintenance.show', $m->id) }}" class="alert-list-item">
+              <?php $__currentLoopData = $pendingMaintenance; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $m): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+              <a href="<?php echo e(route('maintenance.show', $m->id)); ?>" class="alert-list-item">
                 <div class="list-icon" style="background: #e0f2fe;">
                   <i class="bi bi-wrench text-info"></i>
                 </div>
                 <div class="list-content">
-                  <span class="list-text">{{ $m->product->product_name ?? 'N/A' }}</span>
-                  <span class="list-meta">{{ $m->end_time->format('d M Y') }}</span>
+                  <span class="list-text"><?php echo e($m->product->product_name ?? 'N/A'); ?></span>
+                  <span class="list-meta"><?php echo e($m->end_time->format('d M Y')); ?></span>
                 </div>
               </a>
-              @endforeach
+              <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
             </div>
-            @endif
+            <?php endif; ?>
 
-            @if($expiringWarranties->count() == 0 && $pendingMaintenance->count() == 0)
+            <?php if($expiringWarranties->count() == 0 && $pendingMaintenance->count() == 0): ?>
             <div class="empty-state">
               <i class="bi bi-check-circle"></i>
               <span>All clear!</span>
             </div>
-            @endif
+            <?php endif; ?>
           </div>
         </div>
       </div>
@@ -267,25 +266,25 @@
             </div>
           </div>
           <div class="widget-body">
-            @forelse($recentProducts as $product)
-            <a href="{{ route('products.show', $product->id) }}" class="recent-list-item">
+            <?php $__empty_1 = true; $__currentLoopData = $recentProducts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $product): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+            <a href="<?php echo e(route('products.show', $product->id)); ?>" class="recent-list-item">
               <div class="list-icon" style="background: #e0e7ff;">
                 <i class="bi bi-box text-primary"></i>
               </div>
               <div class="list-content">
-                <span class="list-text">{{ $product->product_name }}</span>
-                <span class="list-meta">{{ $product->created_at->diffForHumans() }}</span>
+                <span class="list-text"><?php echo e($product->product_name); ?></span>
+                <span class="list-meta"><?php echo e($product->created_at->diffForHumans()); ?></span>
               </div>
             </a>
-            @empty
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
             <div class="empty-state">
               <i class="bi bi-inbox"></i>
               <span>No products yet</span>
             </div>
-            @endforelse
-            @if($recentProducts->count() > 0)
-            <a href="{{ route('products.index') }}" class="widget-footer-link">View all products →</a>
-            @endif
+            <?php endif; ?>
+            <?php if($recentProducts->count() > 0): ?>
+            <a href="<?php echo e(route('products.index')); ?>" class="widget-footer-link">View all products →</a>
+            <?php endif; ?>
           </div>
         </div>
       </div>
@@ -308,9 +307,9 @@
     </div>
   </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('styles')
+<?php $__env->startPush('styles'); ?>
 <style>
   .dashboard-container {
     padding: 0;
@@ -715,9 +714,9 @@
     }
   }
 </style>
-@endpush
+<?php $__env->stopPush(); ?>
 
-@push('scripts')
+<?php $__env->startPush('scripts'); ?>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   const entityColors = ['#6366f1', '#ec4899', '#14b8a6', '#3b82f6', '#f59e0b', '#10b981'];
@@ -729,9 +728,9 @@
     entityChart = new Chart(entityCtx, {
       type: type,
       data: {
-        labels: {!! json_encode(array_keys($entityCounts)) !!},
+        labels: <?php echo json_encode(array_keys($entityCounts)); ?>,
         datasets: [{
-          data: {!! json_encode(array_values($entityCounts)) !!},
+          data: <?php echo json_encode(array_values($entityCounts)); ?>,
           backgroundColor: entityColors,
           borderWidth: 0,
           hoverOffset: 8
@@ -772,9 +771,10 @@
       labels: ['Active', 'Expiring Soon', 'Expired'],
       datasets: [{
         data: [
-          {{ $warrantyBreakdown['Active'] ?? 0 }},
-          {{ $warrantyBreakdown['Expiring Soon'] ?? 0 }},
-          {{ $warrantyBreakdown['Expired'] ?? 0 }}
+          <?php echo e($warrantyBreakdown['Active'] ?? 0); ?>,
+          <?php echo e($warrantyBreakdown['Expiring Soon'] ?? 0); ?>,
+          <?php echo e($warrantyBreakdown['Expired'] ?? 0); ?>
+
         ],
         backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
         borderRadius: 8,
@@ -811,10 +811,10 @@
   new Chart(document.getElementById('trendChart').getContext('2d'), {
     type: 'line',
     data: {
-      labels: {!! json_encode(array_column($productTrend, 'month')) !!},
+      labels: <?php echo json_encode(array_column($productTrend, 'month')); ?>,
       datasets: [{
         label: 'Products Added',
-        data: {!! json_encode(array_column($productTrend, 'count')) !!},
+        data: <?php echo json_encode(array_column($productTrend, 'count')); ?>,
         borderColor: '#6366f1',
         backgroundColor: 'rgba(99, 102, 241, 0.1)',
         fill: true,
@@ -854,4 +854,6 @@
     }
   });
 </script>
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\bug-fixes\resources\views/dashboard.blade.php ENDPATH**/ ?>

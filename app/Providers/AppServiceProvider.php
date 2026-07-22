@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use App\Models\User;
 use App\Policies\BrandPolicy;
 use App\Policies\CategoryPolicy;
@@ -36,6 +37,17 @@ class AppServiceProvider extends ServiceProvider
 
         Paginator::defaultView('vendor.pagination.bootstrap-5');
         Paginator::defaultSimpleView('vendor.pagination.simple-bootstrap-5');
+
+        // Set dynamic mail "from" address from settings
+        if (Schema::hasTable('settings')) {
+            $appName = Setting::get('app_name', 'Product Inventory');
+            $email = Setting::get('email', 'noreply@example.com');
+
+            config([
+                'mail.from.name' => $appName,
+                'mail.from.address' => $email,
+            ]);
+        }
     }
 
     protected function configureSessionForInstall(): void

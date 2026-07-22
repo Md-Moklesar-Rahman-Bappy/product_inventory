@@ -119,8 +119,8 @@
                                     <div class="empty-icon">
                                         <i class="bi bi-clock-history"></i>
                                     </div>
-                                    <h6 class="fw-bold text-dark mt-3">No Activity Found</h6>
-                                    <p class="text-muted mb-0">Start interacting with the system to generate logs</p>
+                                    <h6 class="fw-bold">No Activity Found</h6>
+                                    <p class="mb-0">Start interacting with the system to generate logs</p>
                                 </div>
                             </td>
                         </tr>

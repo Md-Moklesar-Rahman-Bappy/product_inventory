@@ -29,6 +29,26 @@
         font-size: 1.5rem;
     }
 
+    .detail-section {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 16px;
+    }
+
+    .section-header {
+        margin-bottom: 16px;
+    }
+
+    .section-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
     .profile-section img {
         width: 150px;
         height: 150px;
