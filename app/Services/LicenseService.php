@@ -14,6 +14,7 @@ class LicenseService
     protected int $checkInterval;
     protected int $offlineGraceDays;
     protected int $requestTimeout;
+    protected string $apiKey;
 
     public function __construct()
     {
@@ -23,6 +24,21 @@ class LicenseService
         $this->checkInterval = config('license.check_interval_days');
         $this->offlineGraceDays = config('license.offline_grace_days');
         $this->requestTimeout = config('license.request_timeout');
+        $this->apiKey = config('license.api_key', '');
+    }
+
+    protected function apiHeaders(): array
+    {
+        $headers = [
+            'Accept' => 'application/json',
+            'Content-Type' => 'application/json',
+        ];
+
+        if (!empty($this->apiKey)) {
+            $headers['X-API-Key'] = $this->apiKey;
+        }
+
+        return $headers;
     }
 
     public function getMachineId(): string
@@ -80,6 +96,7 @@ class LicenseService
             ]);
 
             $response = Http::timeout($this->requestTimeout)
+                ->withHeaders($this->apiHeaders())
                 ->retry(2, 500)
                 ->post($url, $payload);
 
@@ -260,6 +277,7 @@ class LicenseService
 
         try {
             $response = Http::timeout($this->requestTimeout)
+                ->withHeaders($this->apiHeaders())
                 ->retry(2, 1000)
                 ->post($url, $payload);
 

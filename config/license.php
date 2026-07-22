@@ -126,4 +126,16 @@ return [
 
     'api_key' => env('LICENSE_API_KEY', ''),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Signature Verification
+    |--------------------------------------------------------------------------
+    |
+    | The server signs active responses with HMAC SHA256 using its private
+    | LICENSE_SIGNING_SECRET. The client stores this signature for audit
+    | purposes but does NOT verify it — the signing secret never leaves
+    | the server. Client-side tamper detection uses APP_KEY instead.
+    |
+    */
+
 ];
