@@ -3,11 +3,14 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/pail
 /vendor
 /.env
 /.env.backup
 /.env.production
 /.phpunit.result.cache
+/.phpunit.cache
+/.php-cs-fixer.cache
 /.sonar
 Homestead.json
 Homestead.yaml
@@ -16,6 +19,11 @@ npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
+/.nova
 /.vscode
-
+/.zed
+*.log
+.DS_Store
+Thumbs.db
+audit-report.json
 
