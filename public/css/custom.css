@@ -340,57 +340,6 @@ body {
 }
 
 /* ===================================
-   Responsive Styles
-   =================================== */
-@media (min-width: 992px) {
-    /* Desktop: sidebar always visible, toggle between expanded/collapsed */
-    .sidebar {
-        transform: none !important;
-        width: var(--sidebar-width);
-    }
-    
-    .sidebar.collapsed {
-        width: var(--sidebar-collapsed);
-    }
-    
-    .main-content {
-        margin-left: var(--sidebar-width);
-    }
-    
-    .main-content.collapsed {
-        margin-left: var(--sidebar-collapsed);
-    }
-}
-
-@media (max-width: 991.98px) {
-    /* Mobile: sidebar slides in/out */
-    .sidebar {
-        transform: translateX(-100%);
-        width: var(--sidebar-width);
-    }
-    
-    .sidebar.open {
-        transform: translateX(0);
-    }
-    
-    .main-content,
-    .main-content.collapsed {
-        margin-left: 0 !important;
-    }
-    
-    /* On mobile, don't use collapsed style */
-    .sidebar.collapsed {
-        width: var(--sidebar-width);
-    }
-    
-    .sidebar.collapsed .sidebar-header .brand span,
-    .sidebar.collapsed .sidebar-nav .nav-link span,
-    .sidebar.collapsed .sidebar-footer .btn-logout span {
-        display: inline;
-    }
-}
-
-/* ===================================
    Top Navbar
    =================================== */
 .top-navbar {
@@ -399,7 +348,7 @@ body {
     padding: 0.75rem 1.5rem;
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1020;
 }
 
 .top-navbar .toggle-btn {
@@ -651,8 +600,9 @@ body {
         transform: translateX(0);
     }
     
-    .main-content {
-        margin-left: 0;
+    .main-content,
+    .main-content.collapsed {
+        margin-left: 0 !important;
     }
     
     /* On mobile, collapsed means hidden, so show full sidebar when opened */
@@ -679,6 +629,63 @@ body {
     .table-custom {
         display: block;
         overflow-x: auto;
+    }
+
+    .table-header-section {
+        padding: 16px;
+    }
+
+    .table-header-section h5 {
+        font-size: 1rem;
+    }
+
+    .table-header-section small {
+        font-size: 0.75rem;
+    }
+
+    .table td, .table th {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+
+    .action-buttons {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .action-btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    .import-section .d-flex {
+        flex-wrap: wrap;
+    }
+
+    .import-section .form-control {
+        max-width: 100% !important;
+    }
+
+    .filter-card {
+        margin-left: 0.5rem !important;
+        margin-right: 0.5rem !important;
+    }
+
+    .stat-card {
+        padding: 14px;
+    }
+
+    .stat-icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .search-box {
+        max-width: 100%;
     }
 }
 
