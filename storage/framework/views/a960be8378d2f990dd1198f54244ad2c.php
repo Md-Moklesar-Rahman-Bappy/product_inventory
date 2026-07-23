@@ -165,12 +165,14 @@
                 </div>
                 <span>Brand</span>
               </a>
+              <?php if(auth()->user()->permission === 0): ?>
               <a href="<?php echo e(route('users.create')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #10b981, #34d399);">
                   <i class="bi bi-person-plus"></i>
                 </div>
                 <span>Add User</span>
               </a>
+              <?php endif; ?>
               <?php endif; ?>
               <a href="<?php echo e(route('warranties.index')); ?>" class="quick-action-item">
                 <div class="action-icon-wrapper" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">

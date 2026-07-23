@@ -7,11 +7,15 @@
     <?php
         $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
         $faviconPath = \App\Models\Setting::get('favicon_path');
-        $faviconUrl = asset('favicon.ico');
         if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
             $faviconUrl = Storage::disk('public')->url($faviconPath);
+        } else {
+            $faviconUrl = asset('favicon.ico');
         }
-        $faviconUrl = $faviconUrl . '?v=' . filemtime(public_path('favicon.ico'));
+        $faviconFile = !empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)
+            ? Storage::disk('public')->path($faviconPath)
+            : public_path('favicon.ico');
+        $faviconUrl .= '?v=' . (file_exists($faviconFile) ? filemtime($faviconFile) : time());
     ?>
     <title><?php echo e($appName); ?> - <?php echo $__env->yieldContent('title', 'Dashboard'); ?></title>
     
