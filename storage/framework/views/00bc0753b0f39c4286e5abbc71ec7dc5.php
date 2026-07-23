@@ -85,4 +85,4 @@
         </nav>
     </div>
 <?php endif; ?>
-<?php /**PATH D:\Xammp\htdocs\bug-fixes v3\product_inventory\resources\views\vendor\pagination\bootstrap-5.blade.php ENDPATH**/ ?>
+<?php /**PATH D:\Xammp\htdocs\bug-fixes v3\product_inventory\resources\views/vendor/pagination/bootstrap-5.blade.php ENDPATH**/ ?>

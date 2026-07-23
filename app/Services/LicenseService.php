@@ -276,7 +276,7 @@ class LicenseService
         ]);
 
         try {
-            $response = Http::timeout($this->requestTimeout)
+            $response = Http::timeout(5)
                 ->withHeaders($this->apiHeaders())
                 ->retry(2, 1000)
                 ->post($url, $payload);
@@ -315,7 +315,7 @@ class LicenseService
 
             $statuses = ['inactive', 'expired', 'revoked'];
             if (in_array($data['status'], $statuses)) {
-                $this->writeLicenseCache([
+                $updatedCache = [
                     'license_key' => $cache['license_key'],
                     'site_url' => $cache['site_url'],
                     'machine_id' => $cache['machine_id'],
@@ -324,7 +324,9 @@ class LicenseService
                     'last_check' => now()->toDateTimeString(),
                     'signature' => $data['signature'] ?? $cache['signature'],
                     'checksum' => '',
-                ]);
+                ];
+                $updatedCache['checksum'] = $this->computeChecksum($updatedCache);
+                $this->writeLicenseCache($updatedCache);
 
                 Log::info('Remote license status updated', ['status' => $data['status']]);
 
@@ -445,13 +447,7 @@ class LicenseService
 
     public function shouldRecheckRemote(array $cache): bool
     {
-        if (empty($cache['last_check'])) {
-            return true;
-        }
-
-        $lastCheck = \Carbon\Carbon::parse($cache['last_check']);
-
-        return $lastCheck->diffInDays(now()) >= $this->checkInterval;
+        return true;
     }
 
     protected function isWithinGracePeriod(array $cache): bool
