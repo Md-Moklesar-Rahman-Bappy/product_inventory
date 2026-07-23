@@ -88,13 +88,16 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $appName = Setting::get('app_name', 'Product Inventory');
-            $email = Setting::get('email', 'noreply@example.com');
+            $appName = Setting::get('app_name');
+            $email = Setting::get('email');
 
-            config([
-                'mail.from.name' => $appName,
-                'mail.from.address' => $email,
-            ]);
+            if ($appName !== null && $appName !== '') {
+                config(['mail.from.name' => $appName]);
+            }
+
+            if ($email !== null && $email !== '') {
+                config(['mail.from.address' => $email]);
+            }
         } catch (\Exception $e) {
             // Silently skip during install, migrate, or when DB is not ready
         }

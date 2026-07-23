@@ -228,9 +228,25 @@ class InstallController extends Controller
             $user->permission = 0;
             $user->utype = 'SA';
             $user->status = 'active';
+            $user->email_verified_at = now();
             $user->save();
 
-            $user->sendEmailVerificationNotification();
+            $mailWarning = null;
+            try {
+                $user->sendEmailVerificationNotification();
+            } catch (\Exception $mailEx) {
+                $mailWarning = 'Email verification could not be sent. '
+                    . 'You can resend it after login once email is configured. '
+                    . 'Technical: ' . $mailEx->getMessage();
+
+                Log::warning('Mail failed during installation - continuing anyway', [
+                    'mail_host' => config('mail.mailers.smtp.host', 'not set'),
+                    'mail_port' => config('mail.mailers.smtp.port', 'not set'),
+                    'mail_username' => config('mail.mailers.smtp.username', 'not set'),
+                    'exception_class' => get_class($mailEx),
+                    'error' => $mailEx->getMessage(),
+                ]);
+            }
 
             Log::info('Super admin created during installation', [
                 'email' => $request->email,
@@ -241,6 +257,10 @@ class InstallController extends Controller
             session()->forget(['install_database', 'install_license', 'license_key']);
 
             Log::info('Installation completed successfully');
+
+            if ($mailWarning) {
+                session()->flash('mail_warning', $mailWarning);
+            }
 
             return redirect()->route('install.complete');
 

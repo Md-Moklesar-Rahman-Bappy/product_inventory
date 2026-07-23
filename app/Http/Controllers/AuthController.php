@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -37,7 +38,14 @@ class AuthController extends Controller
             'permission' => 2,
         ]);
 
-        event(new Registered($user));
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch Registered event for new user registration', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()->route('login')->with('success', 'Account created successfully. Please check your email to verify.');
     }
@@ -81,7 +89,14 @@ class AuthController extends Controller
         );
 
         if (! $user->hasVerifiedEmail()) {
-            event(new Registered($user));
+            try {
+                event(new Registered($user));
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch Registered event for email verification', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         return redirect()->route('dashboard');

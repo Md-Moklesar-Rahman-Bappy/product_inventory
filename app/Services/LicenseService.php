@@ -114,9 +114,32 @@ class LicenseService
                     'body' => $response->body(),
                 ]);
 
-                $errorMsg = 'Unable to contact license server. Please try again later.';
-                if (config('app.debug')) {
-                    $errorMsg .= ' (HTTP ' . $response->status() . ': ' . substr($response->body(), 0, 200) . ')';
+                $status = $response->status();
+                $body = $response->json() ?? [];
+
+                if ($status === 500) {
+                    $errorMsg = 'License server encountered an internal error. Please contact support or check license server logs.';
+                    if (config('app.debug')) {
+                        $errorMsg .= ' (HTTP 500: ' . ($body['message'] ?? substr($response->body(), 0, 200)) . ')';
+                    }
+                } elseif ($status === 401) {
+                    $errorMsg = 'License server rejected the API key. Check LICENSE_API_KEY configuration.';
+                } elseif ($status === 403) {
+                    $msg = $body['message'] ?? 'Forbidden.';
+                    $errorMsg = 'License server denied the request: ' . $msg;
+                } elseif ($status === 404) {
+                    $msg = $body['message'] ?? 'License key not found.';
+                    $errorMsg = 'License verification failed: ' . $msg;
+                } elseif ($status === 410) {
+                    $msg = $body['message'] ?? 'License expired.';
+                    $errorMsg = 'License verification failed: ' . $msg;
+                } elseif ($status === 429) {
+                    $errorMsg = 'Too many license requests. Please try again later.';
+                } else {
+                    $errorMsg = 'License server returned an unexpected response. Please try again later.';
+                    if (config('app.debug')) {
+                        $errorMsg .= ' (HTTP ' . $status . ': ' . substr($response->body(), 0, 200) . ')';
+                    }
                 }
 
                 return ['success' => false, 'message' => $errorMsg];
@@ -180,7 +203,7 @@ class LicenseService
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            $errorMsg = 'Unable to connect to license server. Please check your internet connection and try again.';
+            $errorMsg = 'Unable to connect to license server. Please check the server URL and try again.';
             if (config('app.debug')) {
                 $errorMsg .= ' (Debug: ' . get_class($e) . ': ' . $e->getMessage() . ')';
             }

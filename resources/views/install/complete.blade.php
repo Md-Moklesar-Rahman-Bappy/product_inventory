@@ -16,6 +16,13 @@
             You can now log in using the admin credentials you just created.
         </div>
 
+        @if(session('mail_warning'))
+            <div class="alert alert-warning mb-4">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Mail Configuration Notice:</strong> {{ session('mail_warning') }}
+            </div>
+        @endif
+
         <a href="{{ route('login') }}" class="btn btn-install btn-lg">
             <i class="bi bi-box-arrow-in-right me-2"></i> Go to Login
         </a>
