@@ -1473,6 +1473,13 @@ body {
     color: white;
 }
 
+.btn-submit {
+    background: linear-gradient(135deg, #4f46e5, #4338ca); color: white;
+    border: none; border-radius: 10px; font-weight: 600; padding: 10px 24px;
+    transition: var(--transition);
+}
+.btn-submit:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(79,70,229,0.4); color: white; }
+
 .btn-edit {
     background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
     border: none;
@@ -1637,3 +1644,28 @@ body {
         flex-wrap: wrap;
     }
 }
+
+/* ===================================
+   Dashboard Widget
+   =================================== */
+.dashboard-widget {
+    background: white; border-radius: var(--radius-xl);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1px solid #f0f0f0;
+    overflow: hidden;
+}
+.widget-header {
+    padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+    display: flex; align-items: center; justify-content: space-between;
+}
+.widget-header h6 { font-weight: 700; color: var(--dark); margin: 0; }
+.widget-body { padding: 16px 20px; max-height: 320px; overflow-y: auto; }
+.widget-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid #f8fafc;
+}
+.widget-item:last-child { border-bottom: none; }
+
+.widget-body::-webkit-scrollbar { width: 6px; }
+.widget-body::-webkit-scrollbar-track { background: transparent; }
+.widget-body::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 3px; }
+.widget-body::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }

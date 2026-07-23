@@ -29,9 +29,6 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
     <!-- Toastr CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     
@@ -168,7 +165,7 @@
                         </button>
                     </div>
                     <div class="col">
-                        <h1 class="page-title">@yield('title', 'Dashboard')</h1>
+                        <h1 class="page-title mb-0">@yield('title', 'Dashboard')</h1>
                     </div>
                     <div class="col-auto d-flex align-items-center gap-2">
                         <!-- Global Search -->
@@ -220,7 +217,7 @@
                 <div class="row align-items-center">
                     <div class="col-md-6">
                         <p class="mb-0 small text-muted">
-                            <i class="fas fa-calendar-alt me-1 text-primary"></i>
+                            <i class="bi bi-calendar-event me-1 text-primary"></i>
                             <span id="datetime"></span>
                         </p>
                         @php
@@ -228,7 +225,7 @@
                         @endphp
                         @if($address)
                             <p class="mb-0 small text-muted mt-1">
-                                <i class="fas fa-map-marker-alt me-1 text-primary"></i>
+                                <i class="bi bi-geo-alt me-1 text-primary"></i>
                                 {{ $address }}
                             </p>
                         @endif
@@ -236,7 +233,7 @@
                     <div class="col-md-6 text-md-end">
                         @php
                             $website = \App\Models\Setting::get('website');
-                            $footerCredit = \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project');
+                            $footerCredit = \App\Models\Setting::get('footer_credit', 'Product Inventory');
                             $phone = \App\Models\Setting::get('phone');
                             $email = \App\Models\Setting::get('email');
                         @endphp
@@ -247,12 +244,12 @@
                         @endif
                         @if($phone)
                             <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-muted text-decoration-none me-3">
-                                <i class="fas fa-phone-alt me-1"></i>{{ $phone }}
+                                <i class="bi bi-telephone me-1"></i>{{ $phone }}
                             </a>
                         @endif
                         @if($email)
                             <a href="mailto:{{ $email }}" class="text-muted text-decoration-none">
-                                <i class="fas fa-envelope me-1"></i>{{ $email }}
+                                <i class="bi bi-envelope me-1"></i>{{ $email }}
                             </a>
                         @endif
                     </div>
