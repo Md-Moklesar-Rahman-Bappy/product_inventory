@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\EnsureUserIsSuperadmin;
+use App\Http\Middleware\ForcePasswordChange;
 use App\Http\Middleware\InstalledMiddleware;
 use App\Http\Middleware\VerifyLicenseMiddleware;
 use Illuminate\Foundation\Application;
@@ -23,6 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
             EnsureUserIsActive::class,
             InstalledMiddleware::class,
             VerifyLicenseMiddleware::class,
+            ForcePasswordChange::class,
         ]);
 
         $middleware->alias([

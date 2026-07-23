@@ -30,6 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'permission',
         'utype',
         'status',
+        'force_password_change',
     ];
 
     // ──────── Guarded Fields (Mass Assignment Protection) ─────────
@@ -52,6 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'force_password_change' => 'boolean',
     ];
 
     // ──────── Accessors ─────────

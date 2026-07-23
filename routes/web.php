@@ -52,6 +52,12 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('logout', 'logout')->middleware('auth')->name('logout');
 });
 
+// 🔒 Force Password Change (accessible even when password change is required)
+Route::middleware(['auth'])->group(function () {
+    Route::get('force-password-change', [AuthController::class, 'forcePasswordChangeForm'])->name('force.password.change');
+    Route::post('force-password-change', [AuthController::class, 'forcePasswordChangeStore'])->name('force.password.change.store');
+});
+
 // 🔐 Authenticated Routes
 Route::middleware(['auth'])->group(function () {
 

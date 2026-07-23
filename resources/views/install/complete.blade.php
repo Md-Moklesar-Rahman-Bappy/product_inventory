@@ -11,9 +11,20 @@
             Product Inventory has been installed successfully. Your license is activated and your super admin account is ready.
         </p>
 
-        <div class="alert alert-info mb-4">
-            <i class="bi bi-info-circle me-2"></i>
-            You can now log in using the admin credentials you just created.
+        <div class="card mb-4 mx-auto" style="max-width: 400px;">
+            <div class="card-body text-start">
+                <h6 class="card-title mb-3"><i class="bi bi-key me-2"></i>Default Login Credentials</h6>
+                <div class="mb-2">
+                    <strong>Email:</strong> <code>superadmin@superadmin.com</code>
+                </div>
+                <div class="mb-2">
+                    <strong>Password:</strong> <code>Password@123</code>
+                </div>
+                <div class="alert alert-warning mt-3 mb-0 py-2">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    <small><strong>You must change this password on first login.</strong></small>
+                </div>
+            </div>
         </div>
 
         @if(session('mail_warning'))

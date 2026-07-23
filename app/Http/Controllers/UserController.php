@@ -155,6 +155,7 @@ class UserController extends Controller
             'address' => $request->address,
             'permission' => $request->permission,
             'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
+            'force_password_change' => $request->boolean('force_password_change'),
         ]);
 
         if ($request->filled('password')) {

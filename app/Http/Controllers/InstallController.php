@@ -179,22 +179,8 @@ class InstallController extends Controller
             return redirect()->route('install.requirements');
         }
 
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'mobile' => 'required|string|max:20',
-            'password' => [
-                'required',
-                'confirmed',
-                'min:8',
-                'regex:/[A-Z]/',
-                'regex:/[a-z]/',
-                'regex:/[0-9]/',
-                'regex:/[!@#$%^&*]/',
-            ],
-        ], [
-            'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
-        ]);
+        $defaultEmail = 'superadmin@superadmin.com';
+        $defaultPassword = 'Password@123';
 
         try {
             Artisan::call('migrate', ['--force' => true]);
@@ -221,35 +207,18 @@ class InstallController extends Controller
             }
 
             $user = new User();
-            $user->name = $request->name;
-            $user->email = $request->email;
-            $user->mobile = $request->mobile;
-            $user->password = Hash::make($request->password);
+            $user->name = 'Super Admin';
+            $user->email = $defaultEmail;
+            $user->password = Hash::make($defaultPassword);
             $user->permission = 0;
             $user->utype = 'SA';
             $user->status = 'active';
             $user->email_verified_at = now();
+            $user->force_password_change = true;
             $user->save();
 
-            $mailWarning = null;
-            try {
-                $user->sendEmailVerificationNotification();
-            } catch (\Exception $mailEx) {
-                $mailWarning = 'Email verification could not be sent. '
-                    . 'You can resend it after login once email is configured. '
-                    . 'Technical: ' . $mailEx->getMessage();
-
-                Log::warning('Mail failed during installation - continuing anyway', [
-                    'mail_host' => config('mail.mailers.smtp.host', 'not set'),
-                    'mail_port' => config('mail.mailers.smtp.port', 'not set'),
-                    'mail_username' => config('mail.mailers.smtp.username', 'not set'),
-                    'exception_class' => get_class($mailEx),
-                    'error' => $mailEx->getMessage(),
-                ]);
-            }
-
             Log::info('Super admin created during installation', [
-                'email' => $request->email,
+                'email' => $defaultEmail,
             ]);
 
             $this->licenseService->markInstalled();
@@ -257,10 +226,6 @@ class InstallController extends Controller
             session()->forget(['install_database', 'install_license', 'license_key']);
 
             Log::info('Installation completed successfully');
-
-            if ($mailWarning) {
-                session()->flash('mail_warning', $mailWarning);
-            }
 
             return redirect()->route('install.complete');
 

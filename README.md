@@ -86,6 +86,17 @@ A vibrant, responsive Laravel application for managing products with advanced CR
    php artisan serve
    ```
 
+6. **Default Admin Credentials**
+   
+   | Field    | Value                        |
+   |----------|------------------------------|
+   | Email    | `superadmin@superadmin.com`  |
+   | Password | `Password@123`               |
+   | Role     | Super Admin (full access)    |
+   
+   > **Security:** You will be prompted to change the password on first login.
+   > Credentials are also created via `php artisan db:seed` and the installation wizard.
+
 🔍 Search Functionality
 - Search by serial number from the product index page
 - Pagination retains search query
