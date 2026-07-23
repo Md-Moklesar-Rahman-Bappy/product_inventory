@@ -266,7 +266,8 @@
             const seconds = now.getSeconds().toString().padStart(2, '0');
             const ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12 || 12;
-            const timeStr = `${hours}:${minutes}:${seconds} ${ampm} GMT+6`;
+            const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+            const timeStr = `${hours}:${minutes}:${seconds} ${ampm}`;
             
             document.getElementById('datetime').textContent = `${dateStr}, ${timeStr}`;
           }

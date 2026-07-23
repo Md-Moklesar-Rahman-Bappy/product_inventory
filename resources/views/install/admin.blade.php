@@ -3,7 +3,7 @@
 
 @section('content')
     <h4 class="mb-2"><i class="bi bi-person-gear me-2"></i>Step 4: Super Admin Account</h4>
-    <p class="text-muted mb-4">A default super administrator account will be created with the following credentials:</p>
+    <p class="text-muted mb-4">Create the administrator account for managing your inventory system.</p>
 
     <form method="POST" action="{{ route('install.admin.store') }}">
         @csrf
@@ -14,27 +14,42 @@
             </div>
         @enderror
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Email</label>
-                    <div class="form-control bg-light">superadmin@superadmin.com</div>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Password</label>
-                    <div class="form-control bg-light">Password@123</div>
-                </div>
-                <div class="mb-0">
-                    <label class="form-label fw-bold">Role</label>
-                    <div class="form-control bg-light">Super Admin (full access)</div>
-                </div>
-            </div>
+        <div class="mb-3">
+            <label for="name" class="form-label fw-bold">Admin Name</label>
+            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required autofocus>
+            @error('name')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
         </div>
 
-        <div class="alert alert-warning">
-            <i class="bi bi-exclamation-triangle me-2"></i>
-            <strong>Security Notice:</strong> You will be required to change this password on your first login.
-            The default credentials are also documented in the INSTALLATION_GUIDE.md file.
+        <div class="mb-3">
+            <label for="email" class="form-label fw-bold">Admin Email</label>
+            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
+            @error('email')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="mobile" class="form-label fw-bold">Mobile Number</label>
+            <input type="text" class="form-control @error('mobile') is-invalid @enderror" id="mobile" name="mobile" value="{{ old('mobile') }}" required>
+            @error('mobile')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-3">
+            <label for="password" class="form-label fw-bold">Password</label>
+            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
+            <div class="form-text">Min 8 characters, including uppercase, lowercase, number, and special character.</div>
+            @error('password')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
+        <div class="mb-4">
+            <label for="password_confirmation" class="form-label fw-bold">Confirm Password</label>
+            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
         </div>
 
         <div class="text-center">

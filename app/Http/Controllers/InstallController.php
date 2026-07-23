@@ -105,7 +105,16 @@ class InstallController extends Controller
             'DB_DATABASE' => $request->database,
             'DB_USERNAME' => $request->username,
             'DB_PASSWORD' => $request->password,
+            'SESSION_DRIVER' => 'file',
+            'SESSION_COOKIE' => 'product_inventory_session',
+            'CACHE_STORE' => 'file',
+            'QUEUE_CONNECTION' => 'sync',
+            'FILESYSTEM_DISK' => 'public',
         ]);
+
+        if (empty(config('app.key'))) {
+            Artisan::call('key:generate', ['--force' => true]);
+        }
 
         session(['install_database' => true]);
 
@@ -179,8 +188,12 @@ class InstallController extends Controller
             return redirect()->route('install.requirements');
         }
 
-        $defaultEmail = 'superadmin@superadmin.com';
-        $defaultPassword = 'Password@123';
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'mobile' => 'required|string|max:20',
+            'password' => ['required', 'confirmed', 'min:8', 'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[!@#$%^&*]/'],
+        ]);
 
         try {
             Artisan::call('migrate', ['--force' => true]);
@@ -207,18 +220,18 @@ class InstallController extends Controller
             }
 
             $user = new User();
-            $user->name = 'Super Admin';
-            $user->email = $defaultEmail;
-            $user->password = Hash::make($defaultPassword);
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->mobile = $request->mobile;
+            $user->password = Hash::make($request->password);
             $user->permission = 0;
             $user->utype = 'SA';
             $user->status = 'active';
             $user->email_verified_at = now();
-            $user->force_password_change = true;
             $user->save();
 
             Log::info('Super admin created during installation', [
-                'email' => $defaultEmail,
+                'email' => $request->email,
             ]);
 
             $this->licenseService->markInstalled();
