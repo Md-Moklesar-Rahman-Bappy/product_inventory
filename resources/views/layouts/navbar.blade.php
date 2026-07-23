@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
   <!-- Sidebar Toggle (Topbar) -->
   <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" type="button">
-    <i class="fa fa-bars"></i>
+    <i class="bi bi-list"></i>
   </button>
 
   <!-- Topbar Navbar -->
@@ -24,12 +24,14 @@
       </a>
 
       <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown" role="menu">
-        <a class="dropdown-item" href="{{ route('users.show', auth()->user()->id) }}">
+        <a class="dropdown-item" href="{{ route('profile') }}">
           <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profile
         </a>
-        <a class="dropdown-item" href="{{ route('users.edit', auth()->user()->id) }}">
+        @if(auth()->user()->permission <= 1)
+        <a class="dropdown-item" href="{{ route('settings.index') }}">
           <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i> Settings
         </a>
+        @endif
         <a class="dropdown-item" href="{{ route('activity.logs') }}">
           <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i> Activity Log
         </a>

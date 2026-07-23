@@ -383,19 +383,19 @@
         // Display Toastr notifications from session
         document.addEventListener('DOMContentLoaded', function() {
             @if(session('success'))
-                toastr.success('{{ strip_tags(session('success')) }}', 'Success');
+                toastr.success(@js(session('success')), 'Success');
             @endif
             
             @if(session('error'))
-                toastr.error('{{ strip_tags(session('error')) }}', 'Error');
+                toastr.error(@js(session('error')), 'Error');
             @endif
             
             @if(session('warning'))
-                toastr.warning('{{ strip_tags(session('warning')) }}', 'Warning');
+                toastr.warning(@js(session('warning')), 'Warning');
             @endif
             
             @if(session('message'))
-                toastr.info('{{ strip_tags(session('message')) }}', 'Info');
+                toastr.info(@js(session('message')), 'Info');
             @endif
         });
     </script>

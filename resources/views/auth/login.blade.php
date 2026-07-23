@@ -211,6 +211,13 @@
 
         {{-- Submit --}}
         <button type="submit" class="btn-login">LOGIN</button>
+
+        {{-- Forgot Password --}}
+        <div class="mt-3">
+          <a href="{{ route('password.forgot') }}" style="color: #4f46e5; font-size: 0.9rem; text-decoration: none;">
+            <i class="bi bi-question-circle me-1"></i> Forgot Password?
+          </a>
+        </div>
       </form>
 
       <footer>

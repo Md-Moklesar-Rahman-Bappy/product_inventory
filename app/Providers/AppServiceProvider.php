@@ -40,8 +40,8 @@ class AppServiceProvider extends ServiceProvider
 
         // Set dynamic mail "from" address from settings
         if (Schema::hasTable('settings')) {
-            $appName = Setting::get('app_name', 'Product Inventory');
-            $email = Setting::get('email', 'noreply@example.com');
+            $appName = Setting::get('app_name', config('app.name', 'Product Inventory'));
+            $email = Setting::get('email', config('mail.from.address', 'noreply@example.com'));
 
             config([
                 'mail.from.name' => $appName,

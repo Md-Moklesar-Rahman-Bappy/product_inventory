@@ -230,7 +230,14 @@ class InstallController extends Controller
             $user->status = 'active';
             $user->save();
 
-            $user->sendEmailVerificationNotification();
+            try {
+                $user->sendEmailVerificationNotification();
+            } catch (\Exception $e) {
+                Log::warning('Failed to send verification email during installation', [
+                    'email' => $request->email,
+                    'error' => $e->getMessage(),
+                ]);
+            }
 
             Log::info('Super admin created during installation', [
                 'email' => $request->email,

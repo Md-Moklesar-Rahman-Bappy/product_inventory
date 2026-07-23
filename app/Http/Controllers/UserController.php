@@ -15,9 +15,9 @@ class UserController extends Controller
     // 🧾 List Users
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = min((int) $request->input('per_page', 10), 100);
         $users = User::latest()->paginate($perPage);
-        $deletedUsers = User::onlyTrashed()->get();
+        $deletedUsers = User::onlyTrashed()->paginate(10);
 
         return view('users.index', compact('users', 'deletedUsers'));
     }
@@ -67,7 +67,7 @@ class UserController extends Controller
             'about' => $request->about,
             'address' => $request->address,
             'permission' => $request->permission,
-            'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
+            'utype' => (int) $request->permission === 0 ? 'SA' : ((int) $request->permission === 1 ? 'ADM' : 'USR'),
             'status' => 'active',
         ]);
 
@@ -78,7 +78,14 @@ class UserController extends Controller
 
         $user->save();
 
-        $user->sendEmailVerificationNotification();
+        try {
+            $user->sendEmailVerificationNotification();
+        } catch (\Exception $e) {
+            Log::warning('Failed to send verification email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         ActivityLogController::logAction(
             'create',
@@ -154,7 +161,7 @@ class UserController extends Controller
             'about' => $request->about,
             'address' => $request->address,
             'permission' => $request->permission,
-            'utype' => $request->permission === 0 ? 'SA' : ($request->permission === 1 ? 'ADM' : 'USR'),
+            'utype' => (int) $request->permission === 0 ? 'SA' : ((int) $request->permission === 1 ? 'ADM' : 'USR'),
         ]);
 
         if ($request->filled('password')) {

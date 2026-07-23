@@ -6,7 +6,7 @@
 <div class="container py-5">
   <div class="card border-0 shadow-lg rounded-4">
     <div class="card-header text-white" style="background: linear-gradient(90deg, #ff5722, #ff9800); padding: 1.5rem;">
-      <h3 class="mb-0 fw-bold"><i class="fa fa-plus-circle me-2"></i> Add New Brand</h3>
+      <h3 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Add New Brand</h3>
     </div>
 
     <div class="card-body bg-light" style="padding: 2rem;">
@@ -22,7 +22,7 @@
         {{-- Submit Button --}}
         <div class="d-grid mt-4">
           <button type="submit" class="btn btn-success px-4">
-              <i class="fa fa-check-circle me-1"></i> Create
+              <i class="bi bi-check-circle me-1"></i> Create
             </button>
         </div>
       </form>

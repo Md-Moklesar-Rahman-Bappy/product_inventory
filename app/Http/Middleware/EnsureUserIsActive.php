@@ -13,6 +13,8 @@ class EnsureUserIsActive
     {
         if (Auth::check() && Auth::user()->status !== 'active') {
             Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
             return redirect()->route('login')->withErrors([
                 'email' => '🚫 Your account is deactivated.',
             ]);

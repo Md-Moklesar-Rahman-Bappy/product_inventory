@@ -31,6 +31,15 @@ class VerifyLicenseMiddleware
             'verification.verify.public',
             'verification.notice',
             'verification.resend',
+            'password.forgot',
+            'password.forgot.email.form',
+            'password.forgot.email.send',
+            'password.forgot.phone.form',
+            'password.forgot.phone.send',
+            'password.forgot.otp.form',
+            'password.forgot.otp.verify',
+            'password.forgot.reset.form',
+            'password.forgot.reset.update',
         ];
 
         if (in_array($routeName, $exemptRoutes)) {
@@ -45,6 +54,7 @@ class VerifyLicenseMiddleware
             'email',
             'license-error',
             'install',
+            'forgot-password',
         ];
 
         foreach ($exemptPaths as $exemptPath) {

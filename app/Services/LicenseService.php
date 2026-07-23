@@ -84,7 +84,8 @@ class LicenseService
 
         Log::info('License activation attempted', [
             'url' => $url,
-            'payload' => $payload,
+            'site_url' => $this->getSiteUrl(),
+            'product_id' => $this->productId,
         ]);
 
         try {
@@ -92,7 +93,6 @@ class LicenseService
                 'url' => $url,
                 'method' => 'POST',
                 'timeout' => $this->requestTimeout,
-                'payload' => $payload,
             ]);
 
             $response = Http::timeout($this->requestTimeout)
@@ -104,7 +104,6 @@ class LicenseService
                 'url' => $url,
                 'status' => $response->status(),
                 'successful' => $response->successful(),
-                'body' => $response->body(),
             ]);
 
             if ($response->failed()) {
@@ -272,7 +271,8 @@ class LicenseService
 
         Log::info('Remote license check started', [
             'url' => $url,
-            'payload' => $payload,
+            'site_url' => $this->getSiteUrl(),
+            'product_id' => $this->productId,
         ]);
 
         try {
@@ -284,7 +284,6 @@ class LicenseService
             Log::debug('Remote license check response', [
                 'url' => $url,
                 'status' => $response->status(),
-                'body' => $response->body(),
             ]);
 
             if ($response->failed()) {

@@ -32,7 +32,10 @@
                         } }}
                     </strong>
                 </span>
-                <a href="{{ route('logout') }}" class="btn btn-sm btn-outline-light">Logout</a>
+                <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                    @csrf
+                    <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+                </form>
             </div>
         </div>
     </nav>
@@ -111,7 +114,7 @@
                         submitBtn.disabled = true;
                         const originalText = submitBtn.innerHTML;
                         submitBtn.setAttribute('data-original-text', originalText);
-                        submitBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Processing...';
+                        submitBtn.innerHTML = '<i class="bi bi-arrow-repeat spin"></i> Processing...';
                         
                         // Re-enable after 10 seconds as fallback
                         setTimeout(() => {

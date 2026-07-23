@@ -147,9 +147,12 @@
                         </div>
                     </div>
                     <div class="d-flex gap-2 ms-3">
-                        <a href="{{ route('products.skipped.export') }}" class="btn btn-sm btn-outline-dark" title="Export">
-                            <i class="bi bi-download"></i>
-                        </a>
+                        <form action="{{ route('products.skipped.export') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" class="btn btn-sm btn-outline-dark" title="Export">
+                                <i class="bi bi-download"></i>
+                            </button>
+                        </form>
                         <form action="{{ route('products.skipped.clear') }}" method="POST">
                             @csrf
                             <button type="submit" class="btn btn-sm btn-close" aria-label="Close"></button>

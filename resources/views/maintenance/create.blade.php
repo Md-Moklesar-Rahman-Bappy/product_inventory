@@ -6,13 +6,13 @@
 <div class="container py-5">
   <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
     <div class="card-header bg-primary text-white py-3">
-      <h3 class="mb-0 fw-bold"><i class="fa fa-tools me-2"></i> Create Maintenance Record</h3>
+      <h3 class="mb-0 fw-bold"><i class="bi bi-tools me-2"></i> Create Maintenance Record</h3>
     </div>
 
     <div class="card-body bg-white px-4 py-5">
       @if($errors->any())
         <div class="alert alert-danger shadow-sm">
-          <strong><i class="fa fa-exclamation-triangle me-1"></i> Please fix the following:</strong>
+          <strong><i class="bi bi-exclamation-triangle me-1"></i> Please fix the following:</strong>
           <ul class="mt-2 mb-0">
             @foreach($errors->all() as $error)
               <li>{{ $error }}</li>
@@ -26,7 +26,7 @@
         <input type="hidden" name="product_id" value="{{ $product->id }}">
 
         {{-- Product Info --}}
-        <h5 class="text-primary fw-bold mb-3"><i class="fa fa-box-open me-2"></i> Product Details</h5>
+        <h5 class="text-primary fw-bold mb-3"><i class="bi bi-box-seam me-2"></i> Product Details</h5>
         <div class="row g-3 mb-4">
           <div class="col-md-6">
             <label class="form-label">Product Name</label>
@@ -47,13 +47,13 @@
         </div>
 
         {{-- Problem Description --}}
-        <h5 class="text-primary fw-bold mb-3"><i class="fa fa-exclamation-circle me-2"></i> Problem Description</h5>
+        <h5 class="text-primary fw-bold mb-3"><i class="bi bi-exclamation-circle me-2"></i> Problem Description</h5>
         <div class="mb-4">
           <textarea name="description" class="form-control" rows="4" placeholder="Describe the issue..." required>{{ old('description') }}</textarea>
         </div>
 
         {{-- Maintenance Timeline --}}
-        <h5 class="text-primary fw-bold mb-3"><i class="fa fa-calendar-alt me-2"></i> Maintenance Timeline</h5>
+        <h5 class="text-primary fw-bold mb-3"><i class="bi bi-calendar-event me-2"></i> Maintenance Timeline</h5>
         <div class="row g-3 mb-4">
           <div class="col-md-6">
             <label class="form-label">Start Date</label>
@@ -68,10 +68,10 @@
         {{-- Submit --}}
         <div class="d-flex justify-content-between mt-4">
           <button type="submit" class="btn btn-primary px-4 fw-bold">
-            <i class="fa fa-check-circle me-1"></i> Create
+            <i class="bi bi-check-circle me-1"></i> Create
           </button>
           <a href="{{ route('products.index') }}" class="btn btn-outline-secondary px-4">
-            <i class="fa fa-times-circle me-1"></i> Cancel
+            <i class="bi bi-x-circle me-1"></i> Cancel
           </a>
         </div>
       </form>

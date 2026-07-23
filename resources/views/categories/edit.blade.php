@@ -8,7 +8,7 @@
 
     {{-- Gradient Header --}}
     <div class="card-header text-white" style="background: linear-gradient(90deg, #FF9800, #FF5722); padding: 1.5rem;">
-      <h3 class="mb-0 fw-bold"><i class="fa fa-edit me-2"></i> Edit Category</h3>
+      <h3 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Category</h3>
     </div>
 
     {{-- Card Body --}}
@@ -26,7 +26,7 @@
         {{-- Update Button --}}
         <div class="d-grid mt-4">
           <button type="submit" class="btn btn-warning btn-lg fw-bold shadow-sm">
-            <i class="fa fa-save me-1"></i> Update Category
+            <i class="bi bi-save me-1"></i> Update Category
           </button>
         </div>
       </form>

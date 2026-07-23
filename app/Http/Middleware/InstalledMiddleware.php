@@ -29,8 +29,10 @@ class InstalledMiddleware
             || str_starts_with($path, 'install/')
             || $routeName === 'license-error';
 
+        $isForgotPasswordRoute = str_starts_with($path, 'forgot-password');
+
         if (!$isInstalled) {
-            if ($isInstallRoute || $this->isStaticAsset($request)) {
+            if ($isInstallRoute || $isForgotPasswordRoute || $this->isStaticAsset($request)) {
                 return $next($request);
             }
 

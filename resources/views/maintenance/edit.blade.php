@@ -7,14 +7,14 @@
         <div class="card border-0 shadow-lg rounded-4">
             <div class="card-header bg-warning text-dark py-3">
                 <h3 class="mb-0 fw-bold">
-                    <i class="fa fa-tools me-2"></i> Edit Maintenance #{{ $maintenance->id }}
+                    <i class="bi bi-tools me-2"></i> Edit Maintenance #{{ $maintenance->id }}
                 </h3>
             </div>
 
             <div class="card-body bg-light px-4 py-5">
                 @if($errors->any())
                     <div class="alert alert-danger shadow-sm fw-semibold mb-4">
-                        <i class="fa fa-exclamation-circle me-1"></i> Please fix the errors below
+                        <i class="bi bi-exclamation-circle me-1"></i> Please fix the errors below
                     </div>
                 @endif
 
@@ -25,7 +25,7 @@
                     {{-- 📦 Product Info --}}
                     <div class="mb-4">
                         <label class="form-label fw-bold text-primary">
-                            <i class="fa fa-box-open me-1"></i> Product Info
+                            <i class="bi bi-box-seam me-1"></i> Product Info
                         </label>
                         <div class="bg-white border rounded px-3 py-2 shadow-sm">
                             <span class="fw-semibold text-dark">
@@ -40,7 +40,7 @@
                     {{-- 🛡️ Warranty Info (Product Index Style) --}}
                     <div class="mb-4">
                         <label class="form-label fw-bold text-primary">
-                            <i class="fa fa-shield-alt me-1"></i> Warranty
+                            <i class="bi bi-shield-check me-1"></i> Warranty
                         </label>
                         <div
                             class="bg-white border rounded px-3 py-3 shadow-sm d-flex justify-content-between align-items-center">
@@ -100,7 +100,7 @@
                     {{-- 📝 Issue Description --}}
                     <div class="mb-4">
                         <label for="description" class="form-label fw-bold text-primary">
-                            <i class="fa fa-bug me-1"></i> Issue Description
+                            <i class="bi bi-bug me-1"></i> Issue Description
                         </label>
                         <textarea name="description" id="description" rows="3" class="form-control"
                             required>{{ old('description', $maintenance->description) }}</textarea>
@@ -110,7 +110,7 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label for="start_time" class="form-label fw-bold text-primary">
-                                <i class="fa fa-play-circle me-1"></i> Start Time
+                                <i class="bi bi-play-circle me-1"></i> Start Time
                             </label>
                             <input type="datetime-local" name="start_time" id="start_time" class="form-control"
                                 value="{{ old('start_time', optional($maintenance->start_time)->format('Y-m-d\TH:i')) }}"
@@ -118,7 +118,7 @@
                         </div>
                         <div class="col-md-6">
                             <label for="end_time" class="form-label fw-bold text-primary">
-                                <i class="fa fa-stop-circle me-1"></i> End Time
+                                <i class="bi bi-stop-circle me-1"></i> End Time
                             </label>
                             <input type="datetime-local" name="end_time" id="end_time" class="form-control"
                                 value="{{ old('end_time', optional($maintenance->end_time)->format('Y-m-d\TH:i')) }}"
@@ -129,10 +129,10 @@
                     {{-- 🎯 Action Buttons --}}
                     <div class="d-flex justify-content-between">
                         <button type="submit" class="btn btn-warning shadow-sm">
-                            <i class="fa fa-save me-1"></i> Update Record
+                            <i class="bi bi-save me-1"></i> Update Record
                         </button>
                         <a href="{{ route('maintenance.index') }}" class="btn btn-secondary shadow-sm">
-                            <i class="fa fa-arrow-left me-1"></i> Cancel
+                            <i class="bi bi-arrow-left me-1"></i> Cancel
                         </a>
                     </div>
                 </form>

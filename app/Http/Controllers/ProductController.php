@@ -22,7 +22,7 @@ class ProductController extends Controller
     // ──────── CRUD ─────────
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = min((int) $request->input('per_page', 10), 100);
         $search = $request->input('search');
         $status = $request->input('warranty_status');
         $categoryId = $request->input('category_id');
@@ -474,7 +474,7 @@ class ProductController extends Controller
     // ──────── Warranty Overview ─────────
     public function warranties(Request $request)
     {
-        $perPage = $request->input('per_page', 10);
+        $perPage = min((int) $request->input('per_page', 10), 100);
         $status = $request->input('warranty_status');
 
         $query = Product::whereNotNull('warranty_end');

@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
@@ -18,6 +19,19 @@ use Illuminate\Support\Facades\Route;
 
 // 🌐 Public Routes
 Route::view('/', 'auth.login')->name('login');
+
+// 🔑 Password Recovery Routes (Public, rate-limited)
+Route::middleware('throttle:10,1')->group(function () {
+    Route::get('forgot-password', [ForgotPasswordController::class, 'showMethodForm'])->name('password.forgot');
+    Route::get('forgot-password/email', [ForgotPasswordController::class, 'showEmailForm'])->name('password.forgot.email.form');
+    Route::post('forgot-password/email', [ForgotPasswordController::class, 'sendEmailOtp'])->name('password.forgot.email.send');
+    Route::get('forgot-password/phone', [ForgotPasswordController::class, 'showPhoneForm'])->name('password.forgot.phone.form');
+    Route::post('forgot-password/phone', [ForgotPasswordController::class, 'sendPhoneOtp'])->name('password.forgot.phone.send');
+    Route::get('forgot-password/verify', [ForgotPasswordController::class, 'showOtpForm'])->name('password.forgot.otp.form');
+    Route::post('forgot-password/verify', [ForgotPasswordController::class, 'verifyOtp'])->name('password.forgot.otp.verify');
+    Route::get('forgot-password/reset', [ForgotPasswordController::class, 'showResetForm'])->name('password.forgot.reset.form');
+    Route::post('forgot-password/reset', [ForgotPasswordController::class, 'resetPassword'])->name('password.forgot.reset.update');
+});
 
 // 🔐 Registration Routes (with rate limiting)
 Route::middleware('throttle:5,10')->group(function () {
@@ -58,9 +72,19 @@ Route::middleware(['auth'])->group(function () {
     // 📧 Email verification notice + resend
     Route::get('/email/verify', fn () => view('auth.verify'))->name('verification.notice');
     Route::post('/email/resend', function (Request $request) {
-        $request->user()->sendEmailVerificationNotification();
+        try {
+            $request->user()->sendEmailVerificationNotification();
 
-        return back()->with('success', '📧 Verification link sent!');
+            return back()->with('success', '📧 Verification link sent!');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Verification email failed', [
+                'user_id' => $request->user()->id,
+                'email' => $request->user()->email,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'Failed to send verification email. Please try again later. If this persists, contact support.');
+        }
     })->middleware('throttle:3,1')->name('verification.resend');
 
     // 📊 Dashboard

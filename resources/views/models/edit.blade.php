@@ -6,7 +6,7 @@
 <div class="container py-5">
   <div class="card border-0 shadow-lg rounded-4">
     <div class="card-header text-white" style="background: linear-gradient(90deg, #ff9800, #f44336); padding: 1.5rem;">
-      <h3 class="mb-0 fw-bold"><i class="fa fa-edit me-2"></i> Edit Model</h3>
+      <h3 class="mb-0 fw-bold"><i class="bi bi-pencil-square me-2"></i> Edit Model</h3>
     </div>
 
     <div class="card-body bg-light" style="padding: 2rem;">
@@ -23,7 +23,7 @@
         {{-- Submit Button --}}
         <div class="d-grid mt-4">
           <button type="submit" class="btn btn-warning btn-lg fw-bold shadow-sm">
-            <i class="fa fa-save me-1"></i> Update
+            <i class="bi bi-save me-1"></i> Update
           </button>
         </div>
       </form>

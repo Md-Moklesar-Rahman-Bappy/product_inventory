@@ -149,6 +149,26 @@ class Product extends Model
     }
 
     // ──────── Warranty Date Accessors ─────────
+    public function getWarrantyCountdownAttribute()
+    {
+        if (! $this->warranty_end) {
+            return null;
+        }
+
+        $now = Carbon::now(config('app.timezone'));
+        $end = $this->warranty_end;
+
+        if ($end->isPast()) {
+            $days = $now->diffInDays($end);
+
+            return "Expired {$days} days ago";
+        }
+
+        $totalDays = $now->diffInDays($end);
+
+        return "{$totalDays} days remaining";
+    }
+
     public function getWarrantyStartDateAttribute()
     {
         return optional($this->warranty_start)->format('d/m/Y');

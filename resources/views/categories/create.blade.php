@@ -8,7 +8,7 @@
 
     {{-- Gradient Header --}}
     <div class="card-header text-white" style="background: linear-gradient(90deg, #00C9FF, #92FE9D); padding: 1.5rem;">
-      <h3 class="mb-0 fw-bold"><i class="fa fa-plus-circle me-2"></i> Add New Category</h3>
+      <h3 class="mb-0 fw-bold"><i class="bi bi-plus-circle me-2"></i> Add New Category</h3>
     </div>
 
     {{-- Card Body --}}
@@ -25,7 +25,7 @@
         {{-- Submit Button --}}
         <div class="d-grid mt-4">
           <button type="submit" class="btn btn-success px-4">
-              <i class="fa fa-check-circle me-1"></i> Create
+              <i class="bi bi-check-circle me-1"></i> Create
             </button>
 
         </div>
