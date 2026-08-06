@@ -1,6 +1,6 @@
 # Installation Guide
 
-## Product Inventory Dashboard
+## Equipment Inventory Management System Dashboard
 
 ### Super Admin Account
 

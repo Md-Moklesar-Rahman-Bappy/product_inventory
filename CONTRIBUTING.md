@@ -1,6 +1,6 @@
 # 🤝 Contributing Guidelines
 
-Thank you for considering contributing to **Product Inventory Dashboard**!  
+Thank you for considering contributing to **Equipment Inventory Management System Dashboard**!  
 We welcome improvements, bug fixes, and new features. Please follow the guidelines below to ensure smooth collaboration.
 
 ---

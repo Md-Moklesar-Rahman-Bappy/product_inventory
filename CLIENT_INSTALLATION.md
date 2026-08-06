@@ -1,4 +1,4 @@
-# Product Inventory Dashboard - Client Installation Guide
+# Equipment Inventory Management System Dashboard - Client Installation Guide
 
 **Version:** 1.0.0  
 **Developer:** Md Moklesar Rahman  
@@ -8,7 +8,7 @@
 
 ## Overview
 
-Product Inventory Dashboard is a browser-based inventory management system. Installation is fully guided through a web wizard — **no coding or technical expertise required**. Simply upload the ZIP file, open your browser, and follow the step-by-step installer.
+Equipment Inventory Management System Dashboard is a browser-based inventory management system. Installation is fully guided through a web wizard — **no coding or technical expertise required**. Simply upload the ZIP file, open your browser, and follow the step-by-step installer.
 
 ---
 
@@ -191,8 +191,8 @@ Your license key is validated against a remote license server. The license must 
 | File | Description |
 |------|-------------|
 | `CLIENT_INSTALLATION.md` | This installation guide |
-| `docs/Product_Inventory_Client_Documentation.md` | Full application documentation (Markdown) |
-| `docs/Product_Inventory_Client_Documentation.docx` | Full application documentation (Word) |
+| `docs/Equipment_Inventory_Management_System_Client_Documentation.md` | Full application documentation (Markdown) |
+| `docs/Equipment_Inventory_Management_System_Client_Documentation.docx` | Full application documentation (Word) |
 | `INSTALLATION_GUIDE.md` | Developer installation notes |
 | `README.md` | Project overview |
 | `CHANGELOG.md` | Version history |
@@ -210,4 +210,4 @@ For issues or questions, contact:
 
 ---
 
-*Thank you for choosing Product Inventory Dashboard!*
+*Thank you for choosing Equipment Inventory Management System Dashboard!*
