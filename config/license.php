@@ -76,6 +76,8 @@ return [
 
     'activation_endpoint' => '/api/license/activate',
     'check_endpoint' => '/api/license/check',
+    'status_endpoint' => '/api/license/status',
+    'reactivate_endpoint' => '/api/license/reactivate',
 
     /*
     |--------------------------------------------------------------------------

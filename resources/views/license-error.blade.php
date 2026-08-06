@@ -79,6 +79,15 @@
         <div class="contact-info">
             <p><i class="bi bi-envelope me-2"></i>If you need assistance, please contact your software vendor with your license key.</p>
         </div>
+        @auth
+            @if(auth()->user()->permission === 0 || auth()->user()->permission === 1)
+                <div class="mb-3">
+                    <a href="{{ route('license-management.index') }}" class="btn btn-primary w-100">
+                        <i class="bi bi-key me-2"></i>Admin: Manage License
+                    </a>
+                </div>
+            @endif
+        @endauth
         <a href="{{ route('login') }}" class="btn-back">
             <i class="bi bi-arrow-left me-2"></i>Back to Login
         </a>

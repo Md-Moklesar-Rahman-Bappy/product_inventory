@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LicenseManagementController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
@@ -163,5 +164,14 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['auth', 'isSuperadmin'])->prefix('settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/', [SettingController::class, 'update'])->name('settings.update');
+    });
+
+    // 🔑 License Management (Admin/Superadmin only — reachable even when the
+    // license is revoked so an authorized admin can recover safely)
+    Route::middleware(['auth', 'isAdmin'])->prefix('license-management')->name('license-management.')->group(function () {
+        Route::get('/', [LicenseManagementController::class, 'index'])->name('index');
+        Route::post('/refresh', [LicenseManagementController::class, 'refresh'])->name('refresh');
+        Route::post('/reactivate', [LicenseManagementController::class, 'reactivate'])->name('reactivate');
+        Route::post('/replace', [LicenseManagementController::class, 'replace'])->name('replace');
     });
 });
