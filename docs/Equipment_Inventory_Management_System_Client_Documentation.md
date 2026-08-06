@@ -1,4 +1,4 @@
-# Product Inventory Dashboard
+# Equipment Inventory Management System Dashboard
 
 ## Client Documentation
 
@@ -46,7 +46,7 @@
 
 ## 1. Introduction
 
-Product Inventory Dashboard is a comprehensive, browser-based inventory management application built with Laravel 12 and Bootstrap 5. It provides businesses with a powerful yet intuitive interface to manage their products, categories, brands, models, maintenance schedules, and warranties.
+Equipment Inventory Management System Dashboard is a comprehensive, browser-based inventory management application built with Laravel 12 and Bootstrap 5. It provides businesses with a powerful yet intuitive interface to manage their products, categories, brands, models, maintenance schedules, and warranties.
 
 The application features a fully guided web-based installer that requires no command-line knowledge. Simply upload the ZIP file, open your browser, and follow the step-by-step installation wizard.
 
@@ -515,7 +515,7 @@ The activity log provides a complete audit trail of all system actions.
 
 | Setting            | Description                              | Default           |
 |--------------------|------------------------------------------|-------------------|
-| Application Name   | Display name for the application         | Product Inventory |
+| Application Name   | Display name for the application         | Equipment Inventory Management System |
 | Application Logo   | Logo displayed in header/sidebar         | Default logo      |
 | Application Footer | Footer text                              | Default footer    |
 | License Status     | Current license activation status        | —                 |
@@ -638,7 +638,7 @@ All requests include the `X-API-Key` header for authentication.
 #### Application Settings
 | Variable         | Description                        | Default             |
 |------------------|------------------------------------|---------------------|
-| APP_NAME         | Application name                   | Product Inventory   |
+| APP_NAME         | Application name                   | Equipment Inventory Management System   |
 | APP_ENV          | Environment (local/production)     | production          |
 | APP_KEY          | Encryption key (auto-generated)    | —                   |
 | APP_DEBUG        | Debug mode                         | false               |
@@ -873,4 +873,4 @@ This project is proprietary software. Licensed for use by the purchasing client 
 
 ---
 
-*Thank you for choosing Product Inventory Dashboard!*
+*Thank you for choosing Equipment Inventory Management System Dashboard!*
