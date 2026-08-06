@@ -105,7 +105,16 @@ class InstallController extends Controller
             'DB_DATABASE' => $request->database,
             'DB_USERNAME' => $request->username,
             'DB_PASSWORD' => $request->password,
+            'SESSION_DRIVER' => 'file',
+            'SESSION_COOKIE' => 'product_inventory_session',
+            'CACHE_STORE' => 'file',
+            'QUEUE_CONNECTION' => 'sync',
+            'FILESYSTEM_DISK' => 'public',
         ]);
+
+        if (empty(config('app.key'))) {
+            Artisan::call('key:generate', ['--force' => true]);
+        }
 
         session(['install_database' => true]);
 
@@ -183,17 +192,7 @@ class InstallController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'mobile' => 'required|string|max:20',
-            'password' => [
-                'required',
-                'confirmed',
-                'min:8',
-                'regex:/[A-Z]/',
-                'regex:/[a-z]/',
-                'regex:/[0-9]/',
-                'regex:/[!@#$%^&*]/',
-            ],
-        ], [
-            'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
+            'password' => ['required', 'confirmed', 'min:8', 'regex:/[A-Z]/', 'regex:/[a-z]/', 'regex:/[0-9]/', 'regex:/[!@#$%^&*]/'],
         ]);
 
         try {
@@ -228,9 +227,8 @@ class InstallController extends Controller
             $user->permission = 0;
             $user->utype = 'SA';
             $user->status = 'active';
+            $user->email_verified_at = now();
             $user->save();
-
-            $user->sendEmailVerificationNotification();
 
             Log::info('Super admin created during installation', [
                 'email' => $request->email,

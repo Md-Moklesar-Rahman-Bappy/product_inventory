@@ -11,6 +11,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\Facades\Log;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -29,6 +30,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'permission',
         'utype',
         'status',
+        'force_password_change',
     ];
 
     // ──────── Guarded Fields (Mass Assignment Protection) ─────────
@@ -51,6 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'force_password_change' => 'boolean',
     ];
 
     // ──────── Accessors ─────────
@@ -170,7 +173,16 @@ class User extends Authenticatable implements MustVerifyEmail
     // ──────── Verification + Audit Wrapper ─────────
     public function sendVerificationAndLog(): void
     {
-        $this->sendEmailVerificationNotification();
+        try {
+            $this->sendEmailVerificationNotification();
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to send verification email', [
+                'user_id' => $this->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return;
+        }
 
         \App\Http\Controllers\ActivityLogController::logAction(
             'verification-init',
@@ -286,29 +298,36 @@ class User extends Authenticatable implements MustVerifyEmail
     // ──────── Custom Verification Notification ─────────
     public function sendEmailVerificationNotification()
     {
-        $this->notify(new class($this) extends VerifyEmail
-        {
-            protected $user;
-
-            public function __construct($user)
+        try {
+            $this->notify(new class($this) extends VerifyEmail
             {
-                $this->user = $user;
-            }
+                protected $user;
 
-            public function toMail($notifiable)
-            {
-                $verificationUrl = URL::temporarySignedRoute(
-                    'verification.verify.public',
-                    now()->addMinutes(60),
-                    ['id' => $this->user->id, 'hash' => sha1($this->user->getEmailForVerification())]
-                );
+                public function __construct($user)
+                {
+                    $this->user = $user;
+                }
 
-                return (new MailMessage)
-                    ->subject('Verify Your Email Address')
-                    ->line('Click the button below to verify your email.')
-                    ->action('Verify Email', $verificationUrl)
-                    ->line('If you did not create an account, no further action is required.');
-            }
-        });
+                public function toMail($notifiable)
+                {
+                    $verificationUrl = URL::temporarySignedRoute(
+                        'verification.verify.public',
+                        now()->addMinutes(60),
+                        ['id' => $this->user->id, 'hash' => sha1($this->user->getEmailForVerification())]
+                    );
+
+                    return (new MailMessage)
+                        ->subject('Verify Your Email Address')
+                        ->line('Click the button below to verify your email.')
+                        ->action('Verify Email', $verificationUrl)
+                        ->line('If you did not create an account, no further action is required.');
+                }
+            });
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to send email verification notification', [
+                'user_id' => $this->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

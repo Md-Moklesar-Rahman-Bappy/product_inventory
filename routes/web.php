@@ -6,6 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LicenseManagementController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SettingController;
@@ -50,6 +51,12 @@ Route::controller(AuthController::class)->group(function () {
     Route::get('login', 'login')->name('login');
     Route::post('login', 'loginAction')->middleware('throttle:5,1')->name('login.action');
     Route::post('logout', 'logout')->middleware('auth')->name('logout');
+});
+
+// 🔒 Force Password Change (accessible even when password change is required)
+Route::middleware(['auth'])->group(function () {
+    Route::get('force-password-change', [AuthController::class, 'forcePasswordChangeForm'])->name('force.password.change');
+    Route::post('force-password-change', [AuthController::class, 'forcePasswordChangeStore'])->name('force.password.change.store');
 });
 
 // 🔐 Authenticated Routes
@@ -157,5 +164,14 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['auth', 'isSuperadmin'])->prefix('settings')->group(function () {
         Route::get('/', [SettingController::class, 'index'])->name('settings.index');
         Route::put('/', [SettingController::class, 'update'])->name('settings.update');
+    });
+
+    // 🔑 License Management (Admin/Superadmin only — reachable even when the
+    // license is revoked so an authorized admin can recover safely)
+    Route::middleware(['auth', 'isAdmin'])->prefix('license-management')->name('license-management.')->group(function () {
+        Route::get('/', [LicenseManagementController::class, 'index'])->name('index');
+        Route::post('/refresh', [LicenseManagementController::class, 'refresh'])->name('refresh');
+        Route::post('/reactivate', [LicenseManagementController::class, 'reactivate'])->name('reactivate');
+        Route::post('/replace', [LicenseManagementController::class, 'replace'])->name('replace');
     });
 });

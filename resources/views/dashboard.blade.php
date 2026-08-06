@@ -13,7 +13,7 @@
       </div>
       <div class="welcome-badge">
         <span class="badge-modern">
-          <i class="bi bi-box-seam me-2"></i>Product Inventory System
+          <i class="bi bi-box-seam me-2"></i>{{ config('app.name', 'Equipment Inventory Management System') }}
         </span>
       </div>
     </div>

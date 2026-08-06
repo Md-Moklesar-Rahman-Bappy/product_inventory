@@ -7,6 +7,7 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -37,7 +38,14 @@ class AuthController extends Controller
             'permission' => 2,
         ]);
 
-        event(new Registered($user));
+        try {
+            event(new Registered($user));
+        } catch (\Throwable $e) {
+            Log::warning('Failed to dispatch Registered event for new user registration', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
 
         return redirect()->route('login')->with('success', 'Account created successfully. Please check your email to verify.');
     }
@@ -81,7 +89,14 @@ class AuthController extends Controller
         );
 
         if (! $user->hasVerifiedEmail()) {
-            event(new Registered($user));
+            try {
+                event(new Registered($user));
+            } catch (\Throwable $e) {
+                Log::warning('Failed to dispatch Registered event for email verification', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
         return redirect()->route('dashboard');
@@ -107,6 +122,55 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
+    }
+
+    // Force Password Change Form
+    public function forcePasswordChangeForm()
+    {
+        if (! Auth::user()->force_password_change) {
+            return redirect()->route('dashboard');
+        }
+
+        return view('auth.force-password-change');
+    }
+
+    // Handle Forced Password Change
+    public function forcePasswordChangeStore(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user->force_password_change) {
+            return redirect()->route('dashboard');
+        }
+
+        $request->validate([
+            'password' => [
+                'required',
+                'confirmed',
+                'min:8',
+                'regex:/[A-Z]/',
+                'regex:/[a-z]/',
+                'regex:/[0-9]/',
+                'regex:/[!@#$%^&*]/',
+            ],
+        ], [
+            'password.regex' => 'Password must contain at least: 1 uppercase, 1 lowercase, 1 number, and 1 special character (!@#$%^&*)',
+        ]);
+
+        $user->password = Hash::make($request->password);
+        $user->force_password_change = false;
+        $user->save();
+
+        $request->session()->regenerate();
+
+        ActivityLogController::logAction(
+            'update',
+            'User',
+            $user->id,
+            '<span class="text-warning fw-bold">Changed default password</span> for user: <strong>'.e($user->name).'</strong>'
+        );
+
+        return redirect()->route('dashboard')->with('success', 'Password changed successfully. Welcome!');
     }
 
     // Profile View

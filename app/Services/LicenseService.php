@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -114,9 +115,32 @@ class LicenseService
                     'body' => $response->body(),
                 ]);
 
-                $errorMsg = 'Unable to contact license server. Please try again later.';
-                if (config('app.debug')) {
-                    $errorMsg .= ' (HTTP ' . $response->status() . ': ' . substr($response->body(), 0, 200) . ')';
+                $status = $response->status();
+                $body = $response->json() ?? [];
+
+                if ($status === 500) {
+                    $errorMsg = 'License server encountered an internal error. Please contact support or check license server logs.';
+                    if (config('app.debug')) {
+                        $errorMsg .= ' (HTTP 500: ' . ($body['message'] ?? substr($response->body(), 0, 200)) . ')';
+                    }
+                } elseif ($status === 401) {
+                    $errorMsg = 'License server rejected the API key. Check LICENSE_API_KEY configuration.';
+                } elseif ($status === 403) {
+                    $msg = $body['message'] ?? 'Forbidden.';
+                    $errorMsg = 'License server denied the request: ' . $msg;
+                } elseif ($status === 404) {
+                    $msg = $body['message'] ?? 'License key not found.';
+                    $errorMsg = 'License verification failed: ' . $msg;
+                } elseif ($status === 410) {
+                    $msg = $body['message'] ?? 'License expired.';
+                    $errorMsg = 'License verification failed: ' . $msg;
+                } elseif ($status === 429) {
+                    $errorMsg = 'Too many license requests. Please try again later.';
+                } else {
+                    $errorMsg = 'License server returned an unexpected response. Please try again later.';
+                    if (config('app.debug')) {
+                        $errorMsg .= ' (HTTP ' . $status . ': ' . substr($response->body(), 0, 200) . ')';
+                    }
                 }
 
                 return ['success' => false, 'message' => $errorMsg];
@@ -180,7 +204,7 @@ class LicenseService
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            $errorMsg = 'Unable to connect to license server. Please check your internet connection and try again.';
+            $errorMsg = 'Unable to connect to license server. Please check the server URL and try again.';
             if (config('app.debug')) {
                 $errorMsg .= ' (Debug: ' . get_class($e) . ': ' . $e->getMessage() . ')';
             }
@@ -516,7 +540,247 @@ class LicenseService
         }
     }
 
-    protected function maskKey(string $key): string
+    public function getMaskedKey(?string $key): string
+    {
+        if (!$key) {
+            return '';
+        }
+
+        return $this->maskKey($key);
+    }
+
+    public function reactivateLicense(): array
+    {
+        $cache = $this->readLicenseCache();
+
+        if (!$cache) {
+            return ['success' => false, 'message' => 'No license is currently installed on this system.'];
+        }
+
+        $url = $this->serverUrl . config('license.reactivate_endpoint');
+
+        $payload = [
+            'license_key' => $cache['license_key'],
+            'site_url' => $this->getSiteUrl(),
+            'app_url' => $this->getAppUrl(),
+            'machine_id' => $this->getMachineId(),
+            'server_ip' => $this->getServerIp(),
+            'product_id' => $this->productId,
+            'app_version' => $this->appVersion,
+        ];
+
+        Log::info('License reactivation attempted', [
+            'url' => $url,
+            'license_key' => $this->maskKey($cache['license_key']),
+            'user_id' => Auth::id(),
+            'user_email' => Auth::user()?->email,
+        ]);
+
+        try {
+            $response = Http::timeout($this->requestTimeout)
+                ->withHeaders($this->apiHeaders())
+                ->post($url, $payload);
+
+            if ($response->failed()) {
+                $status = $response->status();
+                $body = $response->json() ?? [];
+                $message = $body['message'] ?? 'License server rejected the reactivation request.';
+
+                if ($status === 403) {
+                    Log::warning('License reactivation rejected', [
+                        'license_key' => $this->maskKey($cache['license_key']),
+                        'message' => $message,
+                    ]);
+
+                    return ['success' => false, 'message' => $message];
+                }
+
+                if ($status === 404) {
+                    Log::warning('License reactivation - key not found', [
+                        'license_key' => $this->maskKey($cache['license_key']),
+                    ]);
+
+                    return ['success' => false, 'message' => 'License key not found on the license server. ' . $message];
+                }
+
+                if ($status === 500) {
+                    return ['success' => false, 'message' => 'License server encountered an internal error. Please contact support.'];
+                }
+
+                return ['success' => false, 'message' => $message];
+            }
+
+            $data = $response->json();
+
+            if (($data['status'] ?? null) === 'active') {
+                $this->writeLicenseCache($this->buildCacheEntry($data, $cache));
+
+                Log::info('License reactivated successfully', [
+                    'license_key' => $this->maskKey($cache['license_key']),
+                    'user_id' => Auth::id(),
+                    'user_email' => Auth::user()?->email,
+                ]);
+
+                return ['success' => true, 'message' => 'License reactivated successfully.'];
+            }
+
+            $message = $data['message'] ?? 'License is still revoked.';
+
+            Log::warning('License reactivation failed - still not active', [
+                'license_key' => $this->maskKey($cache['license_key']),
+                'message' => $message,
+            ]);
+
+            return ['success' => false, 'message' => $message];
+
+        } catch (\Exception $e) {
+            Log::error('License reactivation exception', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'message' => 'License server unreachable. Please try again later.'];
+        }
+    }
+
+    public function refreshCache(): array
+    {
+        $cache = $this->readLicenseCache();
+
+        if (!$cache) {
+            return ['success' => false, 'message' => 'No local license cache found. No license is currently installed on this system.'];
+        }
+
+        $result = $this->fetchRemoteStatus($cache);
+
+        if (!$result['success']) {
+            return ['success' => false, 'message' => $result['message']];
+        }
+
+        $data = $result['data'];
+        $serverStatus = $data['status'] ?? 'unknown';
+
+        $this->writeLicenseCache($this->buildCacheEntry($data, $cache));
+
+        Log::info('License local cache refreshed', [
+            'license_key' => $this->maskKey($cache['license_key']),
+            'server_status' => $serverStatus,
+            'user_id' => Auth::id(),
+            'user_email' => Auth::user()?->email,
+        ]);
+
+        if ($serverStatus === 'active') {
+            return ['success' => true, 'message' => 'License is active. Local cache refreshed.'];
+        }
+
+        $statusLabels = [
+            'revoked' => 'revoked',
+            'expired' => 'expired',
+            'inactive' => 'inactive',
+            'suspended' => 'suspended',
+        ];
+
+        $label = $statusLabels[$serverStatus] ?? $serverStatus;
+
+        return [
+            'success' => false,
+            'message' => 'The license server reports this license as ' . $label . '. The application remains locked until the license is reactivated or replaced.',
+        ];
+    }
+
+    protected function fetchRemoteStatus(?array $cache = null): array
+    {
+        $cache = $cache ?: $this->readLicenseCache();
+
+        if (!$cache) {
+            return ['success' => false, 'message' => 'No local license cache found.', 'status' => null, 'data' => null];
+        }
+
+        $url = $this->serverUrl . config('license.status_endpoint');
+
+        $payload = [
+            'license_key' => $cache['license_key'],
+            'site_url' => $this->getSiteUrl(),
+            'machine_id' => $this->getMachineId(),
+            'product_id' => $this->productId,
+            'app_version' => $this->appVersion,
+        ];
+
+        Log::info('Remote license status check started', [
+            'url' => $url,
+            'license_key' => $this->maskKey($cache['license_key']),
+        ]);
+
+        try {
+            $response = Http::timeout($this->requestTimeout)
+                ->withHeaders($this->apiHeaders())
+                ->post($url, $payload);
+
+            if ($response->failed()) {
+                $status = $response->status();
+                $body = $response->json() ?? [];
+
+                if ($status === 404) {
+                    return ['success' => false, 'message' => 'License key not found on the license server.', 'status' => null, 'data' => null];
+                }
+
+                if ($status === 401) {
+                    return ['success' => false, 'message' => 'License server rejected the API key. Check LICENSE_API_KEY configuration.', 'status' => null, 'data' => null];
+                }
+
+                if ($status === 403) {
+                    return ['success' => false, 'message' => 'License server rejected the request: ' . ($body['message'] ?? 'Forbidden.'), 'status' => null, 'data' => null];
+                }
+
+                Log::warning('Remote license status check failed - HTTP error', [
+                    'status' => $status,
+                    'body' => $response->body(),
+                ]);
+
+                return ['success' => false, 'message' => 'License server returned an unexpected response. Please try again later.', 'status' => null, 'data' => null];
+            }
+
+            $data = $response->json();
+
+            if (!isset($data['status'])) {
+                Log::warning('Remote license status check failed - invalid response');
+
+                return ['success' => false, 'message' => 'Invalid response from license server.', 'status' => null, 'data' => null];
+            }
+
+            return ['success' => true, 'message' => 'License status retrieved.', 'status' => $data['status'], 'data' => $data];
+
+        } catch (\Exception $e) {
+            Log::error('Remote license status check exception', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+            ]);
+
+            return ['success' => false, 'message' => 'License server unreachable. Please try again later.', 'status' => null, 'data' => null];
+        }
+    }
+
+    protected function buildCacheEntry(array $data, ?array $existing = null): array
+    {
+        $existing = $existing ?? [];
+
+        $cacheData = [
+            'license_key' => $data['license_key'] ?? $existing['license_key'] ?? '',
+            'site_url' => $data['site_url'] ?? $existing['site_url'] ?? $this->getSiteUrl(),
+            'machine_id' => $data['machine_id'] ?? $existing['machine_id'] ?? $this->getMachineId(),
+            'status' => $data['status'] ?? $existing['status'] ?? 'inactive',
+            'expires_at' => $data['expires_at'] ?? $existing['expires_at'] ?? null,
+            'last_check' => now()->toDateTimeString(),
+            'signature' => $data['signature'] ?? $existing['signature'] ?? '',
+            'checksum' => '',
+        ];
+
+        $cacheData['checksum'] = $this->computeChecksum($cacheData);
+
+        return $cacheData;
+    }
+
+    public function maskKey(string $key): string
     {
         if (strlen($key) <= 8) {
             return str_repeat('*', strlen($key));

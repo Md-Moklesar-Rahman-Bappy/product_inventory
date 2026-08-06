@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
-        $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+        $appName = config('app.name', 'Equipment Inventory Management System');
         $faviconPath = \App\Models\Setting::get('favicon_path');
         $faviconUrl = asset('favicon.ico');
         if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
@@ -113,6 +113,14 @@
                         <span>Maintenance</span>
                     </a>
                 </li>
+
+                {{-- License Management (Admin only) --}}
+                <li class="nav-item">
+                    <a href="{{ route('license-management.index') }}" class="nav-link {{ request()->routeIs('license-management.*') ? 'active' : '' }}">
+                        <i class="bi bi-key-fill"></i>
+                        <span>License Management</span>
+                    </a>
+                </li>
                 @endif
                 
                 {{-- Manage Users (Superadmin only) --}}
@@ -211,49 +219,35 @@
         </div>
 
         <!-- Footer -->
-        <footer class="main-footer">
-            <div class="container-fluid">
-                <div class="row align-items-center">
-                    <div class="col-md-6">
-                        <p class="mb-0 small text-muted">
-                            <i class="fas fa-calendar-alt me-1 text-primary"></i>
-                            <span id="datetime"></span>
-                        </p>
-                        @php
-                            $address = \App\Models\Setting::get('address');
-                        @endphp
-                        @if($address)
-                            <p class="mb-0 small text-muted mt-1">
-                                <i class="fas fa-map-marker-alt me-1 text-primary"></i>
-                                {{ $address }}
-                            </p>
-                        @endif
-                    </div>
-                    <div class="col-md-6 text-md-end">
-                        @php
-                            $website = \App\Models\Setting::get('website');
-                            $footerCredit = \App\Models\Setting::get('footer_credit', 'DLRS SOCDS Project');
-                            $phone = \App\Models\Setting::get('phone');
-                            $email = \App\Models\Setting::get('email');
-                        @endphp
-                        @if($website)
-                            <a href="{{ $website }}" target="_blank" class="text-muted text-decoration-none me-3">{{ $footerCredit }}</a>
-                        @else
-                            <span class="text-muted me-3">{{ $footerCredit }}</span>
-                        @endif
-                        @if($phone)
-                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="text-muted text-decoration-none me-3">
-                                <i class="fas fa-phone-alt me-1"></i>{{ $phone }}
-                            </a>
-                        @endif
-                        @if($email)
-                            <a href="mailto:{{ $email }}" class="text-muted text-decoration-none">
-                                <i class="fas fa-envelope me-1"></i>{{ $email }}
-                            </a>
-                        @endif
-                    </div>
+        <footer class="main-footer border-top shadow-sm"
+            style="background: linear-gradient(to right, #f8f9fa, #e3f2fd);">
+
+            <div class="container-fluid py-3">
+                <div class="text-center small text-muted fw-semibold"
+                    style="animation: fadeIn 0.6s ease-in-out;">
+
+                    <span class="text-dark fw-bold">
+                        {{ $appName }}
+                    </span>
+
+                    <span class="mx-2 text-secondary">|</span>
+
+                    <span>
+                        <i class="bi bi-calendar-event text-primary me-1"></i>
+                        <strong id="datetime"></strong>
+                    </span>
+
+                    <span class="mx-2 text-secondary">|</span>
+
+                    <a href="https://md-moklesar-rahman-bappy.github.io/Md-Moklesar-Rahman/"
+                    target="_blank"
+                    class="text-primary fw-bold text-decoration-none">
+                        Developed By Md Moklesar Rahman
+                    </a>
+
                 </div>
             </div>
+
         </footer>
         <script>
           function updateDateTime() {
@@ -275,6 +269,22 @@
     </script>
     
     <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-footer a:hover {
+            color: #0d6efd !important;
+            text-decoration: underline !important;
+        }
+
         .global-search form {
             display: flex;
             align-items: center;

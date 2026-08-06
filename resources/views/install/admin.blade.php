@@ -3,7 +3,7 @@
 
 @section('content')
     <h4 class="mb-2"><i class="bi bi-person-gear me-2"></i>Step 4: Super Admin Account</h4>
-    <p class="text-muted mb-4">Create the super administrator account. This user will have full access to the system.</p>
+    <p class="text-muted mb-4">Create the administrator account for managing your inventory system.</p>
 
     <form method="POST" action="{{ route('install.admin.store') }}">
         @csrf
@@ -15,48 +15,41 @@
         @enderror
 
         <div class="mb-3">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" name="name" id="name" class="form-control @error('name') is-invalid @enderror"
-                   value="{{ old('name') }}" required autofocus>
+            <label for="name" class="form-label fw-bold">Admin Name</label>
+            <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required autofocus>
             @error('name')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label">Email Address</label>
-            <input type="email" name="email" id="email" class="form-control @error('email') is-invalid @enderror"
-                   value="{{ old('email') }}" required>
+            <label for="email" class="form-label fw-bold">Admin Email</label>
+            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email') }}" required>
             @error('email')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="mb-3">
-            <label for="mobile" class="form-label">Phone Number</label>
-            <input type="text" name="mobile" id="mobile" class="form-control @error('mobile') is-invalid @enderror"
-                   value="{{ old('mobile') }}" placeholder="e.g. 01XXXXXXXXX">
+            <label for="mobile" class="form-label fw-bold">Mobile Number</label>
+            <input type="text" class="form-control @error('mobile') is-invalid @enderror" id="mobile" name="mobile" value="{{ old('mobile') }}" required>
             @error('mobile')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="mb-3">
-            <label for="password" class="form-label">Password</label>
-            <input type="password" name="password" id="password"
-                   class="form-control @error('password') is-invalid @enderror" required>
-            <small class="text-muted">
-                Min 8 characters, must include uppercase, lowercase, number, and special character (!@#$%^&*).
-            </small>
+            <label for="password" class="form-label fw-bold">Password</label>
+            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" required>
+            <div class="form-text">Min 8 characters, including uppercase, lowercase, number, and special character.</div>
             @error('password')
                 <div class="invalid-feedback">{{ $message }}</div>
             @enderror
         </div>
 
         <div class="mb-4">
-            <label for="password_confirmation" class="form-label">Confirm Password</label>
-            <input type="password" name="password_confirmation" id="password_confirmation"
-                   class="form-control" required>
+            <label for="password_confirmation" class="form-label fw-bold">Confirm Password</label>
+            <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" required>
         </div>
 
         <div class="text-center">

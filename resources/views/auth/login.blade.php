@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   @php
-    $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+    $appName = config('app.name', 'Equipment Inventory Management System');
     $faviconPath = \App\Models\Setting::get('favicon_path');
     $faviconUrl = asset('favicon.ico');
     if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {
@@ -152,7 +152,7 @@
       <form method="POST" action="{{ route('login.action') }}" novalidate>
         @csrf
 
-        <div class="login-title">Product Inventory Login</div>
+        <div class="login-title">{{ $appName }} Login</div>
 
         {{-- Flash Messages --}}
         @foreach (['success', 'error', 'message'] as $msg)
@@ -214,7 +214,7 @@
       </form>
 
       <footer>
-        &copy; {{ date('Y') }} Product Inventory. All rights reserved.
+        &copy; {{ date('Y') }} {{ $appName }}. All rights reserved.
       </footer>
 
     </div>

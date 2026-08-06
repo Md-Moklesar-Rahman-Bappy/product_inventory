@@ -1,5 +1,5 @@
 /**
- * Custom JavaScript for Product Inventory
+ * Custom JavaScript for Equipment Inventory Management System
  * Bootstrap 5 Custom Theme
  */
 

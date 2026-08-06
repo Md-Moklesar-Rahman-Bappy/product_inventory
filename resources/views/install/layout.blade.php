@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Installation Wizard - Product Inventory</title>
+    <title>Installation Wizard - {{ config('app.name', 'Equipment Inventory Management System') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -94,7 +94,7 @@
     <div class="install-wrapper">
         <div class="install-card">
             <div class="install-header">
-                <h2><i class="bi bi-box-seam-fill me-2"></i>Product Inventory</h2>
+                <h2><i class="bi bi-box-seam-fill me-2"></i>{{ config('app.name', 'Equipment Inventory Management System') }}</h2>
                 <p>Installation Wizard</p>
             </div>
 
@@ -117,7 +117,7 @@
             </div>
 
             <div class="install-footer">
-                &copy; {{ date('Y') }} Product Inventory. Installation Wizard.
+                &copy; {{ date('Y') }} {{ config('app.name', 'Equipment Inventory Management System') }}. Installation Wizard.
             </div>
         </div>
     </div>

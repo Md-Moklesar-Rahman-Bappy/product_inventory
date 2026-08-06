@@ -8,26 +8,21 @@
 
 🔗 [Live Demo](https://md-moklesar-rahman-bappy.github.io/product_inventory/)
 
-# 🧿 Product Inventory Dashboard
+# 🧿 Equipment Inventory Management System Dashboard
 
 A vibrant, responsive Laravel application for managing products with advanced CRUD operations, dashboard-level UI polish, and robust backend logic.
 
 ---
 
 ## 📑 Table of Contents
-- [Features](#-features)
-- [Tech Stack](#-tech-stack)
-- [Folder Structure](#-folder-structure)
-- [Setup Instructions](#-setup-instructions)
-- [Search Functionality](#-search-functionality)
-- [Screenshots](#-screenshots)
-- [Documentation](#-documentation)
-- [UI/UX Highlights](#-uiux-highlights)
-- [Developer Notes](#-developer-notes)
-- [Credits](#-credits)
-- [License](#-license)
-- [Contributing](#-contributing)
-- [Contact](#-contact)
+- [🧿 Equipment Inventory Management System Dashboard](#-equipment-inventory-management-system-dashboard)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [🚀 Features](#-features)
+  - [🛠️ Tech Stack](#️-tech-stack)
+  - [📁 Folder Structure](#-folder-structure)
+  - [⚙️ Setup Instructions](#️-setup-instructions)
+  - [📸 Screenshots](#-screenshots)
+  - [📖 Documentation](#-documentation)
 
 ---
 
@@ -86,6 +81,10 @@ A vibrant, responsive Laravel application for managing products with advanced CR
    php artisan serve
    ```
 
+6. **Admin Account**
+   
+   During installation, you will be prompted to create your own super admin account with a custom name, email, and password. No default or hardcoded credentials are used.
+
 🔍 Search Functionality
 - Search by serial number from the product index page
 - Pagination retains search query
@@ -94,19 +93,25 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 
 ## 📸 Screenshots
 
+![Login Page](docs/screenshots/login.png)
+
 ![Dashboard](docs/screenshots/dashboard.png)
 
-![Activity Logs ](docs/screenshots/activity-log.png)
+![Activity Logs ](docs/screenshots/activity_logs.png)
 
 ![Products Page](docs/screenshots/products.png)
 
-![Maintenance Page](docs/screenshots/maintenance.png)
+![Products Create Page](docs/screenshots/create_product.png)
 
-![Product Warranty Page](docs/screenshots/product-warranty.png)
+![Product Warranty Page](docs/screenshots/product_warranty.png)
 
-![User Management](docs/screenshots/user-management.png)
+![Product Maintenance Page](docs/screenshots/product_maintenance.png)
 
-![Application Settings](docs/screenshots/user-management.png)
+![User Management](docs/screenshots/user_management.png)
+
+![User Create](docs/screenshots/create_user.png)
+
+![Application Settings](docs/screenshots/settings.png)
 
 
 ## 📖 Documentation

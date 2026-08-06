@@ -283,6 +283,22 @@
                                 <label class="form-label-custom">Address</label>
                                 <textarea name="address" class="form-control form-input" rows="2" placeholder="Enter address">{{ old('address', $user->address) }}</textarea>
                             </div>
+
+                            @if(auth()->user()->isSuperadmin())
+                            <div class="form-section-title mt-4">
+                                <i class="bi bi-shield-lock"></i>
+                                Security Settings
+                            </div>
+                            <div class="mb-3">
+                                <div class="form-check form-switch">
+                                    <input class="form-check-input" type="checkbox" name="force_password_change" id="force_password_change" value="1" {{ old('force_password_change', $user->force_password_change) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="force_password_change">
+                                        <strong>Force password change on next login</strong>
+                                        <br><small class="text-muted">User will be required to set a new password before accessing the system.</small>
+                                    </label>
+                                </div>
+                            </div>
+                            @endif
                         </div>
                     </div>
 

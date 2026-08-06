@@ -3,7 +3,7 @@
 
   {{-- 🌟 Brand --}}
   @php
-    $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+    $appName = config('app.name', 'Equipment Inventory Management System');
     $logoPath = \App\Models\Setting::get('logo_path');
     $logoUrl = asset('images/logo.svg');
     if (!empty($logoPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($logoPath)) {

@@ -23,7 +23,7 @@
                                 <label for="app_name" class="form-label">Application Name <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('app_name') is-invalid @enderror" 
                                     id="app_name" name="app_name" 
-                                    value="{{ old('app_name', $settings['app_name'] ?? 'Product Inventory') }}" required>
+                                    value="{{ old('app_name', $settings['app_name'] ?? config('app.name', 'Equipment Inventory Management System')) }}" required>
                                 @error('app_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror

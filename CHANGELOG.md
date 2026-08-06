@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [1.0.0] - 2026-04-05
 ### Added
-- Initial release of **Product Inventory Dashboard**
+- Initial release of **Equipment Inventory Management System Dashboard**
 - CRUD operations for Products, Brands, Categories, and Models
 - Search by Serial Number with pagination and highlight
 - Dashboard UI with gradient headers, badges, and icons

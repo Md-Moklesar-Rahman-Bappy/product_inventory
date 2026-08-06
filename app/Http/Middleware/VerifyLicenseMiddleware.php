@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Services\LicenseService;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -35,6 +36,21 @@ class VerifyLicenseMiddleware
 
         if (in_array($routeName, $exemptRoutes)) {
             return $next($request);
+        }
+
+        // Admin license recovery page. Reachable only by an authenticated user;
+        // the `auth` + `isAdmin` route middleware then enforces admin/superadmin
+        // access (normal users receive 403). This exemption is required so that a
+        // revoked license cannot lock authorized administrators out of the
+        // recovery UI. It is NOT a license bypass: the page never marks a license
+        // active on its own — every action re-verifies against the authoritative
+        // license server first, and a revoked license stays revoked.
+        if (str_starts_with($path, 'license-management')) {
+            if (Auth::check()) {
+                return $next($request);
+            }
+
+            return redirect()->route('license-error');
         }
 
         $exemptPaths = [

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>License Error - Product Inventory</title>
+    <title>License Error - {{ config('app.name', 'Equipment Inventory Management System') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -79,6 +79,15 @@
         <div class="contact-info">
             <p><i class="bi bi-envelope me-2"></i>If you need assistance, please contact your software vendor with your license key.</p>
         </div>
+        @auth
+            @if(auth()->user()->permission === 0 || auth()->user()->permission === 1)
+                <div class="mb-3">
+                    <a href="{{ route('license-management.index') }}" class="btn btn-primary w-100">
+                        <i class="bi bi-key me-2"></i>Admin: Manage License
+                    </a>
+                </div>
+            @endif
+        @endauth
         <a href="{{ route('login') }}" class="btn-back">
             <i class="bi bi-arrow-left me-2"></i>Back to Login
         </a>

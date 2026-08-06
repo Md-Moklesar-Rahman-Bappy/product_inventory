@@ -38,27 +38,95 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('vendor.pagination.bootstrap-5');
         Paginator::defaultSimpleView('vendor.pagination.simple-bootstrap-5');
 
-        // Set dynamic mail "from" address from settings
-        if (Schema::hasTable('settings')) {
-            $appName = Setting::get('app_name', 'Product Inventory');
-            $email = Setting::get('email', 'noreply@example.com');
-
-            config([
-                'mail.from.name' => $appName,
-                'mail.from.address' => $email,
-            ]);
-        }
+        $this->configureApplicationName();
+        $this->configureMailFromSettings();
     }
 
     protected function configureSessionForInstall(): void
     {
         try {
+            if (!config('database.default')) {
+                config(['session.driver' => 'file']);
+                return;
+            }
+
+            $connection = config('database.connections.' . config('database.default'));
+            if (!$connection) {
+                config(['session.driver' => 'file']);
+                return;
+            }
+
+            if (config('database.default') === 'sqlite') {
+                $dbPath = $connection['database'] ?? '';
+                if ($dbPath && !file_exists($dbPath)) {
+                    config(['session.driver' => 'file']);
+                    return;
+                }
+            }
+
             if (Schema::hasTable('sessions')) {
                 return;
             }
             config(['session.driver' => 'file']);
         } catch (\Exception $e) {
             config(['session.driver' => 'file']);
+        }
+    }
+
+    protected function configureApplicationName(): void
+    {
+        try {
+            $connection = config('database.default');
+
+            if ($connection === 'sqlite') {
+                $dbPath = config("database.connections.sqlite.database", '');
+                if ($dbPath && !file_exists($dbPath)) {
+                    return;
+                }
+            }
+
+            if (!Schema::hasTable('settings')) {
+                return;
+            }
+
+            $appName = Setting::get('app_name');
+
+            if ($appName !== null && $appName !== '') {
+                config(['app.name' => $appName]);
+            }
+        } catch (\Exception $e) {
+            // Silently skip during install, migrate, or when DB is not ready
+        }
+    }
+
+    protected function configureMailFromSettings(): void
+    {
+        try {
+            $connection = config('database.default');
+
+            if ($connection === 'sqlite') {
+                $dbPath = config("database.connections.sqlite.database", '');
+                if ($dbPath && !file_exists($dbPath)) {
+                    return;
+                }
+            }
+
+            if (!Schema::hasTable('settings')) {
+                return;
+            }
+
+            $appName = Setting::get('app_name');
+            $email = Setting::get('email');
+
+            if ($appName !== null && $appName !== '') {
+                config(['mail.from.name' => $appName]);
+            }
+
+            if ($email !== null && $email !== '') {
+                config(['mail.from.address' => $email]);
+            }
+        } catch (\Exception $e) {
+            // Silently skip during install, migrate, or when DB is not ready
         }
     }
 }
