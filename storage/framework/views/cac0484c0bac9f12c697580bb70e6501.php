@@ -28,7 +28,7 @@ if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
 unset($__errorArgs, $__bag); ?>" 
                                     id="app_name" name="app_name" 
-                                    value="<?php echo e(old('app_name', $settings['app_name'] ?? 'Product Inventory')); ?>" required>
+                                    value="<?php echo e(old('app_name', $settings['app_name'] ?? config('app.name', 'Product Inventory License Server'))); ?>" required>
                                 <?php $__errorArgs = ['app_name'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :

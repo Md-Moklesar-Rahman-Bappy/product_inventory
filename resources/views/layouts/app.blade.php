@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     @php
-        $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+        $appName = config('app.name', 'Equipment Inventory Management System');
         $faviconPath = \App\Models\Setting::get('favicon_path');
         $faviconUrl = asset('favicon.ico');
         if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {

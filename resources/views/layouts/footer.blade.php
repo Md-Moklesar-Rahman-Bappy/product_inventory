@@ -5,7 +5,7 @@
       <span>
         <i class="fas fa-calendar-alt me-1 text-primary"></i>
         <strong id="datetime"></strong>
-        <span class="text-dark">{{ \App\Models\Setting::get('footer_credit', 'Developed By Md Moklesar Rahman') }}</span>
+        <span class="text-dark">{{ config('app.name', 'Equipment Inventory Management System') }}</span>
       </span>
     </div>
   </div>

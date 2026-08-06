@@ -18,7 +18,7 @@
     @auth
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('dashboard') }}">Inventory System</a>
+            <a class="navbar-brand" href="{{ route('dashboard') }}">{{ config('app.name', 'Equipment Inventory Management System') }}</a>
             <div class="d-flex align-items-center">
                 <span class="text-white me-3">
                     {{ auth()->user()->name }} —
@@ -73,7 +73,7 @@
 
     {{-- 🧾 Footer --}}
     <footer class="text-center py-3 bg-white border-top mt-auto">
-        <small>&copy; {{ date('Y') }} Product Inventory System. All rights reserved.</small>
+        <small>&copy; {{ date('Y') }} {{ config('app.name', 'Equipment Inventory Management System') }}. All rights reserved.</small>
     </footer>
 
     <script>

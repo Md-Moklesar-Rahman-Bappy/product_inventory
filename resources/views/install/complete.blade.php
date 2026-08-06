@@ -8,7 +8,7 @@
         </div>
         <h3 class="mb-3" style="color: #1e293b;">Installation Complete!</h3>
         <p class="text-muted mb-4">
-            Product Inventory has been installed successfully. Your license is activated and your admin account is ready.
+            {{ config('app.name', 'Equipment Inventory Management System') }} has been installed successfully. Your license is activated and your admin account is ready.
         </p>
 
         <div class="card mb-4 mx-auto" style="max-width: 400px;">

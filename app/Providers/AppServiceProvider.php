@@ -38,6 +38,7 @@ class AppServiceProvider extends ServiceProvider
         Paginator::defaultView('vendor.pagination.bootstrap-5');
         Paginator::defaultSimpleView('vendor.pagination.simple-bootstrap-5');
 
+        $this->configureApplicationName();
         $this->configureMailFromSettings();
     }
 
@@ -69,6 +70,32 @@ class AppServiceProvider extends ServiceProvider
             config(['session.driver' => 'file']);
         } catch (\Exception $e) {
             config(['session.driver' => 'file']);
+        }
+    }
+
+    protected function configureApplicationName(): void
+    {
+        try {
+            $connection = config('database.default');
+
+            if ($connection === 'sqlite') {
+                $dbPath = config("database.connections.sqlite.database", '');
+                if ($dbPath && !file_exists($dbPath)) {
+                    return;
+                }
+            }
+
+            if (!Schema::hasTable('settings')) {
+                return;
+            }
+
+            $appName = Setting::get('app_name');
+
+            if ($appName !== null && $appName !== '') {
+                config(['app.name' => $appName]);
+            }
+        } catch (\Exception $e) {
+            // Silently skip during install, migrate, or when DB is not ready
         }
     }
 

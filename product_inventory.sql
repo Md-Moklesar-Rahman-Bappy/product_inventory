@@ -310,7 +310,7 @@ INSERT INTO `settings` (`id`, `key`, `value`, `type`, `created_at`, `updated_at`
 (3, 'phone', NULL, 'text', '2026-07-23 06:03:19', '2026-07-23 08:21:55'),
 (4, 'email', NULL, 'text', '2026-07-23 06:03:19', '2026-07-23 08:21:55'),
 (5, 'address', NULL, 'text', '2026-07-23 06:03:19', '2026-07-23 08:21:55'),
-(6, 'footer_credit', 'SOCDS Project | Product Inventory', 'text', '2026-07-23 06:03:19', '2026-07-23 08:29:32'),
+(6, 'footer_credit', 'Product Inventory', 'text', '2026-07-23 06:03:19', '2026-07-23 08:29:32'),
 (7, 'logo_path', 'uploads/settings/HSFv6gQmvuiOGPYrP6KB5qoGBu6NDQvRuA6vi270.png', 'image', '2026-07-23 06:03:19', '2026-07-23 08:21:55'),
 (8, 'favicon_path', '', 'image', '2026-07-23 06:03:19', '2026-07-23 06:03:19');
 

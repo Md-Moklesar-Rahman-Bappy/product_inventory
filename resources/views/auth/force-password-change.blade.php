@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   @php
-    $appName = \App\Models\Setting::get('app_name', 'Product Inventory');
+    $appName = config('app.name', 'Equipment Inventory Management System');
     $faviconPath = \App\Models\Setting::get('favicon_path');
     $faviconUrl = asset('favicon.ico');
     if (!empty($faviconPath) && \Illuminate\Support\Facades\Storage::disk('public')->exists($faviconPath)) {

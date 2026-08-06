@@ -112,7 +112,7 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-        'name' => env('MAIL_FROM_NAME', 'Product Inventory'),
+        'name' => env('MAIL_FROM_NAME', 'Equipment Inventory Management System'),
     ],
 
 ];
