@@ -40,9 +40,18 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 | Layer        | Tools & Frameworks               |
 |-------------|----------------------------------|
 | Backend      | Laravel 12.0+, Eloquent ORM      |
-| Frontend     | Blade, Bootstrap 5, Font Awesome |
-| UI/UX        | Custom CSS, gradient buttons     |
-| Database     | MySQL / MariaDB                  |
+| Package      | maatwebsite/excel `^3.1`         |
+| PHP Version  | `^8.2`                           |
+| Database     | MySQL / MariaDB 10.4+ (`utf8mb4`) |
+| Testing      | Pest `^3.8`, PHPUnit `11.5.33`    |
+| Frontend     | Blade, Bootstrap 5               |
+
+## 🔒 Security Practices
+- Import/export routes protected by `auth` and `isAdmin` middleware.
+- No secrets committed (`.env` excluded).
+- `APP_DEBUG=false` in production.
+- Database uses `utf8mb4` charset with `utf8mb4_unicode_ci` collation.
+- Position field handled as text (not numeric) to prevent data loss.
 
 ---
 
@@ -119,6 +128,14 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 - [Architecture](docs/architecture.md)
 - [Roadmap](docs/roadmap.md)
 - [Changelog](docs/changelog.md)
+- [User Guide](docs/USER_GUIDE.md)
+- [Import Template Guide](docs/IMPORT_TEMPLATE_GUIDE.md)
+- [Installation](docs/INSTALLATION.md)
+- [Upgrade](docs/UPGRADE.md)
+- [Backup and Restore](docs/BACKUP_AND_RESTORE.md)
+- [Troubleshooting](docs/TROUBLESHOOTING.md)
+- [Release Checklist](docs/RELEASE_CHECKLIST.md)
+- [Technical Import/Export](docs/TECHNICAL_IMPORT_EXPORT.md)
 
 ✨ UI/UX Highlights
 - Gradient buttons with hover effects
@@ -127,6 +144,20 @@ A vibrant, responsive Laravel application for managing products with advanced CR
 - Empty states with illustrations and messages
 - Consistent color palette across modules
 - Responsive layout for desktop and mobile
+
+## 📦 Import / Export Architecture
+- Central mapping: `App\Services\ProductRowMapper` defines the canonical 12-column product schema.
+- All exports use the same mapping (`ProductExport`, `CategoryProductExport`, `BrandProductExport`, `AssetModelProductExport`).
+- Import validates headings, dates, prices, duplicates, and lookup values.
+
+## 🧾 Canonical Product Schema (12 Columns)
+1. `product_name`  2. `price`  3. `category`  4. `brand`  5. `model`  6. `serial_no`  7. `project_serial_no`  8. `position`  9. `user_description`  10. `remarks`  11. `warranty_start`  12. `warranty_end`
+
+## 🌐 Unicode Policy
+- All text fields support Bangla (UTF-8).
+- Database uses `utf8mb4` charset with `utf8mb4_unicode_ci` collation.
+- `.xlsx` is the recommended import/export format.
+- CSV supported with UTF-8 BOM.
 
 🧠 Developer Notes
 - Uses Laravel resourceful routing and route model binding

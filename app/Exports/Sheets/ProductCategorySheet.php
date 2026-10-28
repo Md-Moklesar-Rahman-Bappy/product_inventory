@@ -3,6 +3,7 @@
 namespace App\Exports\Sheets;
 
 use App\Models\Product;
+use App\Services\ProductRowMapper;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -18,33 +19,17 @@ class ProductCategorySheet implements FromCollection, WithTitle, WithHeadings
 
     public function collection()
     {
-        return Product::with(['brand', 'model'])
+        return Product::with(['category', 'brand', 'model'])
             ->where('category_id', $this->category->id)
             ->get()
             ->map(function ($product) {
-                return [
-                    $product->product_name,
-                    '৳ ' . number_format($product->price, 2),
-                    $product->brand?->brand_name,
-                    $product->model?->model_name,
-                    $product->serial_no,
-                    $product->project_serial_no,
-                    $product->position,
-                    $product->user_description,
-                    $product->remarks,
-                    $product->warranty_start,
-                    $product->warranty_end,
-                ];
+                return ProductRowMapper::mapRow($product);
             });
     }
 
     public function headings(): array
     {
-        return [
-            'Product Name', 'Price', 'Brand', 'Model',
-            'Serial No', 'Project Serial No', 'Position',
-            'User Description', 'Remarks', 'Warranty Start', 'Warranty End'
-        ];
+        return ProductRowMapper::headings();
     }
 
     public function title(): string
