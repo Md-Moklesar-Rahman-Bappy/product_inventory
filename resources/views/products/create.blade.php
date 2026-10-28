@@ -131,14 +131,14 @@
 
                     <div class="form-section-title mb-4">
                         <i class="bi bi-geo-alt"></i>
-                        Location & Description
+                        Position & Description
                     </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label-custom">Location</label>
+                            <label class="form-label-custom">Position</label>
                             <input type="text" id="position" name="position"
                                    class="form-control form-input @error('position') is-invalid @enderror"
-                                   value="{{ old('position') }}" placeholder="Enter location">
+                                   value="{{ old('position') }}" placeholder="Enter position">
                             @error('position') <div class="invalid-feedback">{{ $message }}</div> @enderror
                         </div>
 

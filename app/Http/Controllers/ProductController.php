@@ -296,31 +296,15 @@ class ProductController extends Controller
 
             $callback = function () {
                 $handle = fopen('php://output', 'w');
+                fprintf($handle, chr(0xEF).chr(0xBB).chr(0xBF));
 
-                fputcsv($handle, [
-                    'Product Name', 'Category', 'Brand', 'Model', 'Price',
-                    'Serial No', 'Project Serial No', 'Position',
-                    'User Description', 'Remarks', 'Warranty Start', 'Warranty End',
-                ]);
+                fputcsv($handle, \App\Services\ProductRowMapper::headings());
 
                 Product::with(['category', 'brand', 'model'])
                     ->orderBy('id', 'desc')
                     ->chunk(500, function ($products) use ($handle) {
                         foreach ($products as $p) {
-                            fputcsv($handle, [
-                                $p->product_name,
-                                $p->category?->category_name,
-                                $p->brand?->brand_name,
-                                $p->model?->model_name,
-                                $p->price,
-                                $p->serial_no,
-                                $p->project_serial_no,
-                                $p->position,
-                                str_replace(["\r", "\n"], ' ', $p->user_description),
-                                str_replace(["\r", "\n"], ' ', $p->remarks),
-                                optional($p->warranty_start)->format('d/m/Y'),
-                                optional($p->warranty_end)->format('d/m/Y'),
-                            ]);
+                            fputcsv($handle, \App\Services\ProductRowMapper::formatForCsv($p));
                         }
                     });
 
@@ -504,48 +488,8 @@ class ProductController extends Controller
     }
 
     // ──────── Sample Download ─────────
-    public function downloadSample(): StreamedResponse
+    public function downloadSample()
     {
-        $headers = [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="product_sample.csv"',
-        ];
-
-        $columns = [
-            'product_name',
-            'price',
-            'category',
-            'brand',
-            'model',
-            'serial_no',
-            'project_serial_no',
-            'position',
-            'user_description',
-            'remarks',
-            'warranty_start',
-            'warranty_end',
-        ];
-
-        $callback = function () use ($columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-            fputcsv($file, [
-                'Sample Product',
-                '1000',
-                'Laptop',
-                'HP',
-                'ThinkPad X1',
-                'SN123456',
-                'PSN123456',
-                'Office',
-                'User description',
-                'Remarks',
-                '01/01/2025',
-                '01/01/2026',
-            ]);
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        return Excel::download(new \App\Exports\ProductSampleExport(), 'product_sample_'.now()->format('Ymd_His').'.xlsx');
     }
 }

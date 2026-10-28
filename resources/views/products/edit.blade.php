@@ -119,13 +119,13 @@
 
                     <div class="form-section-title mb-4">
                         <i class="bi bi-geo-alt"></i>
-                        Location & Description
+                        Position & Description
                     </div>
                     <div class="row g-3 mb-4">
                         <div class="col-md-6">
-                            <label class="form-label-custom">Location</label>
+                            <label class="form-label-custom">Position</label>
                             <input type="text" name="position" class="form-control form-input"
-                                value="{{ old('position', $product->position) }}" placeholder="Enter location">
+                                value="{{ old('position', $product->position) }}" placeholder="Enter position">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label-custom">User Description</label>

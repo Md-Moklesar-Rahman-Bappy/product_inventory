@@ -183,7 +183,20 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
             return null;
         }
 
+        if ($warrantyStart && $warrantyEnd && $warrantyEnd < $warrantyStart) {
+            $this->skipRow($row, 'Warranty end date must not be earlier than warranty start date');
+            return null;
+        }
+
         $existingProduct = Product::where('serial_no', $row['serial_no'])->first();
+
+        if (! empty($row['project_serial_no'])) {
+            $existingByProject = Product::where('project_serial_no', $row['project_serial_no'])->first();
+            if ($existingByProject && (! $existingProduct || $existingByProject->id !== $existingProduct->id)) {
+                $this->skipRow($row, 'Duplicate project serial number');
+                return null;
+            }
+        }
 
         $categoryId = ! empty($row['category'])
             ? Category::firstOrCreate(['category_name' => trim($row['category'])])->id
@@ -205,7 +218,7 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
                 'brand_id' => $brandId,
                 'model_id' => $modelId,
                 'project_serial_no' => $row['project_serial_no'] ?? null,
-                'position' => ! empty($row['position']) ? (int) $row['position'] : null,
+                'position' => ! empty($row['position']) ? trim((string) $row['position']) : null,
                 'user_description' => substr($row['user_description'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
                 'remarks' => substr($row['remarks'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
                 'warranty_start' => $warrantyStart,
@@ -233,7 +246,7 @@ class ProductImport implements SkipsOnError, ToModel, WithHeadingRow
             'model_id' => $modelId,
             'serial_no' => $row['serial_no'],
             'project_serial_no' => $row['project_serial_no'] ?? null,
-            'position' => ! empty($row['position']) ? (int) $row['position'] : null,
+            'position' => ! empty($row['position']) ? trim((string) $row['position']) : null,
             'user_description' => substr($row['user_description'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
             'remarks' => substr($row['remarks'] ?? null, 0, self::MAX_TEXT_FIELD_LENGTH),
             'warranty_start' => $warrantyStart,
