@@ -1,189 +1,84 @@
-![Build Status](https://img.shields.io/github/actions/workflow/status/Md-Moklesar-Rahman-Bappy/product_inventory/ci.yml)
-![License](https://img.shields.io/github/license/Md-Moklesar-Rahman-Bappy/product_inventory)
-![Issues](https://img.shields.io/github/issues/Md-Moklesar-Rahman-Bappy/product_inventory)
-![Stars](https://img.shields.io/github/stars/Md-Moklesar-Rahman-Bappy/product_inventory)
-![Release](https://img.shields.io/github/v/release/Md-Moklesar-Rahman-Bappy/product_inventory)
-[![Changelog](https://img.shields.io/badge/Changelog-📜-blue)](CHANGELOG.md)
-[![Screenshots](https://img.shields.io/badge/Screenshots-📸-green)](docs/screenshots/README.md)
+# Product Inventory / Equipment Inventory Management System
 
-🔗 [Live Demo](https://md-moklesar-rahman-bappy.github.io/product_inventory/)
+Version: 3.0.0
+Release Date: 2026-10-28
 
-# 🧿 Equipment Inventory Management System Dashboard
+## What This Package Contains
 
-A vibrant, responsive Laravel application for managing products with advanced CRUD operations, dashboard-level UI polish, and robust backend logic.
+This archive (product_inventory/) contains a customer-installable runtime of the Equipment Inventory Management System.
 
----
+It includes:
+- Application source code (pp/, outes/, esources/)
+- Database migrations and seeders (database/)
+- Production-optimized Composer dependencies (endor/)
+- Web entry point (public/)
+- Browser-based installer (outes/install.php)
+- Customer documentation (README.md, INSTALLATION.md, CHANGELOG.md, TROUBLESHOOTING.md)
 
-## 📑 Table of Contents
-- [🧿 Equipment Inventory Management System Dashboard](#-equipment-inventory-management-system-dashboard)
-  - [📑 Table of Contents](#-table-of-contents)
-  - [🚀 Features](#-features)
-  - [🛠️ Tech Stack](#️-tech-stack)
-  - [📁 Folder Structure](#-folder-structure)
-  - [⚙️ Setup Instructions](#️-setup-instructions)
-  - [📸 Screenshots](#-screenshots)
-  - [📖 Documentation](#-documentation)
+It does NOT contain:
+- Development-only dependencies (PHPUnit, Pest, etc.)
+- Production secrets, .env, or database dumps
+- Runtime logs, caches, or session files
 
----
+## System Requirements
 
-## 🚀 Features
-- 🧩 Modular CRUD for Products, Brands, Categories, and Models  
-- 🔍 Search by Serial Number with pagination and highlight  
-- 🎨 Beautiful dashboard UI with gradient headers, badges, and icons  
-- 📦 Product creation with category, brand, model, serials, and remarks  
-- 🛡️ Form validation with feedback and empty state visuals  
-- 🧠 Blade components and DRY structure for maintainability  
+- PHP >= 8.2
+- Required PHP extensions: mbstring, openssl, pdo, pdo_mysql, curl, json, ileinfo, gd, xml, zip, cmath, 	okenizer
+- MySQL / MariaDB database
+- Writable directories: storage/, ootstrap/cache
+- Web server with document root pointing to public/
 
----
+## Integrity Verification
 
-## 🛠️ Tech Stack
-| Layer        | Tools & Frameworks               |
-|-------------|----------------------------------|
-| Backend      | Laravel 12.0+, Eloquent ORM      |
-| Package      | maatwebsite/excel `^3.1`         |
-| PHP Version  | `^8.2`                           |
-| Database     | MySQL / MariaDB 10.4+ (`utf8mb4`) |
-| Testing      | Pest `^3.8`, PHPUnit `11.5.33`    |
-| Frontend     | Blade, Bootstrap 5               |
+Before extracting, verify the archive:
 
-## 🔒 Security Practices
-- Import/export routes protected by `auth` and `isAdmin` middleware.
-- No secrets committed (`.env` excluded).
-- `APP_DEBUG=false` in production.
-- Database uses `utf8mb4` charset with `utf8mb4_unicode_ci` collation.
-- Position field handled as text (not numeric) to prevent data loss.
+`ash
+sha256sum -c SHA256SUMS.txt
+`
 
----
+Or on Windows (PowerShell):
 
-## 📁 Folder Structure
-├── app/ │   ├── Models/ │   ├── Http/Controllers/ │   └── Requests/ ├── resources/ │   ├── views/ │   │   ├── products/ │   │   ├── brands/ │   │   ├── categories/ │   │   └── models/ │   └── layouts/ ├── routes/ │   └── web.php
+`powershell
+(Get-FileHash product_inventory.zip -Algorithm SHA256).Hash
+`
 
+Compare the result with the value in SHA256SUMS.txt.
 
----
+## Quick Installation Overview
 
-## ⚙️ Setup Instructions
-1. **Clone the repo**
-   ```bash
-   git clone https://github.com/your-username/product-inventory-dashboard.git
-   cd product-inventory-dashboard
-   ```
+1. Extract product_inventory.zip
+2. Place the product_inventory/ folder in your web server document root (e.g., htdocs/ for XAMPP, or /var/www/html/ for Nginx/Apache)
+3. Create an empty MySQL/MariaDB database
+4. Configure public/ as the document root
+5. Ensure storage/ and ootstrap/cache/ are writable
+6. Visit http://your-site/install/requirements in a browser
+7. Follow the browser installer (database ? license activation ? first admin ? complete)
 
-2. **Install dependencies**
-   ```bash
-   composer install
-   npm install && npm run dev
-   ```
+NOTE: This is NOT a "one-click" application. It requires PHP, a web server, PHP extensions, and a database to operate. The archive provides the runtime code and an installation assistant; it does not replace server setup.
 
-3. **Environment setup**
-   ```bash
-   cp .env.example .env
-   php artisan key:generate
-   ```
+## License Activation
 
-4. **Database migration**
-   ```bash
-   php artisan migrate
-   ```
+The application uses a license server for activation. During installation, you will be asked for:
+- License server URL (LICENSE_SERVER_URL)
+- Product ID (LICENSE_PRODUCT_ID)
+- License API key (LICENSE_API_KEY)
+- Your license key
 
-5. **Run the server**
-   ```bash
-   php artisan serve
-   ```
+After installation, the license is cached securely in storage/app/license.json.
 
-6. **Admin Account**
-   
-   During installation, you will be prompted to create your own super admin account with a custom name, email, and password. No default or hardcoded credentials are used.
+## Post-Install Security
 
-🔍 Search Functionality
-- Search by serial number from the product index page
-- Pagination retains search query
-- Matching serials are highlighted using <mark>
-- Clean UI with instant feedback
+- Change the initial super admin password regularly
+- Keep .env out of public access
+- Set APP_DEBUG=false in production
+- Restrict access to /install routes after installation
+- Do not share the LICENSE_API_KEY
 
-## 📸 Screenshots
+## Support and Documentation
 
-![Login Page](docs/screenshots/login.png)
+See INSTALLATION.md for platform-specific instructions (Windows XAMPP, Linux Apache/Nginx, cPanel/shared hosting).
+See TROUBLESHOOTING.md for common errors (403, 404, 419, 500, blank page, database connection, Bangla display, position zero, import/export alignment).
 
-![Dashboard](docs/screenshots/dashboard.png)
+## Upgrade Warning
 
-![Activity Logs ](docs/screenshots/activity_logs.png)
-
-![Products Page](docs/screenshots/products.png)
-
-![Products Create Page](docs/screenshots/create_product.png)
-
-![Product Warranty Page](docs/screenshots/product_warranty.png)
-
-![Product Maintenance Page](docs/screenshots/product_maintenance.png)
-
-![User Management](docs/screenshots/user_management.png)
-
-![User Create](docs/screenshots/create_user.png)
-
-![Application Settings](docs/screenshots/settings.png)
-
-
-## 📖 Documentation
-- [UI Guidelines](docs/ui-guidelines.md)
-- [Architecture](docs/architecture.md)
-- [Roadmap](docs/roadmap.md)
-- [Changelog](docs/changelog.md)
-- [User Guide](docs/USER_GUIDE.md)
-- [Import Template Guide](docs/IMPORT_TEMPLATE_GUIDE.md)
-- [Installation](docs/INSTALLATION.md)
-- [Upgrade](docs/UPGRADE.md)
-- [Backup and Restore](docs/BACKUP_AND_RESTORE.md)
-- [Troubleshooting](docs/TROUBLESHOOTING.md)
-- [Release Checklist](docs/RELEASE_CHECKLIST.md)
-- [Technical Import/Export](docs/TECHNICAL_IMPORT_EXPORT.md)
-
-✨ UI/UX Highlights
-- Gradient buttons with hover effects
-- Font Awesome icons for actions
-- Tooltips for clarity
-- Empty states with illustrations and messages
-- Consistent color palette across modules
-- Responsive layout for desktop and mobile
-
-## 📦 Import / Export Architecture
-- Central mapping: `App\Services\ProductRowMapper` defines the canonical 12-column product schema.
-- All exports use the same mapping (`ProductExport`, `CategoryProductExport`, `BrandProductExport`, `AssetModelProductExport`).
-- Import validates headings, dates, prices, duplicates, and lookup values.
-
-## 🧾 Canonical Product Schema (12 Columns)
-1. `product_name`  2. `price`  3. `category`  4. `brand`  5. `model`  6. `serial_no`  7. `project_serial_no`  8. `position`  9. `user_description`  10. `remarks`  11. `warranty_start`  12. `warranty_end`
-
-## 🌐 Unicode Policy
-- All text fields support Bangla (UTF-8).
-- Database uses `utf8mb4` charset with `utf8mb4_unicode_ci` collation.
-- `.xlsx` is the recommended import/export format.
-- CSV supported with UTF-8 BOM.
-
-🧠 Developer Notes
-- Uses Laravel resourceful routing and route model binding
-- Form requests handle validation cleanly
-- Blade components for buttons, alerts, and form inputs
-- Foreign key constraints enforced in migrations
-- Modular design for scalability and maintainability
-- GitHub Actions workflow runs tests automatically on push/PR
-- Releases are automated via tags and changelog integration
-
-🙌 Credits
-Crafted with ❤️ by Md Moklesar Rahman
-Laravel architect & UI/UX designer
-Focused on beauty, clarity, and backend precision.
-📧 Email: md.moklasarrahmanbappy@gmail.com
-📧 Email: risingbappy1@gmail.com
-
-📜 License
-This project is open-source under the [MIT License](LICENSE.md).
-
-🤝 Contributing
-Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-- Bug reports: use the [Bug Report Template](.github/ISSUE_TEMPLATE/bug_report.md)
-- Feature requests: use the [Feature Request Template](.github/ISSUE_TEMPLATE/feature_request.md)
-- Pull requests: follow the [PR Template](.github/pull_request_template.md)
-
-📬 Contact
-For feedback, suggestions, or collaboration, feel free to reach out via email or GitHub.
-
+Before upgrading, back up your database and the storage/app/license.json file. The charset migration (if applied) is not safely reversible without backups.
